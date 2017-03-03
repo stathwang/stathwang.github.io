@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/pygments/monokai.min.css">
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://stathwang.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Seong Hyun Hwang Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="author" content="Seong Hyun Hwang" />
+<meta name="description" content="As a data scientist, not only do I analyze data and present the findings, but I also make careful engineering choices that allow collecting, storing, and analyzing data to be more robust and efficient. The traditional data system architecture works like the following: Collect and upload server logs to Amazon …" />
+<meta name="keywords" content="hadoop, mapreduce, mrjob, spark">
+<meta property="og:site_name" content="Seong Hyun Hwang"/>
+<meta property="og:title" content="Hadoop and MapReduce Woes"/>
+<meta property="og:description" content="As a data scientist, not only do I analyze data and present the findings, but I also make careful engineering choices that allow collecting, storing, and analyzing data to be more robust and efficient. The traditional data system architecture works like the following: Collect and upload server logs to Amazon …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://stathwang.github.io/hadoop-and-mapreduce-woes.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2015-10-09 22:16:00-04:00"/>
+<meta property="article:modified_time" content="2015-10-09 22:17:00-04:00"/>
+<meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
+<meta property="article:section" content="Big Data"/>
+<meta property="article:tag" content="hadoop"/>
+<meta property="article:tag" content="mapreduce"/>
+<meta property="article:tag" content="mrjob"/>
+<meta property="article:tag" content="spark"/>
+<meta property="og:image" content="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg">
+  <title>Seong Hyun Hwang &ndash; Hadoop and MapReduce Woes</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="https://stathwang.github.io">
+        <img src="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg" alt="Seong Hyun Hwang" title="Seong Hyun Hwang">
+      </a>
+      <h1><a href="https://stathwang.github.io">Seong Hyun Hwang</a></h1>
+<p>Data Scientist - Product Developer</p>      <nav>
+        <ul class="list">
+          <li><a href="https://stathwang.github.io/pages/about.html#about">about</a></li>
+          <li><a href="https://stathwang.github.io/pages/projects.html#projects">projects</a></li>
+          <li><a href="https://stathwang.github.io/pages/teaching.html#teaching">teaching</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/stathwang" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-twitter" href="https://twitter.com/superhugehwang" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a class="sc-rss" href="//stathwang.github.io/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+    <nav>
+      <a href="https://stathwang.github.io">Home</a>
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+      <a href="https://stathwang.github.io/feeds/all.atom.xml">Atom</a>
+    </nav>
+
+<article>
+  <header>
+    <h1 id="hadoop-and-mapreduce-woes">Hadoop and MapReduce Woes</h1>
+    <p>Posted on Fri 09 October 2015 in <a href="https://stathwang.github.io/category/big-data.html">Big Data</a></p>
+  </header>
+  <div>
+    <p><img alt="Hadoop Flow Diagram" src="https://stathwang.github.io/images/hadoop_diagram.jpg"></p>
+<p>As a data scientist, not only do I analyze data and present the findings, but I also make careful engineering choices that allow collecting, storing, and analyzing data to be more robust and efficient. The traditional data system architecture works like the following:</p>
+<ol>
+<li>Collect and upload server logs to Amazon S3.</li>
+<li>Download logs and bulk insert them into HDFS and HBase.</li>
+<li>Use MapReduce to clean and wrangle log data as well as analyze them.</li>
+<li>Store the intermediary output in a MySQL or PostgreSQL table.</li>
+<li>Use R and/or Python to create dashboards and visualizations and further analyze data.</li>
+</ol>
+<p>This structural flow works pretty well, but in the end it proves to be inconvenient. The PC hardwares that are the computing clusters break down too often. Since we can't continue to buy more hardwares to increase memory and computation power, the daily batch jobs run slow over time with the increase in the size of log data. Moreover, writing and running MapReduce code takes quite a bit of time and practice for an average analyst.</p>
+<p>One solution to tackle these problems is using <a href="http://spark.apache.org">Apache Spark</a>. The new data system architecture looks like this:</p>
+<ol>
+<li>Collect and store logs and intermediary outputs in Amazon S3.</li>
+<li>Clean, wrangle, and analyze log data using Spark clusters in Amazon EC2 and run batch jobs there as well.</li>
+<li>Use R and/or Python to do additional analysis and create visualizations as necessary.</li>
+</ol>
+<p>This is so much simpler than using <a href="https://hadoop.apache.org">Hadoop</a> and <a href="https://hadoop.apache.org/docs/r1.2.1/mapred_tutorial.html">MapReduce</a>! Remember that Spark servers require good amount of memory so it's advisable to use EC2 R3 instance. All the servers run in the AWS cloud. By doing this, there's no need to copy and parse log data every morning which take more than 10 hours, while Spark, S3, and EC2 combo handles the same process in less than an hour! Awesome!</p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://stathwang.github.io/tag/hadoop.html">hadoop</a>
+      <a href="https://stathwang.github.io/tag/mapreduce.html">mapreduce</a>
+      <a href="https://stathwang.github.io/tag/mrjob.html">mrjob</a>
+      <a href="https://stathwang.github.io/tag/spark.html">spark</a>
+    </p>
+  </div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'thedatalogical';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</article>
+
+    <hr />
+    <p />
+    <!-- Begin MailChimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+  #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
+  /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+     We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+<form action="//github.us1.list-manage.com/subscribe/post?u=0f2c943c221c777ef88591fb6&amp;id=6cf4236c90" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+  <label for="mce-EMAIL">Subscribe to my sporadic data science newsletter and blog post</label>
+  <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0f2c943c221c777ef88591fb6_6cf4236c90" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+<br />
+<br />
+
+<!--End mc_embed_signup-->
+
+    <footer>
+        <p>&copy; Seong Hyun Hwang 2016</p>
+    </footer>
+  </main>
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69797568-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+  <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us1.list-manage.com","uuid":"0f2c943c221c777ef88591fb6","lid":"6cf4236c90"}) })</script>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Seong Hyun Hwang ",
+  "url" : "https://stathwang.github.io",
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "description": "Seong Hyun Hwang's Thoughts and Writings"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Hadoop and MapReduce Woes",
+  "headline": "Hadoop and MapReduce Woes",
+  "datePublished": "2015-10-09 22:16:00-04:00",
+  "dateModified": "2015-10-09 22:17:00-04:00",
+  "author": {
+    "@type": "Person",
+    "name": "Seong Hyun Hwang",
+    "url": "https://stathwang.github.io/author/seong-hyun-hwang.html"
+  },
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "url": "https://stathwang.github.io/hadoop-and-mapreduce-woes.html",
+  "description": "As a data scientist, not only do I analyze data and present the findings, but I also make careful engineering choices that allow collecting, storing, and analyzing data to be more robust and efficient. The traditional data system architecture works like the following: Collect and upload server logs to Amazon …"
+}
+</script></body>
+</html>

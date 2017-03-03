@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/pygments/monokai.min.css">
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://stathwang.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Seong Hyun Hwang Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="author" content="Seong Hyun Hwang" />
+<meta name="description" content="a short background Automatic text summarization is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such …" />
+<meta name="keywords" content="text summarization, natural language processing, machine learning, r">
+<meta property="og:site_name" content="Seong Hyun Hwang"/>
+<meta property="og:title" content="Automatic Text Summarization"/>
+<meta property="og:description" content="a short background Automatic text summarization is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://stathwang.github.io/automatic-text-summarization.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2015-09-10 18:40:00-04:00"/>
+<meta property="article:modified_time" content="2015-10-09 21:43:00-04:00"/>
+<meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
+<meta property="article:section" content="Machine Learning"/>
+<meta property="article:tag" content="text summarization"/>
+<meta property="article:tag" content="natural language processing"/>
+<meta property="article:tag" content="machine learning"/>
+<meta property="article:tag" content="r"/>
+<meta property="og:image" content="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg">
+  <title>Seong Hyun Hwang &ndash; Automatic Text Summarization</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="https://stathwang.github.io">
+        <img src="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg" alt="Seong Hyun Hwang" title="Seong Hyun Hwang">
+      </a>
+      <h1><a href="https://stathwang.github.io">Seong Hyun Hwang</a></h1>
+<p>Data Scientist - Product Developer</p>      <nav>
+        <ul class="list">
+          <li><a href="https://stathwang.github.io/pages/about.html#about">about</a></li>
+          <li><a href="https://stathwang.github.io/pages/projects.html#projects">projects</a></li>
+          <li><a href="https://stathwang.github.io/pages/teaching.html#teaching">teaching</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/stathwang" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-twitter" href="https://twitter.com/superhugehwang" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a class="sc-rss" href="//stathwang.github.io/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+    <nav>
+      <a href="https://stathwang.github.io">Home</a>
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+      <a href="https://stathwang.github.io/feeds/all.atom.xml">Atom</a>
+    </nav>
+
+<article>
+  <header>
+    <h1 id="automatic-text-summarization">Automatic Text Summarization</h1>
+    <p>Posted on Thu 10 September 2015 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
+  </header>
+  <div>
+    <p><strong>a short background</strong></p>
+<p><a href="https://en.wikipedia.org/wiki/Automatic_summarization">Automatic text summarization</a> is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such problem of information overload becomes more salient with the exponential growth in the quantity of data, such as the online and offline articles, books, and newspapers, so has our interest in automatic text summarization to <em>reduce time and inefficiency of digesting them</em>. Automatic summarization reduces a text document using <a href="https://en.wikipedia.org/wiki/Natural_language_processing">natural language processing</a> to create a coherent, robust summary without loss of important ideas of the original document. I've decided to build a naive but powerful text summarization tool in R that feeds in and summarizes <a href="https://www.facebook.com/techcrunch">TechCrunch</a> and <a href="https://www.facebook.com/nytimes">The New York Times</a> articles from their respective Facebook pages.</p>
+<p>There are two major approaches to text summarization: one that is <em>extraction-based</em> and the other <em>abstraction-based</em>. I'll be focusing on the extractive method which works by selecting a subset of words, phrases or sentences that already exist in the original text to make the summary. On the other hand, the abstractive method try to form the summary by building words, phrases or sentences from scratch. The latter is much more complicated than the former, so much of the research has focused on the former.</p>
+<p><strong>the algorithm</strong></p>
+<p>In extractive methods, culling key words, sentences, or paragraphs is very important. The naive algorithm I've written in R extracts the key sentence from each paragraph in the document. So if there are five paragraphs in an article, then the algorithm will return five key sentences as a summary. Why am I doing this? Well, I assume that each paragraph is <em>well-written</em>, meaning it contains one main idea and purpose. This is a pretty solid assumption in that the writers of news and blog articles want to make sure they convey their ideas succinctly and coherently. If their writings are sloppy and unclear, then the readers would get confused as to what they are trying to say. So for each paragraph, the algorithm computes a similarity score between any two sentences. The similarity score is roughly calculated as two times the number of words that overlap divided by the total number of words in two sentences:</p>
+<div class="math">\begin{equation*} 
+\dfrac{2 \times |Sentence_1 \cap Sentence_2|}{|Sentence_1| + |Sentence_2|}
+\end{equation*}</div>
+<p>where <span class="math">\(Sentence_1\)</span> represents a set of words in the first sentence and <span class="math">\(Sentence_2\)</span> a set of words in the second. The intuition is that we would split each sentence into words or tokens, count how many common words there are, and then normalize the result with the average length of the two sentences. This similarity function is called <a href="https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient">Dice coefficient</a>, but feel free to use other similarity metrics such as <em>Jaccard</em> and <em>Cosine similarity</em> or even <em>Euclidean distance</em>. Once we have a list of similarity scores for every sentence in a paragraph, we choose the sentence that have the highest sum of its similarity scores to be the key sentence of the paragraph.</p>
+<p><strong>the pseudocode</strong></p>
+<ol>
+<li>Split a text document into pre-existing paragraphs.</li>
+<li>Remove stopwords and non-alphanumeric characters in every sentence. Stem all words.</li>
+<li>For every paragraph in order:<ul>
+<li>For each sentence:<ul>
+<li>Calculate a similarity score with every other sentence</li>
+<li>Find the sum of its similarity scores</li>
+</ul>
+</li>
+<li>Choose a sentence that has the highest sum</li>
+</ul>
+</li>
+</ol>
+<p>Of course this is not the foolproof method of summarizing text as there can be a lot of ways my naive text summarization algorithm can be adjusted and improved. For instance, the title contains words that are usually keywords from the text, so you can give more weight to those sentences that contain one or more of title keywords in the similarity function. You can also experiment with different similarity metrics as I've mentioned above or only return key sentences that have similarity scores above a certain heuristic cutoff. Also instead of picking one best sentence from each paragraph, try picking 2-3 important paragraphs.</p>
+<p><strong>the data and results</strong></p>
+<p>Let's use this naive algorithm to summarize this <a href="http://techcrunch.com/2015/10/19/common-building-opening/">article</a> from the TechCrunch Facebook post. The article is summarized using sentences whose similarity scores exceed 1.</p>
+<blockquote>
+<p>Common, a co-living startup from General Assembly co-founder Brad Hargreaves, is unveiling its first building today in Brooklyn's Crown Heights. The Common opening comes at a time when venture-backed companies like WeWork are piling into co-living as a way to use urban residential space more cost-efficiently and to attract Millennials, who are delaying marriage and families later and later. Over the summer, Common partnered with a local New York City real estate developer to buy Crown Heights building earlier this year. "The whole idea here is to use common areas and activate typically under-utilized space," Hargreaves told me in a video tour via Skype. They're bringing in Common residents to the next one. About 250 people have applied for the 19 available Common spots so far in the neighborhood. They later fell out of favor as the American middle-class left for the suburbs in the mid-20th century, turning residential hotels into the housing choice of last resort for the poor left behind in the urban core. Unless low-rise, suburban areas ringing the urban core step up and add housing and unless cities start scrutinizing the higher-end of the market where external capital is sitting in vacant units as pure investment rather than shelter, there will be an extraordinary amount of pressure to make urban residential space more efficient. For now, Hargreaves is focused on New York City with two buildings slated for opening in Brooklyn.He has raised about $7.35 million from Maveron and other investors this year.</p>
+</blockquote>
+<p>The summary, though not perfect, generally makes sense with main ideas in place and is much shorter than the original article! I used the <a href="https://github.com/pablobarbera/Rfacebook">Rfacebook</a> package in R to grab the article from TechCrunch as well as New York Times Facebook page and <a href="https://github.com/hadley/rvest">rvest</a> package in R to scrape information relevant to the article. I plan to create a Shiny app where the app summarizes articles from their Facebook pages, outputs the main idea, purpose, and summary, suggests relevant hashtags, and perhaps recommend similar articles from their past posts. Stay tuned!</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://stathwang.github.io/tag/text-summarization.html">text summarization</a>
+      <a href="https://stathwang.github.io/tag/natural-language-processing.html">natural language processing</a>
+      <a href="https://stathwang.github.io/tag/machine-learning.html">machine learning</a>
+      <a href="https://stathwang.github.io/tag/r.html">r</a>
+    </p>
+  </div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'thedatalogical';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</article>
+
+    <hr />
+    <p />
+    <!-- Begin MailChimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+  #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
+  /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+     We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+<form action="//github.us1.list-manage.com/subscribe/post?u=0f2c943c221c777ef88591fb6&amp;id=6cf4236c90" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+  <label for="mce-EMAIL">Subscribe to my sporadic data science newsletter and blog post</label>
+  <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0f2c943c221c777ef88591fb6_6cf4236c90" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+<br />
+<br />
+
+<!--End mc_embed_signup-->
+
+    <footer>
+        <p>&copy; Seong Hyun Hwang 2016</p>
+    </footer>
+  </main>
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69797568-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+  <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us1.list-manage.com","uuid":"0f2c943c221c777ef88591fb6","lid":"6cf4236c90"}) })</script>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Seong Hyun Hwang ",
+  "url" : "https://stathwang.github.io",
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "description": "Seong Hyun Hwang's Thoughts and Writings"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Automatic Text Summarization",
+  "headline": "Automatic Text Summarization",
+  "datePublished": "2015-09-10 18:40:00-04:00",
+  "dateModified": "2015-10-09 21:43:00-04:00",
+  "author": {
+    "@type": "Person",
+    "name": "Seong Hyun Hwang",
+    "url": "https://stathwang.github.io/author/seong-hyun-hwang.html"
+  },
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "url": "https://stathwang.github.io/automatic-text-summarization.html",
+  "description": "a short background Automatic text summarization is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such …"
+}
+</script></body>
+</html>

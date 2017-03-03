@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/pygments/monokai.min.css">
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://stathwang.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Seong Hyun Hwang Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="author" content="Seong Hyun Hwang" />
+<meta name="description" content="an interesting graph I was going to write part two of the previous post on A/B testing now using Bayesian methods, but I plan to do that in another time since today I'm going to write about clustering, a widely used machine learning technique, specifically clustering Burger King menu …" />
+<meta name="keywords" content="clustering, machine learning, burger king">
+<meta property="og:site_name" content="Seong Hyun Hwang"/>
+<meta property="og:title" content="Clustering Burger King Menu with the Dirichlet Process"/>
+<meta property="og:description" content="an interesting graph I was going to write part two of the previous post on A/B testing now using Bayesian methods, but I plan to do that in another time since today I'm going to write about clustering, a widely used machine learning technique, specifically clustering Burger King menu …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://stathwang.github.io/clustering-burger-king-menu-with-the-dirichlet-process.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2015-08-18 18:40:00-04:00"/>
+<meta property="article:modified_time" content="2015-10-09 20:15:00-04:00"/>
+<meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
+<meta property="article:section" content="Machine Learning"/>
+<meta property="article:tag" content="clustering"/>
+<meta property="article:tag" content="machine learning"/>
+<meta property="article:tag" content="burger king"/>
+<meta property="og:image" content="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg">
+  <title>Seong Hyun Hwang &ndash; Clustering Burger King Menu with the Dirichlet Process</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="https://stathwang.github.io">
+        <img src="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg" alt="Seong Hyun Hwang" title="Seong Hyun Hwang">
+      </a>
+      <h1><a href="https://stathwang.github.io">Seong Hyun Hwang</a></h1>
+<p>Data Scientist - Product Developer</p>      <nav>
+        <ul class="list">
+          <li><a href="https://stathwang.github.io/pages/about.html#about">about</a></li>
+          <li><a href="https://stathwang.github.io/pages/projects.html#projects">projects</a></li>
+          <li><a href="https://stathwang.github.io/pages/teaching.html#teaching">teaching</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/stathwang" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-twitter" href="https://twitter.com/superhugehwang" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a class="sc-rss" href="//stathwang.github.io/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+    <nav>
+      <a href="https://stathwang.github.io">Home</a>
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+      <a href="https://stathwang.github.io/feeds/all.atom.xml">Atom</a>
+    </nav>
+
+<article>
+  <header>
+    <h1 id="clustering-burger-king-menu-with-the-dirichlet-process">Clustering Burger King Menu with the Dirichlet Process</h1>
+    <p>Posted on Tue 18 August 2015 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
+  </header>
+  <div>
+    <p><strong>an interesting graph</strong></p>
+<p><img alt="Burger King Cluster Sample" src="https://stathwang.github.io/images/bk_sample_ggplot.jpeg"></p>
+<p>I was going to write part two of the previous post on A/B testing now using Bayesian methods, but I plan to do that in another time since today I'm going to write about <a href="https://en.wikipedia.org/wiki/Cluster_analysis">clustering</a>, a widely used machine learning technique, specifically clustering Burger King menu items based on their nutritional values. Clustering is an unsupervised learning method to find structure in data; informally, it is a way to find natural groupings among objects of interest. For instance, the graph above is one such cluster formed based on nutritional variables that can be labeled as the <em>breakfast</em> cluster; sausage, egg and cheese biscuit and its variations have high sodium and cholesterol level but low amount of total sugar and carb. I want to cluster Burger King menu as such because I want to see if there are menu items I certainly want to avoid, and I want to find that out without having to manually go through every item and analyze its nutritional values. After all, I am a data scientist, not a nutritionist.</p>
+<p><strong>the data</strong></p>
+<p>I first downloaded a PDF version of Burger King menu <a href="http://www.bk.com/pdfs/nutrition.pdf">here</a>, then converted it to an Excel file in CSV format to read in RStudio. As you can see in the PDF, each and every menu item is already grouped under its predefined menu category. For example, all the Whopper sandwiches are classified as <em>Whopper Sandwiches</em> and all the kids meal related menu items such as apple slices and kids oatmeal are under the <em>Kids Meals</em> section. But this kind of grouping is really not helpful, especially if you are one of the health-conscious who want to choose a menu that is considerably healthier than the others. It also makes more sense to group apple slices under fruits and oatmeal under breakfast instead of just lumping them all in kids meal. Clustering, or grouping, menu items by nutritional values may reveal a different kind of groups with perhaps new, surprising insights that may be more valuable for the ever growing health-conscious public. Ideally I want the resulting clusters to be clear and robust, and the number of clusters to grow with the size of the data, in this case, the number of menu items.</p>
+<p><img alt="Menu Screenshot" src="https://stathwang.github.io/images/bk_menu.png"></p>
+<p>Above is a screenshot of the first page of the downloaded PDF file. All variations of Whopper sandwiches are under the <em>Whopper Sandwiches</em> label and the other burgers are part of the <em>Flame Broiled Burgers</em> group. I did some data cleaning and feature scaling with the <em>scale</em> function in R's base library to arrive at the following data set:</p>
+<p><img alt="Scaled Menu Dataset" src="https://stathwang.github.io/images/bk_data.png"></p>
+<p>The variables used to cluster Burger King's menu are <em>calories</em>, <em>calories from fat</em>, <em>total fat</em>, <em>saturated fat</em>, <em>trans fat</em>, <em>cholesterol</em>, <em>sodium</em>, <em>total carb</em>, <em>dietary fiber</em>, <em>total sugar</em>, and <em>protein</em>. Unfortunately Burger King doesn't provide vitamin data which may also be useful for better clustering. The clusters are derived from this clean data set.</p>
+<p><strong>the methods</strong></p>
+<p>There are many ways to cluster data. The traditional approaches like <em>k-means</em>, <em>hierarchical clustering</em>, and <em>Gaussian mixture model-based clustering</em> are not really good options here because I need to specify the number of clusters in advance, counter-intuitive because the objective is to find <em>natural</em> clusters and I want the data to be clustered automatically into its own optimal cluster number. There are ways to select the optimal number of clusters using gap and prediction strength statistics and with <em>NbClust</em> package in R, but the problem is that of a fundamental one: most real-world data don't have a fixed number of clusters. This is also problematic since it makes better sense to have the number of clusters increase as the data size grows, as in this case the number of menu items increases. Moreover, k-means and hierarchical clustering are distance-based algorithms, heuristic methods not firmly supported by probability and statistics, and thus not robust. Gaussian mixture model-based clustering assumes data is generated from a mixture of finite number of normal distributions.</p>
+<p>I could try out graph-partitioning approach like spectral clustering or the state-of-the-art community detection method such as Infomap, but the former also has the same problem of fixing the number of graph partitions in a graph where in this case each menu item represents a node with two neighboring nodes connected by an edge indicating a similarity between two menu items. The latter is an algorithm that attempts to find communities within a network of graphs and does not work well in this case because the adjacency matrix created from the scaled data is a network of menu items that are all too closely related, just one big community thus not helpful. It's also sort of a different way to phrase the problem than clustering.</p>
+<p><strong>the results</strong></p>
+<p>I used <a href="http://blog.datumbox.com/overview-of-cluster-analysis-and-dirichlet-process-mixture-models">Dirichlet process mixture model-based clustering</a>. Understanding Dirichlet process and nonparametric Bayes are quite intuitive if you understand the Chinese restaurant process, Polya urn model, and the stick-breaking process which I'm going to skip here. Assuming that you have a bit of knowledge about Dirichlet process mixture models, the results of my clusters are shown below. I ran Gibbs sampler many times to infer the number of clusters from the entire dataset to be around 7. Let's look at each individual cluster in detail.</p>
+<p><strong>cluster 1: breakfast</strong></p>
+<p><img alt="cluster1" src="https://stathwang.github.io/images/cluster1.png"></p>
+<p>The first cluster is the breakfast cluster with the following representative menu items:</p>
+<ul>
+<li>Sausage, Egg &amp; Cheese Croissan'wich</li>
+<li>Ham, Egg &amp; Cheese Croissan'wich</li>
+<li>Bacon, Egg &amp; Cheese Double Croissan'wich</li>
+<li>Sausage Biscuit</li>
+<li>Country Ham and Egg Biscuit</li>
+<li>Bacon, Egg &amp; Cheese Biscuit</li>
+</ul>
+<p>Just by looking at the <span class="math">\(z\)</span>-scaled nutritional values of the four main menu items above, most breakfast menu items contain high sodium and cholesterol which may not be your best option for breakfast.</p>
+<p><strong>cluster2: chicken burgers, crispy food</strong></p>
+<p><img alt="cluster2" src="https://stathwang.github.io/images/cluster2.png"></p>
+<p>The second cluster is a cluster of mainly chicken burgers and crispy fried food such as french fries, onion rings and hash browns. They have high dietary fiber with low sugar and low trans fat. Chicken burgers such as the Original Chicken Sandwich and Tendercrisp Chicken Sandwich also have a high protein level. I guess this cluster is a bit healthier than the others. It contains the following representative menu items:</p>
+<ul>
+<li>Whopper Sandwich w/o Mayo</li>
+<li>Whopper Jr. Sandwich</li>
+<li>Tendercrisp Chicken Sandwich</li>
+<li>Original Chicken Sandwich</li>
+<li>Spicy Crispy Chicken Jr.</li>
+<li>Big Fish Sandwich</li>
+<li>BK Veggie Burger</li>
+<li>Onion Rings Medium</li>
+<li>French Fries Small</li>
+<li>Hash Browns Large</li>
+</ul>
+<p>Note that the clusters are not perfect; some contain menu items that aren't really similar to other items in the same cluster. This problem can be somewhat alleviated if you run clustering algorithms many times and take the average result.</p>
+<p><strong>cluster3: big burgers</strong></p>
+<p><img alt="cluster3" src="https://stathwang.github.io/images/cluster3.png"></p>
+<p>The third cluster mainly contains big burgers, meaning doubles and triples and so-called the ultimate burgers that are high in calories, fat, cholesterol, and protein:</p>
+<ul>
+<li>Whopper Sandwich with Cheese</li>
+<li>Double Whopper Sandwich</li>
+<li>Triple Whopper Sandwich</li>
+<li>Spicy BLT Whopper</li>
+<li>A.1. Ultimate Bacon Cheeseburger</li>
+<li>Chicken Nuggets 20 pieces</li>
+</ul>
+<p>As you can see, the shape of the distribution of the nutritional values for all these clusters look similar to each other, meaning the cluster is tight and well-defined.</p>
+<p><strong>cluster4: sauces, coffees, less sugary drinks</strong></p>
+<p><img alt="cluster4" src="https://stathwang.github.io/images/cluster4.png"></p>
+<p>The fourth cluster contains sauces, salad dressings, coffees and less sugary drinks. They have low calories and low carb, but generally not nutritious:</p>
+<ul>
+<li>Ken's Honey Mustard Dressing Packet</li>
+<li>Ken's Citrus Caesar Dressing Packet</li>
+<li>Ketchup</li>
+<li>Mayonnaise</li>
+<li>Seattle's Best Coffee Regular 16 fl oz</li>
+<li>Iced Coffee Medium</li>
+<li>Non Fat Latte Small</li>
+<li>Diet Coke 20 fl oz</li>
+<li>Unsweetened Tea 30 fl oz</li>
+<li>Buffalo Dipping Sauce 1 oz</li>
+</ul>
+<p><strong>cluster5: ultimate breakfast platter</strong></p>
+<p><img alt="cluster5" src="https://stathwang.github.io/images/cluster5.png"></p>
+<p>The fifth cluster contains a single menu item - that is, the Ultimate Breakfast Platter. It's similar to the third big burger cluster but also have high sugar level. It's basically high in everything! Yuck! I was pretty surprised by this cluster and concluded that this standalone cluster may be the worst Burger King menu. There is a supporting article <a href="http://www.fitday.com/fitness-articles/nutrition/the-five-worst-things-on-burger-kings-menu.html#b">here</a>.</p>
+<p><strong>cluster 6: desserts and sugary drinks</strong></p>
+<p><img alt="cluster6" src="https://stathwang.github.io/images/cluster6.png"></p>
+<p>The second to last cluster contains desserts and sugary drinks that are high in, of course, total sugar level and carb. These two are separating difference from the fourth cluster of sauces, coffees and less sugary drinks. If Burger King provided vitamin A and C values for all these menu items, then the clustering algorithm would have created two clusters instead of one, separating sugary drinks high in vitamin C versus desserts that are not.</p>
+<ul>
+<li>Smoothie: Tropical Mango 15 oz</li>
+<li>Smoothie: Strawberry Banana 12 fl oz</li>
+<li>Chocolate Fudge Sundae</li>
+<li>Chocolate Chip Cookies 2</li>
+<li>Dutch Apple Pie</li>
+<li>Hot Chocolate Large</li>
+<li>Sprite 30 fl oz</li>
+<li>Coca Cola Classic 20 fl oz</li>
+<li>Hi-C Fruit Punch 20 fl oz</li>
+<li>Sweet Tea 30 fl oz</li>
+<li>Minute Maid Orange Juice 10 fl oz</li>
+</ul>
+<p><strong>cluster 7: milkshakes</strong></p>
+<p><img alt="cluster7" src="https://stathwang.github.io/images/cluster7.png"></p>
+<p>Finally the last cluster is full of milkshakes from vanilla to oreo. As you can see from these 7 quite coherent and robust clusters, we can find out which group of menu items are similar and know to avoid certain items like the Ultimate Breakfast Platter. Now that you have an idea how to cluster Burger King menu items, why not try clustering McDonald's menu and compare the two? That'd be really interesting!</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://stathwang.github.io/tag/clustering.html">clustering</a>
+      <a href="https://stathwang.github.io/tag/machine-learning.html">machine learning</a>
+      <a href="https://stathwang.github.io/tag/burger-king.html">burger king</a>
+    </p>
+  </div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'thedatalogical';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</article>
+
+    <hr />
+    <p />
+    <!-- Begin MailChimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+  #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
+  /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+     We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+<form action="//github.us1.list-manage.com/subscribe/post?u=0f2c943c221c777ef88591fb6&amp;id=6cf4236c90" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+  <label for="mce-EMAIL">Subscribe to my sporadic data science newsletter and blog post</label>
+  <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0f2c943c221c777ef88591fb6_6cf4236c90" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+<br />
+<br />
+
+<!--End mc_embed_signup-->
+
+    <footer>
+        <p>&copy; Seong Hyun Hwang 2016</p>
+    </footer>
+  </main>
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69797568-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+  <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us1.list-manage.com","uuid":"0f2c943c221c777ef88591fb6","lid":"6cf4236c90"}) })</script>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Seong Hyun Hwang ",
+  "url" : "https://stathwang.github.io",
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "description": "Seong Hyun Hwang's Thoughts and Writings"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Clustering Burger King Menu with the Dirichlet Process",
+  "headline": "Clustering Burger King Menu with the Dirichlet Process",
+  "datePublished": "2015-08-18 18:40:00-04:00",
+  "dateModified": "2015-10-09 20:15:00-04:00",
+  "author": {
+    "@type": "Person",
+    "name": "Seong Hyun Hwang",
+    "url": "https://stathwang.github.io/author/seong-hyun-hwang.html"
+  },
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "url": "https://stathwang.github.io/clustering-burger-king-menu-with-the-dirichlet-process.html",
+  "description": "an interesting graph I was going to write part two of the previous post on A/B testing now using Bayesian methods, but I plan to do that in another time since today I'm going to write about clustering, a widely used machine learning technique, specifically clustering Burger King menu …"
+}
+</script></body>
+</html>

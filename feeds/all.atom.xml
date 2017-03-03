@@ -1,0 +1,874 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Seong Hyun Hwang</title><link href="https://stathwang.github.io/" rel="alternate"></link><link href="https://stathwang.github.io/feeds/all.atom.xml" rel="self"></link><id>https://stathwang.github.io/</id><updated>2017-03-03T15:11:00-05:00</updated><entry><title>Bayesian Heuristic Approaches to Ranking Movies</title><link href="https://stathwang.github.io/bayesian-heuristic-approaches-to-ranking-movies.html" rel="alternate"></link><published>2017-03-03T15:10:00-05:00</published><updated>2017-03-03T15:11:00-05:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2017-03-03:/bayesian-heuristic-approaches-to-ranking-movies.html</id><summary type="html">&lt;p&gt;Hi everyone. It's been a little more than a year since I've made changes to this blog. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;plyr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;table&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rvest&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;doMC&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ggplot2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;registerDoMC&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;base_url&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://nojehu.com/bbs/board.php?bo_table=streaming05&amp;amp;page=&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;page_end&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mi"&gt;500&lt;/span&gt;
+&lt;span class="n"&gt;starttime&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;Sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;dat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;llply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;page_end&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;function …&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Hi everyone. It's been a little more than a year since I've made changes to this blog. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;plyr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;table&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rvest&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;doMC&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ggplot2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;registerDoMC&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;base_url&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;http://nojehu.com/bbs/board.php?bo_table=streaming05&amp;amp;page=&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;page_end&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mi"&gt;500&lt;/span&gt;
+&lt;span class="n"&gt;starttime&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;Sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;dat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;llply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;page_end&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;movies&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;read_html&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;base_url&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+  &lt;span class="n"&gt;titles&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;movies&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+    &lt;span class="n"&gt;html_nodes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.gall_text_href&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;html_text&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+    &lt;span class="n"&gt;gsub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;댓글[0-9]+개&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;gsub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\\&lt;/span&gt;&lt;span class="s2"&gt;s+&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="n"&gt;upvotes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;movies&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt; 
+    &lt;span class="n"&gt;html_nodes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.gall_con li:nth-child(4) strong&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;html_text&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="k"&gt;as&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;numeric&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+  &lt;span class="n"&gt;downvotes&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;movies&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;html_nodes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.gall_con li:nth-child(5) strong&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;html_text&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="k"&gt;as&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;numeric&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+  &lt;span class="n"&gt;views&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;movies&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;html_nodes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.gall_text_href+ li&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;html_text&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;gsub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.*([0-9]+)$&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="se"&gt;\\&lt;/span&gt;&lt;span class="s2"&gt;1&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="k"&gt;as&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;numeric&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+  &lt;span class="n"&gt;image_urls&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;movies&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;html_nodes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.gall_href img&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;%&amp;gt;%&lt;/span&gt;
+    &lt;span class="n"&gt;html_attr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;src&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="n"&gt;output&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;table&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;titles&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;upvotes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;downvotes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;image_urls&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+  &lt;span class="n"&gt;cat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;paste0&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Page &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;scraped!&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;output&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parallel&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;starttime&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="math"&gt;\begin{equation*}
+\end{equation*}&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;rbindlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;dat&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fill&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;cols&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;upvotes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;downvotes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;views&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cols&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;numeric&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SDcols&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cols&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="n"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SD&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;numeric&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;upvotes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;downvotes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="n"&gt;write&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;csv&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;onair-ranking.csv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;fread&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;onair-ranking.csv&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;upvote_total&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;upvote&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;downvote_total&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;downvote&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="n"&gt;totalvotes&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;upvotes&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvotes&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="n"&gt;rank_naive&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;qbeta&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;upvote_total&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;upvote_total&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvote_total&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;upvotes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;upvote_total&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;upvote_total&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvote_total&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvotes&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="n"&gt;rank_popular&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;qbeta&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;upvote_total&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;upvote_total&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvote_total&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;totalvotes&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;totalvotes&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;upvotes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;upvote_total&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;upvote_total&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvote_total&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;totalvotes&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;totalvotes&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvotes&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="n"&gt;rank_agg&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;qbeta&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;0.1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;upvote_total&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;upvote_total&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvote_total&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;totalvotes&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;totalvotes&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;upvotes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;upvote_total&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;upvote_total&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvote_total&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;totalvotes&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;totalvotes&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;views&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;downvotes&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="n"&gt;f1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;rank_naive&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="n"&gt;f2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;rank_popular&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;span class="n"&gt;f3&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;order&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;rank_agg&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+
+&lt;span class="n"&gt;f1&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="n"&gt;Type&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Naive Rank&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;f2&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="n"&gt;Type&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Popularity Rank&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;f3&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="n"&gt;Type&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Aggregate Rank&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;total&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;rbind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f1&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Type&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Rank&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;Score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rank_naive&lt;/span&gt;&lt;span class="p"&gt;)],&lt;/span&gt; 
+               &lt;span class="n"&gt;f2&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Type&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Rank&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;Score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rank_popular&lt;/span&gt;&lt;span class="p"&gt;)],&lt;/span&gt;
+               &lt;span class="n"&gt;f3&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Type&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Rank&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;Score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;rank_agg&lt;/span&gt;&lt;span class="p"&gt;)])&lt;/span&gt;
+&lt;span class="n"&gt;g&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;ggplot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;total&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;aes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Rank&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Score&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colour&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Type&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
+  &lt;span class="n"&gt;geom_point&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  &lt;span class="n"&gt;theme&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;legend&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;position&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;0.8&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.8&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;legend&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;background&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;element_rect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;linetype&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;dotted&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
+  &lt;span class="n"&gt;ggtitle&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Comparison of Different Types of Bayesian Heuristic Ranking&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;g&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="ranking"></category><category term="recommender system"></category><category term="statistics"></category><category term="machine learning"></category><category term="r"></category></entry><entry><title>Languages for Data Science</title><link href="https://stathwang.github.io/languages-for-data-science.html" rel="alternate"></link><published>2016-02-04T10:38:00-05:00</published><updated>2016-02-05T21:51:00-05:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2016-02-04:/languages-for-data-science.html</id><summary type="html">&lt;p&gt;As a data scientist, I think it's useful to be versatile at quite a few different programming languages. Most data scientists, including me, use both R and Python for data analysis, but whenever possible I first try using R simply because I started out learning R first, and if it …&lt;/p&gt;</summary><content type="html">&lt;p&gt;As a data scientist, I think it's useful to be versatile at quite a few different programming languages. Most data scientists, including me, use both R and Python for data analysis, but whenever possible I first try using R simply because I started out learning R first, and if it becomes too cumbersome, I switch to Python. R is a great tool if you can break free from the limitation by setting up your own RStudio server to have a large memory and a high computation power. I use R mainly for prototyping statistical models and sometimes deploying them in production, visualizing data conveniently, and for both simple and complex one-off data analysis. On the other hand, I use Python when I need to extract, scrape, parse, and clean data fast, apply natural language processing and deep learning models that need to be scaled quite a bit and aren't fully supported by libraries in R, and also when I need to share my code with the engineers and analysts who don't have knowledge in R. I also write MapReduce codes in Python.&lt;/p&gt;
+&lt;p&gt;But I think data scientists need to do more than just learning R, Python, SQL, and few big data technologies and frameworks like Hadoop, MapReduce, and Spark. A data scientist should not only have the knowledge to analyze data but also work with how the data should be collected, stored, and extracted, which is traditionally a role of data engineers, and have some knowledge in web programming languages, which are tasks for web developers. For example, there are times when I need to create a dashboard for analysts or complex websites that include multiple landing pages and logins. I use Shiny often for dashboards; I resort to Django, Ruby on Rails and Node.js with Bootstrap for websites.&lt;/p&gt;
+&lt;p&gt;Being a data scientist is not easy. Many people out there think that analyzing data is what a typical data scientist do. Sure, that's what we do most of the time. But data scientists do many other things as well, and in order to get those done successfully, learning several programming langauges to maximize the efficiency of work is important to become a data mastermind.&lt;/p&gt;</content><category term="programming languages"></category><category term="coding"></category></entry><entry><title>Hierarchical Bayes Part II: Estimating the Total Daily Number of Customers at Bon Me</title><link href="https://stathwang.github.io/hierarchical-bayes-part-ii-estimating-the-total-daily-number-of-customers-at-bon-me.html" rel="alternate"></link><published>2016-01-30T00:09:00-05:00</published><updated>2016-02-05T21:19:00-05:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2016-01-30:/hierarchical-bayes-part-ii-estimating-the-total-daily-number-of-customers-at-bon-me.html</id><summary type="html">&lt;p&gt;&lt;a href="http://www.bonmetruck.com/about/"&gt;Bon Me&lt;/a&gt; is one of my favorite places to grab a quick bite for lunch. Surprisingly I didn't know about its existence until earlier last year despite being so close to my workplace. I really recommend you try miso-braised pulled pork on brown rice without cilantro. It's really addicting.&lt;/p&gt;
+&lt;p&gt;Anyhow …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="http://www.bonmetruck.com/about/"&gt;Bon Me&lt;/a&gt; is one of my favorite places to grab a quick bite for lunch. Surprisingly I didn't know about its existence until earlier last year despite being so close to my workplace. I really recommend you try miso-braised pulled pork on brown rice without cilantro. It's really addicting.&lt;/p&gt;
+&lt;p&gt;Anyhow, when you order food at Bon Me, you are given a receipt with a number that represents your order number. For example, if I get a receipt that had number 20 on it, it means that I'm the 20th customer of the day and there are 19 people who already ordered food before me. Simply said, each receipt, likewise a customer who holds it, is numbered in sequence. Then would it be possible to estimate the total number of customers Bon Me serves on a given day using a sample of those numbered receipts? Let's simplify the problem by assuming we have a pile of receipts in a box at the end of the day and decide to sample five receipts without replacement independently and randomly from the pile. The receipt numbers are ordered like below:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation*}
+6, 18, 20, 99, 250
+\end{equation*}&lt;/div&gt;
+&lt;p&gt;Intuitively, a naive practitioner of statistics would say the total number of people at Bon Me on this day is 250 based on this five number sample. But is it really 250? Clearly there is a chance the total number of customers is greater than 250 since what we are looking at is only a sample. We don't know the exact total number of receipts/customers (since that's what we are trying to estimate duh!), but the fact we have four numbers 6, 18, 20, 99 below 250 means it's not at all unlikely we will see numbers higher than 250 either. The Bayesians would remedy this problem by putting a distribution around that number to quantify their uncertainty with the estimate. I can show you how to mathematically derive the formula using combinatorics and the laws of probability, but the focus of this blog post is to estimate the total number of customers at Bon Me on a given day by constructing a hierarchical Bayesian model in R with JAGS. JAGS, as I mentioned in the earlier post, is a software which stands for &lt;em&gt;Just Another Gibbs Sampler&lt;/em&gt; that runs complex MCMC simulations from a generative model. Instead of JAGS, you can also use BUGS or Stan; though I like Stan more, JAGS should work fine in many situations.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the problem set-up&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let's say the total number of receipts from Bon Me on a given day is &lt;span class="math"&gt;\(K\)&lt;/span&gt;. Of those &lt;span class="math"&gt;\(K\)&lt;/span&gt;, let's call the five number sample above we happen to observe as data &lt;span class="math"&gt;\(D\)&lt;/span&gt;. Then we want to know the posterior probability of the number of receipts &lt;span class="math"&gt;\(K\)&lt;/span&gt;, given data &lt;span class="math"&gt;\(D\)&lt;/span&gt; on which receipt numbers have been observed so far:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation*} 
+P(K | D) {\propto} P(D | K)P(K)
+\end{equation*}&lt;/div&gt;
+&lt;p&gt;where &lt;span class="math"&gt;\(P(D | K)\)&lt;/span&gt; refers to the &lt;em&gt;likelihood&lt;/em&gt; of observing all the receipt numbers given the actual number of receipts in existence &lt;span class="math"&gt;\(K\)&lt;/span&gt; which I assume to be discrete uniformly distributed with the minimum at &lt;span class="math"&gt;\(0\)&lt;/span&gt; and the maximum at &lt;span class="math"&gt;\(K\)&lt;/span&gt;. When deciding which distribution to use for the likelihood, you want to consider the process from which the data is generated. In this case, given that I know the total number of receipts in a pile &lt;span class="math"&gt;\(K\)&lt;/span&gt;, the probability of drawing a random receipt from the pile should be &lt;span class="math"&gt;\(1/K\)&lt;/span&gt;, and that &lt;span class="math"&gt;\(1/K\)&lt;/span&gt; is uniform for every draw. The &lt;em&gt;prior&lt;/em&gt; over &lt;span class="math"&gt;\(K\)&lt;/span&gt;, which we know should be at least as high as the highest receipt number we observed in the sample (call that &lt;span class="math"&gt;\(M\)&lt;/span&gt;) but could be much higher. Let's assume &lt;span class="math"&gt;\(P(K)\)&lt;/span&gt; to be also discrete uniformly distributed with the minimum at &lt;span class="math"&gt;\(M\)&lt;/span&gt; and the maximum at an arbitrary big number:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation*} 
+P(D | K) {\sim} Unif(0, K) \\
+P(K) {\sim} Unif(M, {\infty})
+\end{equation*}&lt;/div&gt;
+&lt;p&gt;The following is the full running code in R using JAGS:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rjags&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;runjags&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;dat&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;18&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;99&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;250&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Specify the generative model:&lt;/span&gt;
+&lt;span class="n"&gt;modelString&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="n"&gt;dunif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;K&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+  &lt;span class="n"&gt;K&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="n"&gt;dunif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;yMax&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10000&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;writeLines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;modelString&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;con&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;model.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
+&lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;dat&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Specify the data as a list:&lt;/span&gt;
+&lt;span class="n"&gt;dataList&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;yMax&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;max&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Run the chains&lt;/span&gt;
+&lt;span class="n"&gt;parameters&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;K&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;adaptSteps&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mi"&gt;1000&lt;/span&gt;
+&lt;span class="n"&gt;burnInSteps&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mi"&gt;1000&lt;/span&gt;
+&lt;span class="n"&gt;nChains&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;
+&lt;span class="n"&gt;numSavedSteps&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mi"&gt;50000&lt;/span&gt;
+&lt;span class="n"&gt;thinSteps&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="n"&gt;nPerChain&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;ceiling&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;numSavedSteps&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;thinSteps&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="n"&gt;nChains&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Create, initialize, and adapt the model:&lt;/span&gt;
+&lt;span class="n"&gt;jagsModel&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;jags&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;model&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;model.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;dataList&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Chains&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;nChains&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;adapt&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;adaptSteps&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Burn in:&lt;/span&gt;
+&lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;jagsModel&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;iter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;burnInSteps&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Save MCMC chain and examine the results:&lt;/span&gt;
+&lt;span class="n"&gt;codaSamples&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;coda&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;samples&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;jagsModel&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;variable&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;names&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;parameters&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;iter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;nPerChain&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;thin&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;thinSteps&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;mcmcChain&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;matrix&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;codaSamples&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;chainLength&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;NROW&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mcmcChain&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;paramK&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;mcmcChain&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;K&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;the results&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;By plotting the histogram of &lt;span class="math"&gt;\(paramK\)&lt;/span&gt;, we get the following posterior distribution of the total number of receipts/customers at Bon Me on that day:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Posterior Distribution of K" src="https://stathwang.github.io/images/gt_image1.png"&gt;&lt;/p&gt;
+&lt;p&gt;As we can see, the posterior mode is 264, not 250. The posterior mean is 336, and the median is 297. The 95% highest posterior density interval lies between 250 and 536. Therefore, the most probable total number of customers Bon Me served on that day is 264. Not so much apart from the original 250 huh? This result is based on only one sample, but if your sample more often, the results will converge to the true number of total customers.&lt;/p&gt;
+&lt;p&gt;As a side note, the original problem formulation changes if Bon Me refreshes its receipt numbers after a certain point. For example, if Bon Me receipt number reverts back to 1 after reaching number 20, then it's more difficult to estimate the total number of customers. Also if the receipt number is completely random, not sequential and ordered, then it's nearly impossible.&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="bayesian statistics"></category><category term="hierarchical bayes"></category><category term="monte carlo simulation"></category><category term="statistics"></category><category term="machine learning"></category><category term="r"></category><category term="jags"></category></entry><entry><title>Happy New Year!</title><link href="https://stathwang.github.io/happy-new-year.html" rel="alternate"></link><published>2015-12-31T18:01:00-05:00</published><updated>2016-01-01T19:25:00-05:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2015-12-31:/happy-new-year.html</id><summary type="html">&lt;p&gt;Happy new year! Hope everyone's had a nice, relaxing time with family and friends. Around here, things are moving really fast. First, I've been working on two new blog posts which I might publish in the coming weeks. As a preview, the first post deals with a way to estimate …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Happy new year! Hope everyone's had a nice, relaxing time with family and friends. Around here, things are moving really fast. First, I've been working on two new blog posts which I might publish in the coming weeks. As a preview, the first post deals with a way to estimate the total number of customers in a restaurant using a sample of customer receipts using hierarchical Bayesian model, and the second will be about Twitter analysis of the U.S. presidential candidates. Secondly, I'm creating an R package that implements the bat algorithm which is a metaheuristic optimization method based on the echolocation of microbats. Stay tuned for more details!&lt;/p&gt;
+&lt;p&gt;Aside from that, this year I plan to learn professional photography. I really like taking photos of nature and basically just about anything that interests me that I'm going to learn how to utilize all the features in my DSLR and edit photos in Adobe Photoshop and other similar tools. I'm going to start by adding a new &lt;em&gt;photo&lt;/em&gt; section to my blog, uploading old photos from my past travels and comparing them to the photos I will be taking this year.&lt;/p&gt;
+&lt;p&gt;Finally, I'd like to thank everyone who has supported my blog! I launched my blog earlier last year with the title &lt;em&gt;thedatalogical&lt;/em&gt; but has since been integrated with my Github account with the .io extension under the name &lt;em&gt;stathwang&lt;/em&gt;. The old site is no longer actively maintained. I'm gonna do a major round of UI changes in near future, so don't be too surprised!&lt;/p&gt;
+&lt;p&gt;Onwards and upwards to 2016 :)&lt;/p&gt;</content><category term="personal"></category></entry><entry><title>Hierarchical Bayes Part I: Predicting the Fitbit Challenge Winner</title><link href="https://stathwang.github.io/hierarchical-bayes-part-i-predicting-the-fitbit-challenge-winner.html" rel="alternate"></link><published>2015-11-28T11:01:00-05:00</published><updated>2016-02-01T09:21:00-05:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2015-11-28:/hierarchical-bayes-part-i-predicting-the-fitbit-challenge-winner.html</id><summary type="html">&lt;p&gt;Hi there! It's been a little more than a month since my last post. Thanksgiving was two days ago, and I had a good time with my family. How's everyone doing?&lt;/p&gt;
+&lt;p&gt;With the upcoming Cyber Monday, I'm sure many of you have cool electronics and gadgets in mind to look …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hi there! It's been a little more than a month since my last post. Thanksgiving was two days ago, and I had a good time with my family. How's everyone doing?&lt;/p&gt;
+&lt;p&gt;With the upcoming Cyber Monday, I'm sure many of you have cool electronics and gadgets in mind to look forward to buying. One of my recommendations is &lt;a href="http://www.fitbit.com"&gt;Fitbit&lt;/a&gt;, which is a health and fitness wearable that keeps track of daily activities and workouts. I bought a &lt;a href="https://www.fitbit.com/chargehr"&gt;Charge HR&lt;/a&gt;, one of many Fitbit products for active fitness, not too long ago because I thought I'd get more motivated to exercise regularly and lose weight if I wore it on my wrist all the time. How do I feel about it so far? I really like it! While wearing, it counts my steps, estimates calories lost, and even tracks my heartbeat in real-time. Every night I come home and sync data with the Fitbit app in my phone via Bluetooth and feel good about my exercise and workout achievements. I've also recently started competing against two of my friends in a Fitbit weekly challenge where a person with the greatest total number of steps taken during the workweek wins the challenge. We've decided to make it more interesting by having the second and the last place pay for snacks every Sunday night after the challenge with the second place responsible for &lt;span class="math"&gt;\(1/3\)&lt;/span&gt; and the last &lt;span class="math"&gt;\(2/3\)&lt;/span&gt; of the expense. So far, I've been the last place for four times in a row which is a bit discouraging but nonetheless incentivizes me to aim for the first place by walking and running more. I have my own "excuses" for that, but that's not the focus of this post so I won't get into the details.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the data&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The main focus of this post, then, is that I want to be able to &lt;strong&gt;predict who's going to win the weekly challenge for the next week using data from the past weeks&lt;/strong&gt;. But I realized that Fitbit doesn't store all the weekly challenge data forever, so I was only able to retrieve data for the past three weeks including this week. For example, A came in first two weeks ago with about 53K steps total, B took about 36K steps coming in second, and person C was the last place with a little more than 24K steps. The dataset from the challenge looks like the following:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Participant ID&lt;/th&gt;
+&lt;th&gt;Steps&lt;/th&gt;
+&lt;th&gt;Max Date&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;53497&lt;/td&gt;
+&lt;td&gt;2015-11-13&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;51667&lt;/td&gt;
+&lt;td&gt;2015-11-20&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;39039&lt;/td&gt;
+&lt;td&gt;2015-11-27&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;td&gt;36315&lt;/td&gt;
+&lt;td&gt;2015-11-13&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;td&gt;27629&lt;/td&gt;
+&lt;td&gt;2015-11-20&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;td&gt;46166&lt;/td&gt;
+&lt;td&gt;2015-11-27&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;td&gt;24256&lt;/td&gt;
+&lt;td&gt;2015-11-13&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;td&gt;19076&lt;/td&gt;
+&lt;td&gt;2015-11-20&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;td&gt;37665&lt;/td&gt;
+&lt;td&gt;2015-11-27&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;where the column max date is the last date of a weekly challenge which is Friday and the actual participant names are replaced by the alphabetical ids. The question is whether the variation in the number of steps within each subject can be used to predict the steps for each subject for the next week with the max date 2015-12-04 from which I calculate each subject's probability of being the first, second and last place. I'm going to assume that each subject or participant is independent of the others in steps; for instance, the number of steps taken by A for the past three weeks has nothing to do with the number of steps by B and C during the same time frame. Statistically speaking, this means the number of steps are drawn from A's true, innate step distribution only. Though I see that the steps taken by A, B, and C respectively are generally higher for the past weeks, the data is small enough to lack a clear justification for such trend and possible correlation among participants.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the methods&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;An easy way to solve this problem is to use a &lt;em&gt;Bayesian linear mixed model&lt;/em&gt; by setting the participant ids as the random effect to predict the number of steps. But this formulation is too limiting in that I assume each participant's steps to be normally distributed which may not be the case.&lt;/p&gt;
+&lt;p&gt;Instead, I'm going to construct a &lt;em&gt;full hierarchical Bayesian model&lt;/em&gt; in &lt;a href="http://mcmc-jags.sourceforge.net/"&gt;JAGS&lt;/a&gt;, which stands for Just Another Gibbs Sampler that analyzes it using &lt;em&gt;Markov Chain Monte Carlo (MCMC)&lt;/em&gt; simulation, that captures the variability of steps within subject as well as my prior knowledge of each subject's weekly step tendency. Here we have a probabilistic generative model for &lt;em&gt;each participant&lt;/em&gt;:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation*} 
+y_i \overset{iid}{\sim} Gamma(\alpha, \beta) \\
+\theta \sim N(\mu, \sigma^2) \\
+\omega \sim Unif(L, H)
+\end{equation*}&lt;/div&gt;
+&lt;p&gt;where
+&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation*}
+\alpha = \dfrac{\theta^2}{\omega^2} \\
+\beta = \dfrac{\theta}{\omega^2}
+\end{equation*}&lt;/div&gt;
+&lt;p&gt;&lt;span class="math"&gt;\(\theta\)&lt;/span&gt; and &lt;span class="math"&gt;\(\omega\)&lt;/span&gt; represent the mean and the standard deviation respectively which are the reparameterization of &lt;span class="math"&gt;\(\alpha\)&lt;/span&gt; the shape parameter and &lt;span class="math"&gt;\(\beta\)&lt;/span&gt; the rate parameter for the purpose of convenience. Often it's far more intuitive to work with the mean and the standard deviation because we think in terms of central tendency and deviation away from the center than rather obscure shape and rate parameters. For each subject, I've assumed his or her steps &lt;span class="math"&gt;\(y_i\)&lt;/span&gt; to be independently and identically Gamma distributed with non-zero mode instead of the traditional normal distribution because steps can't be negative and the Gamma distribution accounts for the long tail in steps that goes beyond the average number of steps taken by the subject. The prior distribution for &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; is normal at mean &lt;span class="math"&gt;\(\mu\)&lt;/span&gt; and standard deviation &lt;span class="math"&gt;\(\sigma\)&lt;/span&gt; where I'm going to set &lt;span class="math"&gt;\(\mu\)&lt;/span&gt; to be the subject-level mean and &lt;span class="math"&gt;\(\sigma\)&lt;/span&gt; to be wide in the range of data for all subjects. The uninformative prior for &lt;span class="math"&gt;\(\omega\)&lt;/span&gt; is a uniform distribution with the minimum at &lt;span class="math"&gt;\(L\)&lt;/span&gt; and the maximum at &lt;span class="math"&gt;\(H\)&lt;/span&gt; both of which are also set to be wide in the range of data that accounts for all possible variability in steps. The diagram below shows the equations above in a hierarchical structure:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Diagram" src="https://stathwang.github.io/images/krusche_style_diag1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The following is the equivalent JAGS syntax. As you can see, &lt;span class="math"&gt;\(yMean\)&lt;/span&gt; represents a subject-level mean and &lt;span class="math"&gt;\(ySD\)&lt;/span&gt; the standard deviation of the steps for all subjects. So here I'm saying that &lt;span class="math"&gt;\(\omega\)&lt;/span&gt;, the standard deviation of the steps for each subject, can range from anywhere between &lt;span class="math"&gt;\(\frac{ySD}{100}\)&lt;/span&gt; and &lt;span class="math"&gt;\(ySD \times 10\)&lt;/span&gt; which scales quite extensive. In addition, the standard deviation &lt;span class="math"&gt;\(\sigma\)&lt;/span&gt; of the normally distributed random variable &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; is &lt;span class="math"&gt;\((ySD \times 10)^2\)&lt;/span&gt; which is also wide in the range of data but is actually written as &lt;span class="math"&gt;\(\frac{1}{(ySD \times 10)^2}\)&lt;/span&gt; since JAGS works with the precision values.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;model&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="n"&gt;dgamma&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="n"&gt;alpha&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nb"&gt;pow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;theta&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="nb"&gt;pow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;omega&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;beta&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;theta&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="nb"&gt;pow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;omega&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;theta&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="n"&gt;dnorm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;yMean&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ySD&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;^&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;omega&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="n"&gt;dunif&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ySD&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ySD&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;A full hierarchical Bayesian model like this is intuitive, yet powerful in that the posterior estimates and their uncertainties are robust and reflective of prior information on the challenge participants.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the distributions&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;After running three separate sets of MCMC simulations, one set of &lt;span class="math"&gt;\(50000\)&lt;/span&gt; simulations per subject, I get the posterior predictive distribution of the average number of steps for A that looks like this:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Posterior Distribution of Mean for A" src="https://stathwang.github.io/images/post_a_mean.png"&gt;&lt;/p&gt;
+&lt;p&gt;The average number of steps for A has the 95% highest posterior density interval between 31K and 117K steps. Since the resulting posterior distribution is skewed, it's better to use the mode which is 52.7K to describe the central tendency of the average number of steps instead of the mean. The posterior predictive distribution of the standard deviation of steps for A:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Posterior Distribution of Sd for A" src="https://stathwang.github.io/images/post_a_sd.png"&gt;&lt;/p&gt;
+&lt;p&gt;The 95% credibility interval for the standard deviation of steps is quite large which is plausible since I don't have much data at hand to be very certain about my estimates of the average number of steps for A. This is also the result of using the uninformative prior for &lt;span class="math"&gt;\(\omega\)&lt;/span&gt;, representing the subject-level standard deviation of steps, where the prior seems to dominate the likelihood due to high uncertainty from the lack of data itself. Similarly, these are the results for B and C:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Posterior Distribution of Mean for B" src="https://stathwang.github.io/images/post_b_mean.png"&gt;
+&lt;img alt="Posterior Distribution of Sd for B" src="https://stathwang.github.io/images/post_b_sd.png"&gt;&lt;/p&gt;
+&lt;p&gt;The mode of the average number of steps for B is about 37.4K with the standard deviation ranging from 4K to 95K which also signifies a large uncertainty in our estimates of the average steps. The mode for C is 28.5K which is way below 37.4K steps for B, but its uncertainty is huge as well.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Posterior Distribution of Mean for C" src="https://stathwang.github.io/images/post_c_mean.png"&gt;
+&lt;img alt="Posterior Distribution of Sd for C" src="https://stathwang.github.io/images/post_c_sd.png"&gt;&lt;/p&gt;
+&lt;p&gt;Next I'm going to use these posterior distributions of the mean number of steps for A, B, and C to calculate the probability of placing first, second, and last for each participant in the challenge next week.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the predictions&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The MCMC simulations for the three participants return &lt;span class="math"&gt;\(50000\)&lt;/span&gt; sample steps from their respective posterior predictive distributions. Using those &lt;span class="math"&gt;\(50000\)&lt;/span&gt; sample steps for each subject, I can order three participants in decreasing order, creating the columns first, second, and last:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Observation&lt;/th&gt;
+&lt;th&gt;A&lt;/th&gt;
+&lt;th&gt;B&lt;/th&gt;
+&lt;th&gt;C&lt;/th&gt;
+&lt;th&gt;First&lt;/th&gt;
+&lt;th&gt;Second&lt;/th&gt;
+&lt;th&gt;Last&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;50237&lt;/td&gt;
+&lt;td&gt;34798&lt;/td&gt;
+&lt;td&gt;25127&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;53579&lt;/td&gt;
+&lt;td&gt;44662&lt;/td&gt;
+&lt;td&gt;40684&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;48365&lt;/td&gt;
+&lt;td&gt;37662&lt;/td&gt;
+&lt;td&gt;42237&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;48806&lt;/td&gt;
+&lt;td&gt;41669&lt;/td&gt;
+&lt;td&gt;57515&lt;/td&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;39237&lt;/td&gt;
+&lt;td&gt;31379&lt;/td&gt;
+&lt;td&gt;48063&lt;/td&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;...&lt;/td&gt;
+&lt;td&gt;...&lt;/td&gt;
+&lt;td&gt;...&lt;/td&gt;
+&lt;td&gt;...&lt;/td&gt;
+&lt;td&gt;...&lt;/td&gt;
+&lt;td&gt;...&lt;/td&gt;
+&lt;td&gt;...&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Now I can calculate how many times out of &lt;span class="math"&gt;\(50000\)&lt;/span&gt; sample observations did A, B, and C win first, second, and last place. The table below writes the probability of each place for every subject:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Participant ID&lt;/th&gt;
+&lt;th&gt;P(First)&lt;/th&gt;
+&lt;th&gt;P(Second)&lt;/th&gt;
+&lt;th&gt;P(Last)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;0.5328&lt;/td&gt;
+&lt;td&gt;0.3606&lt;/td&gt;
+&lt;td&gt;0.1066&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;B&lt;/td&gt;
+&lt;td&gt;0.2591&lt;/td&gt;
+&lt;td&gt;0.4195&lt;/td&gt;
+&lt;td&gt;0.3214&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C&lt;/td&gt;
+&lt;td&gt;0.2081&lt;/td&gt;
+&lt;td&gt;0.2199&lt;/td&gt;
+&lt;td&gt;0.5720&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;Therefore, A has 53% chance of winning next week, while B has approximately 26% chance of achieving the first place and C only 21% chance&lt;/strong&gt;. These estimates are very different from the common frequentist estimates of &lt;span class="math"&gt;\(2/3\)&lt;/span&gt;, or 67%, naively calculated from A's past 2 wins out of 3 total. Also if the steps in each week is independent of that in the other weeks, like a coin toss, then the probability of winning for A, B, and C is all equivalent to &lt;span class="math"&gt;\(1/3\)&lt;/span&gt;, or 33%.&lt;/p&gt;
+&lt;p&gt;When I actually ran the analysis, I also computed how much money A, B, and C are going to lose by the end of 3 months using a Monte Carlo simulation from the triangular distribution. I won't discuss the details here, but the results were that A is likely to lose about $71, B $79, and C $134. Interesting!&lt;/p&gt;
+&lt;p&gt;I've formulated a hierarchical Bayesian model in JAGS in R to predict the probability of winning for A, B, and C which is more realistic, intuitive, and robust than the usual naive frequentist approach. Hope this was a fun read for you! Let me know if you have any questions or suggestions.&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="bayesian statistics"></category><category term="hierarchical bayes"></category><category term="monte carlo simulation"></category><category term="statistics"></category><category term="machine learning"></category><category term="r"></category><category term="jags"></category></entry><entry><title>Hadoop and MapReduce Woes</title><link href="https://stathwang.github.io/hadoop-and-mapreduce-woes.html" rel="alternate"></link><published>2015-10-09T22:16:00-04:00</published><updated>2015-10-09T22:17:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2015-10-09:/hadoop-and-mapreduce-woes.html</id><summary type="html">&lt;p&gt;&lt;img alt="Hadoop Flow Diagram" src="https://stathwang.github.io/images/hadoop_diagram.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;As a data scientist, not only do I analyze data and present the findings, but I also make careful engineering choices that allow collecting, storing, and analyzing data to be more robust and efficient. The traditional data system architecture works like the following:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Collect and upload server logs to Amazon …&lt;/li&gt;&lt;/ol&gt;</summary><content type="html">&lt;p&gt;&lt;img alt="Hadoop Flow Diagram" src="https://stathwang.github.io/images/hadoop_diagram.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;As a data scientist, not only do I analyze data and present the findings, but I also make careful engineering choices that allow collecting, storing, and analyzing data to be more robust and efficient. The traditional data system architecture works like the following:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Collect and upload server logs to Amazon S3.&lt;/li&gt;
+&lt;li&gt;Download logs and bulk insert them into HDFS and HBase.&lt;/li&gt;
+&lt;li&gt;Use MapReduce to clean and wrangle log data as well as analyze them.&lt;/li&gt;
+&lt;li&gt;Store the intermediary output in a MySQL or PostgreSQL table.&lt;/li&gt;
+&lt;li&gt;Use R and/or Python to create dashboards and visualizations and further analyze data.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This structural flow works pretty well, but in the end it proves to be inconvenient. The PC hardwares that are the computing clusters break down too often. Since we can't continue to buy more hardwares to increase memory and computation power, the daily batch jobs run slow over time with the increase in the size of log data. Moreover, writing and running MapReduce code takes quite a bit of time and practice for an average analyst.&lt;/p&gt;
+&lt;p&gt;One solution to tackle these problems is using &lt;a href="http://spark.apache.org"&gt;Apache Spark&lt;/a&gt;. The new data system architecture looks like this:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Collect and store logs and intermediary outputs in Amazon S3.&lt;/li&gt;
+&lt;li&gt;Clean, wrangle, and analyze log data using Spark clusters in Amazon EC2 and run batch jobs there as well.&lt;/li&gt;
+&lt;li&gt;Use R and/or Python to do additional analysis and create visualizations as necessary.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This is so much simpler than using &lt;a href="https://hadoop.apache.org"&gt;Hadoop&lt;/a&gt; and &lt;a href="https://hadoop.apache.org/docs/r1.2.1/mapred_tutorial.html"&gt;MapReduce&lt;/a&gt;! Remember that Spark servers require good amount of memory so it's advisable to use EC2 R3 instance. All the servers run in the AWS cloud. By doing this, there's no need to copy and parse log data every morning which take more than 10 hours, while Spark, S3, and EC2 combo handles the same process in less than an hour! Awesome!&lt;/p&gt;</content><category term="hadoop"></category><category term="mapreduce"></category><category term="mrjob"></category><category term="spark"></category></entry><entry><title>Automatic Text Summarization</title><link href="https://stathwang.github.io/automatic-text-summarization.html" rel="alternate"></link><published>2015-09-10T18:40:00-04:00</published><updated>2015-10-09T21:43:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2015-09-10:/automatic-text-summarization.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;a short background&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Automatic_summarization"&gt;Automatic text summarization&lt;/a&gt; is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;a short background&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://en.wikipedia.org/wiki/Automatic_summarization"&gt;Automatic text summarization&lt;/a&gt; is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such problem of information overload becomes more salient with the exponential growth in the quantity of data, such as the online and offline articles, books, and newspapers, so has our interest in automatic text summarization to &lt;em&gt;reduce time and inefficiency of digesting them&lt;/em&gt;. Automatic summarization reduces a text document using &lt;a href="https://en.wikipedia.org/wiki/Natural_language_processing"&gt;natural language processing&lt;/a&gt; to create a coherent, robust summary without loss of important ideas of the original document. I've decided to build a naive but powerful text summarization tool in R that feeds in and summarizes &lt;a href="https://www.facebook.com/techcrunch"&gt;TechCrunch&lt;/a&gt; and &lt;a href="https://www.facebook.com/nytimes"&gt;The New York Times&lt;/a&gt; articles from their respective Facebook pages.&lt;/p&gt;
+&lt;p&gt;There are two major approaches to text summarization: one that is &lt;em&gt;extraction-based&lt;/em&gt; and the other &lt;em&gt;abstraction-based&lt;/em&gt;. I'll be focusing on the extractive method which works by selecting a subset of words, phrases or sentences that already exist in the original text to make the summary. On the other hand, the abstractive method try to form the summary by building words, phrases or sentences from scratch. The latter is much more complicated than the former, so much of the research has focused on the former.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the algorithm&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;In extractive methods, culling key words, sentences, or paragraphs is very important. The naive algorithm I've written in R extracts the key sentence from each paragraph in the document. So if there are five paragraphs in an article, then the algorithm will return five key sentences as a summary. Why am I doing this? Well, I assume that each paragraph is &lt;em&gt;well-written&lt;/em&gt;, meaning it contains one main idea and purpose. This is a pretty solid assumption in that the writers of news and blog articles want to make sure they convey their ideas succinctly and coherently. If their writings are sloppy and unclear, then the readers would get confused as to what they are trying to say. So for each paragraph, the algorithm computes a similarity score between any two sentences. The similarity score is roughly calculated as two times the number of words that overlap divided by the total number of words in two sentences:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation*} 
+\dfrac{2 \times |Sentence_1 \cap Sentence_2|}{|Sentence_1| + |Sentence_2|}
+\end{equation*}&lt;/div&gt;
+&lt;p&gt;where &lt;span class="math"&gt;\(Sentence_1\)&lt;/span&gt; represents a set of words in the first sentence and &lt;span class="math"&gt;\(Sentence_2\)&lt;/span&gt; a set of words in the second. The intuition is that we would split each sentence into words or tokens, count how many common words there are, and then normalize the result with the average length of the two sentences. This similarity function is called &lt;a href="https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient"&gt;Dice coefficient&lt;/a&gt;, but feel free to use other similarity metrics such as &lt;em&gt;Jaccard&lt;/em&gt; and &lt;em&gt;Cosine similarity&lt;/em&gt; or even &lt;em&gt;Euclidean distance&lt;/em&gt;. Once we have a list of similarity scores for every sentence in a paragraph, we choose the sentence that have the highest sum of its similarity scores to be the key sentence of the paragraph.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the pseudocode&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Split a text document into pre-existing paragraphs.&lt;/li&gt;
+&lt;li&gt;Remove stopwords and non-alphanumeric characters in every sentence. Stem all words.&lt;/li&gt;
+&lt;li&gt;For every paragraph in order:&lt;ul&gt;
+&lt;li&gt;For each sentence:&lt;ul&gt;
+&lt;li&gt;Calculate a similarity score with every other sentence&lt;/li&gt;
+&lt;li&gt;Find the sum of its similarity scores&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Choose a sentence that has the highest sum&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Of course this is not the foolproof method of summarizing text as there can be a lot of ways my naive text summarization algorithm can be adjusted and improved. For instance, the title contains words that are usually keywords from the text, so you can give more weight to those sentences that contain one or more of title keywords in the similarity function. You can also experiment with different similarity metrics as I've mentioned above or only return key sentences that have similarity scores above a certain heuristic cutoff. Also instead of picking one best sentence from each paragraph, try picking 2-3 important paragraphs.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the data and results&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let's use this naive algorithm to summarize this &lt;a href="http://techcrunch.com/2015/10/19/common-building-opening/"&gt;article&lt;/a&gt; from the TechCrunch Facebook post. The article is summarized using sentences whose similarity scores exceed 1.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Common, a co-living startup from General Assembly co-founder Brad Hargreaves, is unveiling its first building today in Brooklyn's Crown Heights. The Common opening comes at a time when venture-backed companies like WeWork are piling into co-living as a way to use urban residential space more cost-efficiently and to attract Millennials, who are delaying marriage and families later and later. Over the summer, Common partnered with a local New York City real estate developer to buy Crown Heights building earlier this year. "The whole idea here is to use common areas and activate typically under-utilized space," Hargreaves told me in a video tour via Skype. They're bringing in Common residents to the next one. About 250 people have applied for the 19 available Common spots so far in the neighborhood. They later fell out of favor as the American middle-class left for the suburbs in the mid-20th century, turning residential hotels into the housing choice of last resort for the poor left behind in the urban core. Unless low-rise, suburban areas ringing the urban core step up and add housing and unless cities start scrutinizing the higher-end of the market where external capital is sitting in vacant units as pure investment rather than shelter, there will be an extraordinary amount of pressure to make urban residential space more efficient. For now, Hargreaves is focused on New York City with two buildings slated for opening in Brooklyn.He has raised about $7.35 million from Maveron and other investors this year.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The summary, though not perfect, generally makes sense with main ideas in place and is much shorter than the original article! I used the &lt;a href="https://github.com/pablobarbera/Rfacebook"&gt;Rfacebook&lt;/a&gt; package in R to grab the article from TechCrunch as well as New York Times Facebook page and &lt;a href="https://github.com/hadley/rvest"&gt;rvest&lt;/a&gt; package in R to scrape information relevant to the article. I plan to create a Shiny app where the app summarizes articles from their Facebook pages, outputs the main idea, purpose, and summary, suggests relevant hashtags, and perhaps recommend similar articles from their past posts. Stay tuned!&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="text summarization"></category><category term="natural language processing"></category><category term="machine learning"></category><category term="r"></category></entry><entry><title>Clustering Burger King Menu with the Dirichlet Process</title><link href="https://stathwang.github.io/clustering-burger-king-menu-with-the-dirichlet-process.html" rel="alternate"></link><published>2015-08-18T18:40:00-04:00</published><updated>2015-10-09T20:15:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2015-08-18:/clustering-burger-king-menu-with-the-dirichlet-process.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;an interesting graph&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Burger King Cluster Sample" src="https://stathwang.github.io/images/bk_sample_ggplot.jpeg"&gt;&lt;/p&gt;
+&lt;p&gt;I was going to write part two of the previous post on A/B testing now using Bayesian methods, but I plan to do that in another time since today I'm going to write about &lt;a href="https://en.wikipedia.org/wiki/Cluster_analysis"&gt;clustering&lt;/a&gt;, a widely used machine learning technique, specifically clustering Burger King menu …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;an interesting graph&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Burger King Cluster Sample" src="https://stathwang.github.io/images/bk_sample_ggplot.jpeg"&gt;&lt;/p&gt;
+&lt;p&gt;I was going to write part two of the previous post on A/B testing now using Bayesian methods, but I plan to do that in another time since today I'm going to write about &lt;a href="https://en.wikipedia.org/wiki/Cluster_analysis"&gt;clustering&lt;/a&gt;, a widely used machine learning technique, specifically clustering Burger King menu items based on their nutritional values. Clustering is an unsupervised learning method to find structure in data; informally, it is a way to find natural groupings among objects of interest. For instance, the graph above is one such cluster formed based on nutritional variables that can be labeled as the &lt;em&gt;breakfast&lt;/em&gt; cluster; sausage, egg and cheese biscuit and its variations have high sodium and cholesterol level but low amount of total sugar and carb. I want to cluster Burger King menu as such because I want to see if there are menu items I certainly want to avoid, and I want to find that out without having to manually go through every item and analyze its nutritional values. After all, I am a data scientist, not a nutritionist.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the data&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I first downloaded a PDF version of Burger King menu &lt;a href="http://www.bk.com/pdfs/nutrition.pdf"&gt;here&lt;/a&gt;, then converted it to an Excel file in CSV format to read in RStudio. As you can see in the PDF, each and every menu item is already grouped under its predefined menu category. For example, all the Whopper sandwiches are classified as &lt;em&gt;Whopper Sandwiches&lt;/em&gt; and all the kids meal related menu items such as apple slices and kids oatmeal are under the &lt;em&gt;Kids Meals&lt;/em&gt; section. But this kind of grouping is really not helpful, especially if you are one of the health-conscious who want to choose a menu that is considerably healthier than the others. It also makes more sense to group apple slices under fruits and oatmeal under breakfast instead of just lumping them all in kids meal. Clustering, or grouping, menu items by nutritional values may reveal a different kind of groups with perhaps new, surprising insights that may be more valuable for the ever growing health-conscious public. Ideally I want the resulting clusters to be clear and robust, and the number of clusters to grow with the size of the data, in this case, the number of menu items.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Menu Screenshot" src="https://stathwang.github.io/images/bk_menu.png"&gt;&lt;/p&gt;
+&lt;p&gt;Above is a screenshot of the first page of the downloaded PDF file. All variations of Whopper sandwiches are under the &lt;em&gt;Whopper Sandwiches&lt;/em&gt; label and the other burgers are part of the &lt;em&gt;Flame Broiled Burgers&lt;/em&gt; group. I did some data cleaning and feature scaling with the &lt;em&gt;scale&lt;/em&gt; function in R's base library to arrive at the following data set:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Scaled Menu Dataset" src="https://stathwang.github.io/images/bk_data.png"&gt;&lt;/p&gt;
+&lt;p&gt;The variables used to cluster Burger King's menu are &lt;em&gt;calories&lt;/em&gt;, &lt;em&gt;calories from fat&lt;/em&gt;, &lt;em&gt;total fat&lt;/em&gt;, &lt;em&gt;saturated fat&lt;/em&gt;, &lt;em&gt;trans fat&lt;/em&gt;, &lt;em&gt;cholesterol&lt;/em&gt;, &lt;em&gt;sodium&lt;/em&gt;, &lt;em&gt;total carb&lt;/em&gt;, &lt;em&gt;dietary fiber&lt;/em&gt;, &lt;em&gt;total sugar&lt;/em&gt;, and &lt;em&gt;protein&lt;/em&gt;. Unfortunately Burger King doesn't provide vitamin data which may also be useful for better clustering. The clusters are derived from this clean data set.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the methods&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;There are many ways to cluster data. The traditional approaches like &lt;em&gt;k-means&lt;/em&gt;, &lt;em&gt;hierarchical clustering&lt;/em&gt;, and &lt;em&gt;Gaussian mixture model-based clustering&lt;/em&gt; are not really good options here because I need to specify the number of clusters in advance, counter-intuitive because the objective is to find &lt;em&gt;natural&lt;/em&gt; clusters and I want the data to be clustered automatically into its own optimal cluster number. There are ways to select the optimal number of clusters using gap and prediction strength statistics and with &lt;em&gt;NbClust&lt;/em&gt; package in R, but the problem is that of a fundamental one: most real-world data don't have a fixed number of clusters. This is also problematic since it makes better sense to have the number of clusters increase as the data size grows, as in this case the number of menu items increases. Moreover, k-means and hierarchical clustering are distance-based algorithms, heuristic methods not firmly supported by probability and statistics, and thus not robust. Gaussian mixture model-based clustering assumes data is generated from a mixture of finite number of normal distributions.&lt;/p&gt;
+&lt;p&gt;I could try out graph-partitioning approach like spectral clustering or the state-of-the-art community detection method such as Infomap, but the former also has the same problem of fixing the number of graph partitions in a graph where in this case each menu item represents a node with two neighboring nodes connected by an edge indicating a similarity between two menu items. The latter is an algorithm that attempts to find communities within a network of graphs and does not work well in this case because the adjacency matrix created from the scaled data is a network of menu items that are all too closely related, just one big community thus not helpful. It's also sort of a different way to phrase the problem than clustering.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the results&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I used &lt;a href="http://blog.datumbox.com/overview-of-cluster-analysis-and-dirichlet-process-mixture-models"&gt;Dirichlet process mixture model-based clustering&lt;/a&gt;. Understanding Dirichlet process and nonparametric Bayes are quite intuitive if you understand the Chinese restaurant process, Polya urn model, and the stick-breaking process which I'm going to skip here. Assuming that you have a bit of knowledge about Dirichlet process mixture models, the results of my clusters are shown below. I ran Gibbs sampler many times to infer the number of clusters from the entire dataset to be around 7. Let's look at each individual cluster in detail.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;cluster 1: breakfast&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="cluster1" src="https://stathwang.github.io/images/cluster1.png"&gt;&lt;/p&gt;
+&lt;p&gt;The first cluster is the breakfast cluster with the following representative menu items:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Sausage, Egg &amp;amp; Cheese Croissan'wich&lt;/li&gt;
+&lt;li&gt;Ham, Egg &amp;amp; Cheese Croissan'wich&lt;/li&gt;
+&lt;li&gt;Bacon, Egg &amp;amp; Cheese Double Croissan'wich&lt;/li&gt;
+&lt;li&gt;Sausage Biscuit&lt;/li&gt;
+&lt;li&gt;Country Ham and Egg Biscuit&lt;/li&gt;
+&lt;li&gt;Bacon, Egg &amp;amp; Cheese Biscuit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Just by looking at the &lt;span class="math"&gt;\(z\)&lt;/span&gt;-scaled nutritional values of the four main menu items above, most breakfast menu items contain high sodium and cholesterol which may not be your best option for breakfast.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;cluster2: chicken burgers, crispy food&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="cluster2" src="https://stathwang.github.io/images/cluster2.png"&gt;&lt;/p&gt;
+&lt;p&gt;The second cluster is a cluster of mainly chicken burgers and crispy fried food such as french fries, onion rings and hash browns. They have high dietary fiber with low sugar and low trans fat. Chicken burgers such as the Original Chicken Sandwich and Tendercrisp Chicken Sandwich also have a high protein level. I guess this cluster is a bit healthier than the others. It contains the following representative menu items:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Whopper Sandwich w/o Mayo&lt;/li&gt;
+&lt;li&gt;Whopper Jr. Sandwich&lt;/li&gt;
+&lt;li&gt;Tendercrisp Chicken Sandwich&lt;/li&gt;
+&lt;li&gt;Original Chicken Sandwich&lt;/li&gt;
+&lt;li&gt;Spicy Crispy Chicken Jr.&lt;/li&gt;
+&lt;li&gt;Big Fish Sandwich&lt;/li&gt;
+&lt;li&gt;BK Veggie Burger&lt;/li&gt;
+&lt;li&gt;Onion Rings Medium&lt;/li&gt;
+&lt;li&gt;French Fries Small&lt;/li&gt;
+&lt;li&gt;Hash Browns Large&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Note that the clusters are not perfect; some contain menu items that aren't really similar to other items in the same cluster. This problem can be somewhat alleviated if you run clustering algorithms many times and take the average result.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;cluster3: big burgers&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="cluster3" src="https://stathwang.github.io/images/cluster3.png"&gt;&lt;/p&gt;
+&lt;p&gt;The third cluster mainly contains big burgers, meaning doubles and triples and so-called the ultimate burgers that are high in calories, fat, cholesterol, and protein:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Whopper Sandwich with Cheese&lt;/li&gt;
+&lt;li&gt;Double Whopper Sandwich&lt;/li&gt;
+&lt;li&gt;Triple Whopper Sandwich&lt;/li&gt;
+&lt;li&gt;Spicy BLT Whopper&lt;/li&gt;
+&lt;li&gt;A.1. Ultimate Bacon Cheeseburger&lt;/li&gt;
+&lt;li&gt;Chicken Nuggets 20 pieces&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As you can see, the shape of the distribution of the nutritional values for all these clusters look similar to each other, meaning the cluster is tight and well-defined.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;cluster4: sauces, coffees, less sugary drinks&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="cluster4" src="https://stathwang.github.io/images/cluster4.png"&gt;&lt;/p&gt;
+&lt;p&gt;The fourth cluster contains sauces, salad dressings, coffees and less sugary drinks. They have low calories and low carb, but generally not nutritious:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ken's Honey Mustard Dressing Packet&lt;/li&gt;
+&lt;li&gt;Ken's Citrus Caesar Dressing Packet&lt;/li&gt;
+&lt;li&gt;Ketchup&lt;/li&gt;
+&lt;li&gt;Mayonnaise&lt;/li&gt;
+&lt;li&gt;Seattle's Best Coffee Regular 16 fl oz&lt;/li&gt;
+&lt;li&gt;Iced Coffee Medium&lt;/li&gt;
+&lt;li&gt;Non Fat Latte Small&lt;/li&gt;
+&lt;li&gt;Diet Coke 20 fl oz&lt;/li&gt;
+&lt;li&gt;Unsweetened Tea 30 fl oz&lt;/li&gt;
+&lt;li&gt;Buffalo Dipping Sauce 1 oz&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;cluster5: ultimate breakfast platter&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="cluster5" src="https://stathwang.github.io/images/cluster5.png"&gt;&lt;/p&gt;
+&lt;p&gt;The fifth cluster contains a single menu item - that is, the Ultimate Breakfast Platter. It's similar to the third big burger cluster but also have high sugar level. It's basically high in everything! Yuck! I was pretty surprised by this cluster and concluded that this standalone cluster may be the worst Burger King menu. There is a supporting article &lt;a href="http://www.fitday.com/fitness-articles/nutrition/the-five-worst-things-on-burger-kings-menu.html#b"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;cluster 6: desserts and sugary drinks&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="cluster6" src="https://stathwang.github.io/images/cluster6.png"&gt;&lt;/p&gt;
+&lt;p&gt;The second to last cluster contains desserts and sugary drinks that are high in, of course, total sugar level and carb. These two are separating difference from the fourth cluster of sauces, coffees and less sugary drinks. If Burger King provided vitamin A and C values for all these menu items, then the clustering algorithm would have created two clusters instead of one, separating sugary drinks high in vitamin C versus desserts that are not.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Smoothie: Tropical Mango 15 oz&lt;/li&gt;
+&lt;li&gt;Smoothie: Strawberry Banana 12 fl oz&lt;/li&gt;
+&lt;li&gt;Chocolate Fudge Sundae&lt;/li&gt;
+&lt;li&gt;Chocolate Chip Cookies 2&lt;/li&gt;
+&lt;li&gt;Dutch Apple Pie&lt;/li&gt;
+&lt;li&gt;Hot Chocolate Large&lt;/li&gt;
+&lt;li&gt;Sprite 30 fl oz&lt;/li&gt;
+&lt;li&gt;Coca Cola Classic 20 fl oz&lt;/li&gt;
+&lt;li&gt;Hi-C Fruit Punch 20 fl oz&lt;/li&gt;
+&lt;li&gt;Sweet Tea 30 fl oz&lt;/li&gt;
+&lt;li&gt;Minute Maid Orange Juice 10 fl oz&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;cluster 7: milkshakes&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="cluster7" src="https://stathwang.github.io/images/cluster7.png"&gt;&lt;/p&gt;
+&lt;p&gt;Finally the last cluster is full of milkshakes from vanilla to oreo. As you can see from these 7 quite coherent and robust clusters, we can find out which group of menu items are similar and know to avoid certain items like the Ultimate Breakfast Platter. Now that you have an idea how to cluster Burger King menu items, why not try clustering McDonald's menu and compare the two? That'd be really interesting!&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="clustering"></category><category term="machine learning"></category><category term="burger king"></category></entry><entry><title>A/B Testing the Frequentist Way</title><link href="https://stathwang.github.io/ab-testing-the-frequentist-way.html" rel="alternate"></link><published>2015-04-03T20:25:00-04:00</published><updated>2015-10-09T18:48:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2015-04-03:/ab-testing-the-frequentist-way.html</id><summary type="html">&lt;p&gt;This is going to be my first post on a topic in data science, and in the next few posts including this one, I will talk about A/B testing, specifically how to do it right using Bayesian methods in comparison with the traditional Frequentist hypothesis testing.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the basic concept …&lt;/strong&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is going to be my first post on a topic in data science, and in the next few posts including this one, I will talk about A/B testing, specifically how to do it right using Bayesian methods in comparison with the traditional Frequentist hypothesis testing.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the basic concept&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As the name implies, A/B testing is a way of testing which one of the two variants, A and B, where A represents the control and B the treatment in a controlled experiment, is statistically significantly better than the other. A and B could be web pages, for example, where in a simplified setting A is the currently deployed web page with a yellow button in the center, and we want to test whether web page B with a blue button in the center is better than A, given that all other elements of the two web pages such as copy text, layouts, background colors, and images are the same.&lt;/p&gt;
+&lt;p&gt;In search engine marketing, a user types a query &lt;em&gt;health insurance&lt;/em&gt; in a search engine say, Google, possibly because he or she wants to enroll in one, and Google shows ads, or so called creatives, at the top and on the side of the search results page. Let's say that an advertiser currently shows a creative like the one below:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Creative" src="https://stathwang.github.io/images/creative.png"&gt;&lt;/p&gt;
+&lt;p&gt;At the time of writing, Obamacare enrollment deadline for 2015 has already passed as it was on February 15th but those few who didn't make the deadline due to special circumstances including, but not limited to, marriage or divorce, technical glitches during the enrollment process, or birth of a new baby were given a week of extension in some states, so it makes sense to have drafted a creative like the one above. Now as the advertiser, can we make this creative better so as to attract more users to click on it? In other words, we want to test whether changing the description lines from the original &lt;em&gt;Deadline Extended in Your State? Check for Updates. Get Insured Now!&lt;/em&gt; which we'll label as A to &lt;em&gt;Missed Deadline? You Can Still Get Insured!&lt;/em&gt; as B. Of course, we can say there is no measurable difference between these two seemingly similar languages, and it's useless and too time-consuming to test for changes in minor details, such as testing whether adding an exclamation mark at the end of a sentence significantly improves ad clicks, but let's just argue that the former implies a caveat that not all states offer extension and the latter doesn't and testing which creative is more effective is of importance.&lt;/p&gt;
+&lt;p&gt;How then are we going to measure the effectiveness of the creatives? What does it mean by when one is better than the other? Here the metric of interest is the click-through-rate, or simply CTR, which is basically the number of times an ad is clicked divided by the number of times an ad is shown, clicks over impressions. If there are 5 clicks resulting from a total of 100 impressions for creative A, then A has a CTR of 5/100 or 5%. If A gets a higher CTR than B, then A is defined to be &lt;em&gt;better&lt;/em&gt; than B, and vice versa. Now let's set up an A/B test.&lt;/p&gt;
+&lt;p&gt;Assume creative A that we are currently showing is the control and creative B is the treatment or the test that we compare against A. An A/B test is basically a randomized controlled experiment; that is, let's assume there is a simple random sample of 2000 users who missed the enrollment deadline and are actively searching for their health insurance plans. I show creative A to a randomly chosen 1000 users and creative B to the rest 1000 users. In reality this randomization of showing each user a random creative A or B is done automatically and algorithmically by Google, and we would stop when we reach a total of 2000 users. It would be easier to understand if we think somewhere along the line of first drawing 1000 random numbers without replacement from 1 through 2000 where each number represents a different user and showing A to those 1000 users whose numbers were drawn and otherwise show B. You can then gather the binary data on whether each user in each group clicked 1 or not 0. Also assume in this example that we count only unique clicks. If a user clicks a creative but goes back and clicks again then such action will still be counted as 1. Stop the test when the number of users reaches a total of 2000. Make sure not to stop the test early or continue further testing for the reasons that will be explained in later posts.&lt;/p&gt;
+&lt;p&gt;After testing, A has received a total of 380 clicks and B 370. In other words, A has a CTR of 0.38 and B 0.37. The primary focus of A/B testing is on which of these two creatives did better in terms of higher CTR and hence should supersede the other. A simple way to do this is to carry out a two-sided proportion test as CTR is a proportion.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the frequentist way&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;A classical hypothesis testing is the frequentist alternative to the Bayesian method I will write about in later posts. The null hypothesis is that the CTR of A is same as the CTR of B, whereas the alternative hypothesis is the CTR of A is not same as, or different from, the CTR of B. We assume that the null hypothesis is true to begin with and calculate a statistic - a number derived from data - as follows:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation*} 
+z = \dfrac{P_T - P_C}{\sqrt{p(1 - p)(\frac{1}{n_T} + \frac{1}{n_C})}}
+\end{equation*}&lt;/div&gt;
+&lt;p&gt;where our statistic &lt;span class="math"&gt;\(z\)&lt;/span&gt; will be normally distributed given that our sample size grows large, by the central limit theorem. We have a sample of 1000 users in each group. Note that &lt;span class="math"&gt;\(P_T\)&lt;/span&gt; is the observed CTR of the treatment or test group, &lt;span class="math"&gt;\(P_T\)&lt;/span&gt; the observed CTR of the control group, and &lt;span class="math"&gt;\(N_T\)&lt;/span&gt; and &lt;span class="math"&gt;\(N_C\)&lt;/span&gt; refer to the total number of observations in the treatment and control group, respectively.&lt;/p&gt;
+&lt;p&gt;If our null hypothesis is true, &lt;em&gt;z-statistic&lt;/em&gt; will follow the standard normal distribution with mean 0 and standard deviation 1. Let's assume our significance level is 5%. This means that if the value of the z-statistic falls outside the range where 95% of the values from a standard normal distribution fall, we reject the null hypothesis at the 5% significance level. If not, we fail to reject the null. A significance level is basically a false-positive rate, the probability of rejecting the null when the null is true, so setting the significance level to 0.05 means we would erroneously reject the null 5 out of 100 times the experiment is conducted.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;the results&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;In R, the above calculation of z-statistic and comparing it to the point where 95% of the values from a standard normal distribution fall, approximately -1.96 as a lower bound and 1.96 as an upper bound, is done using the function &lt;em&gt;prop.test&lt;/em&gt;. Since the p-value is 0.003653 which is less than 0.05, we reject the null that the CTR between A and B are same. &lt;strong&gt;The interval (0.01497, 0.1008) contains the true population CTR difference between A and B 95 times out of 100 A/B tests done under the same conditions&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;Whew! That's it. Now we say A and B are different in terms of CTR. But so what? To what extent are they different? What is the probability of that extent? That we need to use the Bayesian method to find out. I will discuss the Bayesian alternative which is more intuitive and robust than the frequentist hypothesis testing.&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="a/b testing"></category><category term="bayesian statistics"></category><category term="statistics"></category><category term="machine learning"></category></entry><entry><title>Introduction</title><link href="https://stathwang.github.io/introduction.html" rel="alternate"></link><published>2015-03-02T01:40:00-05:00</published><updated>2015-03-02T01:40:00-05:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2015-03-02:/introduction.html</id><summary type="html">&lt;p&gt;Hi there! I'm officially launching my data science blog where I'll not only talk about what makes a good data scientist but how to become one. I believe data science is an art that is a seasoned combination of statistics, machine learning, and computer science. It's in one sense a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hi there! I'm officially launching my data science blog where I'll not only talk about what makes a good data scientist but how to become one. I believe data science is an art that is a seasoned combination of statistics, machine learning, and computer science. It's in one sense a form of data expression and communication that bridges a gap between data and human. Harvard Business Review in 2012 noted that data scientist is the sexiest job of the 21st century, and this is especially true because every company and field of study uses data in order to make good decisions.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hbr.org/2012/10/data-scientist-the-sexiest-job-of-the-21st-century/"&gt;https://hbr.org/2012/10/data-scientist-the-sexiest-job-of-the-21st-century/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;But how does one make data useful for decision making? Data is nothing without proper source, storage, analysis, insights, and communication; data scientists are needed to carry out and monitor all the process. They are artists, for they need to look at the data from many different perspectives. No one data scientist derives exactly the same conclusion from given data using exactly the same approach. In that sense, data scientists are the Renaissance artists that fuel the growth of the 21st century.&lt;/p&gt;
+&lt;p&gt;I occasionally plan to write about my experiences as a data scientist, statistics and machine learning, programming, philosophy, or just about anything that interests me. If you have any questions feel free to write a comment or an email, and I'll try my best to reply as soon as possible.&lt;/p&gt;
+&lt;p&gt;Thanks!&lt;/p&gt;</content><category term="personal"></category></entry></feed>

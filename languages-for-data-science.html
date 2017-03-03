@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/pygments/monokai.min.css">
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://stathwang.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Seong Hyun Hwang Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="author" content="Seong Hyun Hwang" />
+<meta name="description" content="As a data scientist, I think it's useful to be versatile at quite a few different programming languages. Most data scientists, including me, use both R and Python for data analysis, but whenever possible I first try using R simply because I started out learning R first, and if it …" />
+<meta name="keywords" content="programming languages, coding">
+<meta property="og:site_name" content="Seong Hyun Hwang"/>
+<meta property="og:title" content="Languages for Data Science"/>
+<meta property="og:description" content="As a data scientist, I think it's useful to be versatile at quite a few different programming languages. Most data scientists, including me, use both R and Python for data analysis, but whenever possible I first try using R simply because I started out learning R first, and if it …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://stathwang.github.io/languages-for-data-science.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2016-02-04 10:38:00-05:00"/>
+<meta property="article:modified_time" content="2016-02-05 21:51:00-05:00"/>
+<meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
+<meta property="article:section" content="Notes"/>
+<meta property="article:tag" content="programming languages"/>
+<meta property="article:tag" content="coding"/>
+<meta property="og:image" content="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg">
+  <title>Seong Hyun Hwang &ndash; Languages for Data Science</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="https://stathwang.github.io">
+        <img src="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg" alt="Seong Hyun Hwang" title="Seong Hyun Hwang">
+      </a>
+      <h1><a href="https://stathwang.github.io">Seong Hyun Hwang</a></h1>
+<p>Data Scientist - Product Developer</p>      <nav>
+        <ul class="list">
+          <li><a href="https://stathwang.github.io/pages/about.html#about">about</a></li>
+          <li><a href="https://stathwang.github.io/pages/projects.html#projects">projects</a></li>
+          <li><a href="https://stathwang.github.io/pages/teaching.html#teaching">teaching</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/stathwang" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-twitter" href="https://twitter.com/superhugehwang" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a class="sc-rss" href="//stathwang.github.io/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+    <nav>
+      <a href="https://stathwang.github.io">Home</a>
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+      <a href="https://stathwang.github.io/feeds/all.atom.xml">Atom</a>
+    </nav>
+
+<article>
+  <header>
+    <h1 id="languages-for-data-science">Languages for Data Science</h1>
+    <p>Posted on Thu 04 February 2016 in <a href="https://stathwang.github.io/category/notes.html">Notes</a></p>
+  </header>
+  <div>
+    <p>As a data scientist, I think it's useful to be versatile at quite a few different programming languages. Most data scientists, including me, use both R and Python for data analysis, but whenever possible I first try using R simply because I started out learning R first, and if it becomes too cumbersome, I switch to Python. R is a great tool if you can break free from the limitation by setting up your own RStudio server to have a large memory and a high computation power. I use R mainly for prototyping statistical models and sometimes deploying them in production, visualizing data conveniently, and for both simple and complex one-off data analysis. On the other hand, I use Python when I need to extract, scrape, parse, and clean data fast, apply natural language processing and deep learning models that need to be scaled quite a bit and aren't fully supported by libraries in R, and also when I need to share my code with the engineers and analysts who don't have knowledge in R. I also write MapReduce codes in Python.</p>
+<p>But I think data scientists need to do more than just learning R, Python, SQL, and few big data technologies and frameworks like Hadoop, MapReduce, and Spark. A data scientist should not only have the knowledge to analyze data but also work with how the data should be collected, stored, and extracted, which is traditionally a role of data engineers, and have some knowledge in web programming languages, which are tasks for web developers. For example, there are times when I need to create a dashboard for analysts or complex websites that include multiple landing pages and logins. I use Shiny often for dashboards; I resort to Django, Ruby on Rails and Node.js with Bootstrap for websites.</p>
+<p>Being a data scientist is not easy. Many people out there think that analyzing data is what a typical data scientist do. Sure, that's what we do most of the time. But data scientists do many other things as well, and in order to get those done successfully, learning several programming langauges to maximize the efficiency of work is important to become a data mastermind.</p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://stathwang.github.io/tag/programming-languages.html">programming languages</a>
+      <a href="https://stathwang.github.io/tag/coding.html">coding</a>
+    </p>
+  </div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'thedatalogical';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</article>
+
+    <hr />
+    <p />
+    <!-- Begin MailChimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+  #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
+  /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+     We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+<form action="//github.us1.list-manage.com/subscribe/post?u=0f2c943c221c777ef88591fb6&amp;id=6cf4236c90" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+  <label for="mce-EMAIL">Subscribe to my sporadic data science newsletter and blog post</label>
+  <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0f2c943c221c777ef88591fb6_6cf4236c90" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+<br />
+<br />
+
+<!--End mc_embed_signup-->
+
+    <footer>
+        <p>&copy; Seong Hyun Hwang 2016</p>
+    </footer>
+  </main>
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69797568-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+  <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us1.list-manage.com","uuid":"0f2c943c221c777ef88591fb6","lid":"6cf4236c90"}) })</script>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Seong Hyun Hwang ",
+  "url" : "https://stathwang.github.io",
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "description": "Seong Hyun Hwang's Thoughts and Writings"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Languages for Data Science",
+  "headline": "Languages for Data Science",
+  "datePublished": "2016-02-04 10:38:00-05:00",
+  "dateModified": "2016-02-05 21:51:00-05:00",
+  "author": {
+    "@type": "Person",
+    "name": "Seong Hyun Hwang",
+    "url": "https://stathwang.github.io/author/seong-hyun-hwang.html"
+  },
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "url": "https://stathwang.github.io/languages-for-data-science.html",
+  "description": "As a data scientist, I think it's useful to be versatile at quite a few different programming languages. Most data scientists, including me, use both R and Python for data analysis, but whenever possible I first try using R simply because I started out learning R first, and if it …"
+}
+</script></body>
+</html>
