@@ -28,11 +28,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="author" content="Seong Hyun Hwang" />
-<meta name="description" content="Hi everyone. It's been a little more than a year since I've made changes to this blog. library(plyr) library(data.table) library(rvest) library(doMC) library(ggplot2) registerDoMC(8) base_url <- "http://nojehu.com/bbs/board.php?bo_table=streaming05&page=" page_end <- 500 starttime <- Sys.time() dat <- llply(1:page_end, function …" />
+<meta name="description" content="I like watching movies. I discovered this somewhat sketchy site that hosts quite a few Korean and English movies online. I call library(plyr) library(data.table) library(rvest) library(doMC) library(ggplot2) registerDoMC(8) base_url <- "http://nojehu.com/bbs/board.php?bo_table=streaming05&page=" page_end <- 500 starttime <- Sys.time …" />
 <meta name="keywords" content="ranking, recommender system, statistics, machine learning, r">
 <meta property="og:site_name" content="Seong Hyun Hwang"/>
 <meta property="og:title" content="Bayesian Heuristic Approaches to Ranking Movies"/>
-<meta property="og:description" content="Hi everyone. It's been a little more than a year since I've made changes to this blog. library(plyr) library(data.table) library(rvest) library(doMC) library(ggplot2) registerDoMC(8) base_url <- "http://nojehu.com/bbs/board.php?bo_table=streaming05&page=" page_end <- 500 starttime <- Sys.time() dat <- llply(1:page_end, function …"/>
+<meta property="og:description" content="I like watching movies. I discovered this somewhat sketchy site that hosts quite a few Korean and English movies online. I call library(plyr) library(data.table) library(rvest) library(doMC) library(ggplot2) registerDoMC(8) base_url <- "http://nojehu.com/bbs/board.php?bo_table=streaming05&page=" page_end <- 500 starttime <- Sys.time …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://stathwang.github.io/bayesian-heuristic-approaches-to-ranking-movies.html"/>
 <meta property="og:type" content="article"/>
@@ -83,45 +83,45 @@
     <p>Posted on Fri 03 March 2017 in <a href="https://stathwang.github.io/category/statistics.html">Statistics</a></p>
   </header>
   <div>
-    <p>Hi everyone. It's been a little more than a year since I've made changes to this blog. </p>
-<div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">plyr</span><span class="p">)</span>
-<span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
-<span class="n">library</span><span class="p">(</span><span class="n">rvest</span><span class="p">)</span>
-<span class="n">library</span><span class="p">(</span><span class="n">doMC</span><span class="p">)</span>
-<span class="n">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+    <p>I like watching movies. I discovered this somewhat sketchy site that hosts quite a few Korean and English movies online. I call </p>
+<div class="highlight"><pre><span></span><span class="kn">library</span><span class="p">(</span>plyr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>rvest<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>doMC<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
 
-<span class="n">registerDoMC</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
-<span class="n">base_url</span> <span class="o">&lt;-</span> <span class="s2">&quot;http://nojehu.com/bbs/board.php?bo_table=streaming05&amp;page=&quot;</span>
-<span class="n">page_end</span> <span class="o">&lt;-</span> <span class="mi">500</span>
-<span class="n">starttime</span> <span class="o">&lt;-</span> <span class="n">Sys</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="n">dat</span> <span class="o">&lt;-</span> <span class="n">llply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">page_end</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">movies</span> <span class="o">&lt;-</span> <span class="n">read_html</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
-  <span class="n">titles</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span> 
-    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_text_href&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span> 
-    <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;댓글[0-9]+개&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">.</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">s+&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">.</span><span class="p">)</span>
-  <span class="n">upvotes</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span> 
-    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_con li:nth-child(4) strong&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span>
-    <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">()</span>
-  <span class="n">downvotes</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span>
-    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_con li:nth-child(5) strong&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span>
-    <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">()</span>
-  <span class="n">views</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span>
-    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_text_href+ li&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span>
-    <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;.*([0-9]+)$&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">1&quot;</span><span class="p">,</span> <span class="o">.</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">()</span>
-  <span class="n">image_urls</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span>
-    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_href img&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="n">html_attr</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">)</span>
-  <span class="n">output</span> <span class="o">&lt;-</span> <span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">cbind</span><span class="p">(</span><span class="n">titles</span><span class="p">,</span> <span class="n">upvotes</span><span class="p">,</span> <span class="n">downvotes</span><span class="p">,</span> <span class="n">views</span><span class="p">,</span> <span class="n">image_urls</span><span class="p">))</span>
-  <span class="n">cat</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;Page &quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;scraped!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
-  <span class="k">return</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-<span class="p">},</span> <span class="o">.</span><span class="n">parallel</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">Sys</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">starttime</span><span class="p">)</span>
+registerDoMC<span class="p">(</span><span class="m">8</span><span class="p">)</span>
+base_url <span class="o">&lt;-</span> <span class="s">&quot;http://nojehu.com/bbs/board.php?bo_table=streaming05&amp;page=&quot;</span>
+page_end <span class="o">&lt;-</span> <span class="m">500</span>
+starttime <span class="o">&lt;-</span> <span class="kp">Sys.time</span><span class="p">()</span>
+dat <span class="o">&lt;-</span> llply<span class="p">(</span><span class="m">1</span><span class="o">:</span>page_end<span class="p">,</span> <span class="kr">function</span><span class="p">(</span>i<span class="p">)</span> <span class="p">{</span>
+  movies <span class="o">&lt;-</span> read_html<span class="p">(</span><span class="kp">paste0</span><span class="p">(</span>base_url<span class="p">,</span> i<span class="p">))</span>
+  titles <span class="o">&lt;-</span> movies <span class="o">%&gt;%</span> 
+    html_nodes<span class="p">(</span><span class="s">&quot;.gall_text_href&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    html_text<span class="p">()</span> <span class="o">%&gt;%</span> 
+    <span class="kp">gsub</span><span class="p">(</span><span class="s">&quot;댓글[0-9]+개&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="m">.</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="kp">gsub</span><span class="p">(</span><span class="s">&quot;\\s+&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="m">.</span><span class="p">)</span>
+  upvotes <span class="o">&lt;-</span> movies <span class="o">%&gt;%</span> 
+    html_nodes<span class="p">(</span><span class="s">&quot;.gall_con li:nth-child(4) strong&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    html_text<span class="p">()</span> <span class="o">%&gt;%</span>
+    <span class="kp">as.numeric</span><span class="p">()</span>
+  downvotes <span class="o">&lt;-</span> movies <span class="o">%&gt;%</span>
+    html_nodes<span class="p">(</span><span class="s">&quot;.gall_con li:nth-child(5) strong&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    html_text<span class="p">()</span> <span class="o">%&gt;%</span>
+    <span class="kp">as.numeric</span><span class="p">()</span>
+  views <span class="o">&lt;-</span> movies <span class="o">%&gt;%</span>
+    html_nodes<span class="p">(</span><span class="s">&quot;.gall_text_href+ li&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    html_text<span class="p">()</span> <span class="o">%&gt;%</span>
+    <span class="kp">gsub</span><span class="p">(</span><span class="s">&quot;.*([0-9]+)$&quot;</span><span class="p">,</span> <span class="s">&quot;\\1&quot;</span><span class="p">,</span> <span class="m">.</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="kp">as.numeric</span><span class="p">()</span>
+  image_urls <span class="o">&lt;-</span> movies <span class="o">%&gt;%</span>
+    html_nodes<span class="p">(</span><span class="s">&quot;.gall_href img&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    html_attr<span class="p">(</span><span class="s">&quot;src&quot;</span><span class="p">)</span>
+  output <span class="o">&lt;-</span> data.table<span class="p">(</span><span class="kp">cbind</span><span class="p">(</span>titles<span class="p">,</span> upvotes<span class="p">,</span> downvotes<span class="p">,</span> views<span class="p">,</span> image_urls<span class="p">))</span>
+  <span class="kp">cat</span><span class="p">(</span><span class="kp">paste0</span><span class="p">(</span><span class="s">&quot;Page &quot;</span><span class="p">,</span> i<span class="p">,</span> <span class="s">&quot;scraped!\n&quot;</span><span class="p">))</span>
+  <span class="kr">return</span><span class="p">(</span>output<span class="p">)</span>
+<span class="p">},</span> <span class="m">.</span>parallel <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="kp">print</span><span class="p">(</span><span class="kp">Sys.time</span><span class="p">()</span> <span class="o">-</span> starttime<span class="p">)</span>
 </pre></div>
 
 
@@ -263,7 +263,7 @@
 <!--End mc_embed_signup-->
 
     <footer>
-        <p>&copy; Seong Hyun Hwang (2016, 2017)</p>
+        <p>&copy; Seong Hyun Hwang 2017</p>
     </footer>
   </main>
 
@@ -308,7 +308,7 @@
   },
   "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
   "url": "https://stathwang.github.io/bayesian-heuristic-approaches-to-ranking-movies.html",
-  "description": "Hi everyone. It's been a little more than a year since I've made changes to this blog. library(plyr) library(data.table) library(rvest) library(doMC) library(ggplot2) registerDoMC(8) base_url <- "http://nojehu.com/bbs/board.php?bo_table=streaming05&page=" page_end <- 500 starttime <- Sys.time() dat <- llply(1:page_end, function …"
+  "description": "I like watching movies. I discovered this somewhat sketchy site that hosts quite a few Korean and English movies online. I call library(plyr) library(data.table) library(rvest) library(doMC) library(ggplot2) registerDoMC(8) base_url <- "http://nojehu.com/bbs/board.php?bo_table=streaming05&page=" page_end <- 500 starttime <- Sys.time …"
 }
 </script></body>
 </html>
