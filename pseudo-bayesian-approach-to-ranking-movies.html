@@ -86,7 +86,7 @@
     <p>Many people like watching movies, and I do too. Recently I've discovered <a href="http://nojehu.com/bbs/board.php?bo_table=streaming05">this</a> somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a deadly virus whenever I click on just about anything. Nonetheless, my goal is to watch a movie online, and so far the site has never failed to let me down.</p>
 <p>Here is an example page with a thumbnail image for each movie along with its total number of upvotes, downvotes, and views received since the first upload. The site allows you to sort the movies based on the upvotes, views, or upload dates. I'm going to scrape all such pages and use the information about movies to efficiently rank them using a pseudo-Bayesian procedure.</p>
 <p><img alt="Movies" src="https://stathwang.github.io/images/movies.png"></p>
-<p>Below is a full working R script to grab movie titles, upvotes, downvotes, views, and image urls. Make sure to set <code>.parallel = FALSE</code> when running the loop for the first time and let it run for few iterations. Then set <code>.parallel = TRUE</code> and run it again. I used the <code>rvest</code> library to make my web scraping easier and more robust. The code runs in about a minute using 8 backend cores on a Mac. If you are using a Windows, then you might want to use doSNOW or doParallel instead of doMC.</p>
+<p>Below is a full working R script to grab movie titles and the associated upvotes, downvotes, views, and image urls. Make sure to set <code>.parallel = FALSE</code> when running the loop for the first time and let it run for few iterations. Then set <code>.parallel = TRUE</code> and run it again fully. I used the <code>rvest</code> library to make my web scraping easier and more robust. The code runs in about a minute using a single physical CPU with 8 cores on a Mac. If you are using a Windows, then you might want to use <code>doSNOW</code> or <code>doParallel</code> instead of <code>doMC</code>. Use <code>detectCores()</code> function to check how many cores your laptop has available.</p>
 <div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">plyr</span><span class="p">)</span>
 <span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
 <span class="n">library</span><span class="p">(</span><span class="n">rvest</span><span class="p">)</span>
@@ -106,17 +106,14 @@
     <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">s+&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">.</span><span class="p">)</span>
   <span class="n">upvotes</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span> 
     <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_con li:nth-child(4) strong&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span>
-    <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">()</span>
+    <span class="n">html_text</span><span class="p">()</span>
   <span class="n">downvotes</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span>
     <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_con li:nth-child(5) strong&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span>
-    <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">()</span>
+    <span class="n">html_text</span><span class="p">()</span>
   <span class="n">views</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span>
     <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_text_href+ li&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
     <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span>
-    <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;.*([0-9]+)$&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">1&quot;</span><span class="p">,</span> <span class="o">.</span><span class="p">)</span> <span class="o">%&gt;%</span>
-    <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">()</span>
+    <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;.*([0-9]+)$&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">1&quot;</span><span class="p">,</span> <span class="o">.</span><span class="p">)</span>
   <span class="n">image_urls</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span>
     <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_href img&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
     <span class="n">html_attr</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">)</span>
@@ -132,18 +129,26 @@
 </pre></div>
 
 
-<p>Now that we have the data, let's see how upvotes, downvotes, and views to rank movies.</p>
-<div class="math">\begin{equation*}
-\end{equation*}</div>
-<div class="highlight"><pre><span></span><span class="n">upvote_total</span> <span class="o">&lt;-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="err">$</span><span class="n">upvote</span><span class="p">)</span>
-<span class="n">downvote_total</span> <span class="o">&lt;-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="err">$</span><span class="n">downvote</span><span class="p">)</span>
+<p>Now that I have the data, let's use the number of upvotes, downvotes, and views to rank movies efficiently. When it comes to ranking movies using upvotes and downvotes, we are inherently dealing with positive and negative observations where an upvote corresponds to a success and a downvotes a failure. In statistics, we model such set of binary data using a <a href="https://en.wikipedia.org/wiki/Binomial_distribution">binomial distribution</a>. In Bayesian setting, we'd use a <a href="https://en.wikipedia.org/wiki/Beta_distribution">beta</a> prior with a binomial likelihood to construct a beta posterior. </p>
+<p>Here's what I mean. The maximum likelihood estimate of the true proportion of upvotes of a movie should asymptotically be the total number of upvotes divided by the total number of downvotes for that movie. However, this estimate, while intuitive and uncomplicated, is not so reliable when we have new movies with zero or small number upvotes. So the Bayesians tend to make use of prior information by borrowing data from the whole - that is, the proportion of total upvotes and downvotes of all movies. These global proportion of upvotes and downvotes serve as prior pseudo counts, and we add them to our actual data - the number of upvotes and downvotes for each movie - to get the parameter estimates of a beta posterior. Then instead of using the posterior mean or mode, I use the 10th quantile of a beta posterior as the measure of rank. The greater the score, the higher the rank of a movie.</p>
+<div class="highlight"><pre><span></span><span class="n">upvote_total</span> <span class="o">&lt;-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="err">$</span><span class="n">upvotes</span><span class="p">)</span>
+<span class="n">downvote_total</span> <span class="o">&lt;-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="err">$</span><span class="n">downvotes</span><span class="p">)</span>
 <span class="n">f</span><span class="p">[,</span> <span class="n">totalvotes</span> <span class="p">:</span><span class="o">=</span> <span class="n">upvotes</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">]</span>
 <span class="n">f</span><span class="p">[,</span> <span class="n">rank_naive</span> <span class="p">:</span><span class="o">=</span> <span class="n">qbeta</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">)</span> <span class="o">+</span> <span class="n">upvotes</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">))</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">)]</span>
-<span class="n">f</span><span class="p">[,</span> <span class="n">rank_popular</span> <span class="p">:</span><span class="o">=</span> <span class="n">qbeta</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">)</span> <span class="o">+</span> <span class="n">upvotes</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span> <span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">))</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">)]</span>
-<span class="n">f</span><span class="p">[,</span> <span class="n">rank_agg</span> <span class="p">:</span><span class="o">=</span> <span class="n">qbeta</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">views</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">views</span><span class="p">)</span> <span class="o">+</span> <span class="n">upvotes</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span> <span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">views</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">views</span><span class="p">))</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">)]</span>
 </pre></div>
 
 
+<p>As you can see, this naive pseudo-Bayesian rank score doesn't take into account the vote popularity of each movie. The vote popularity of each movie can be approximated as the total number of upvotes that a movie has received divided by the votes total. Below I added a popularity proportion as another pseudo count for a beta posterior.</p>
+<div class="highlight"><pre><span></span><span class="n">f</span><span class="p">[,</span> <span class="n">rank_popular</span> <span class="p">:</span><span class="o">=</span> <span class="n">qbeta</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">)</span> <span class="o">+</span> <span class="n">upvotes</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span> <span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">))</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">)]</span>
+</pre></div>
+
+
+<p>But again, even this popularity pseudo-Bayesian rank score fails to incorporate the view popularity of each movie. The view popularity of a movie is calculated as the total number of views of the movie over the views total.</p>
+<div class="highlight"><pre><span></span><span class="n">f</span><span class="p">[,</span> <span class="n">rank_agg</span> <span class="p">:</span><span class="o">=</span> <span class="n">qbeta</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">views</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">views</span><span class="p">)</span> <span class="o">+</span> <span class="n">upvotes</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span> <span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">views</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">views</span><span class="p">))</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">)]</span>
+</pre></div>
+
+
+<p>Let's plot the </p>
 <div class="highlight"><pre><span></span><span class="n">f1</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">rank_naive</span><span class="p">)]</span>
 <span class="n">f2</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">rank_popular</span><span class="p">)]</span>
 <span class="n">f3</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">rank_agg</span><span class="p">)]</span>
@@ -160,65 +165,6 @@
   <span class="n">ggtitle</span><span class="p">(</span><span class="s2">&quot;Comparison of Different Types of Bayesian Heuristic Ranking&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
 </pre></div>
-
-
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    var location_protocol = (false) ? 'https' : document.location.protocol;
-    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script>
   </div>
   <div class="tag-cloud">
     <p>
