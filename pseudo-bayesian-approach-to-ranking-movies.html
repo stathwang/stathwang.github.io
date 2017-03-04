@@ -83,10 +83,10 @@
     <p>Posted on Fri 03 March 2017 in <a href="https://stathwang.github.io/category/statistics.html">Statistics</a></p>
   </header>
   <div>
-    <p>Many people like watching movies, and I do too. Recently I've discovered <a href="http://nojehu.com/bbs/board.php?bo_table=streaming05">this</a> somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a deadly virus and also few inappropriate ads on the side of a page. Nonetheless, my goal is to watch a movie online, and so far the site has never failed to let me down.</p>
+    <p>Many people like watching movies, and I do too. Recently I've discovered <a href="http://nojehu.com/bbs/board.php?bo_table=streaming05">this</a> somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a deadly virus whenever I click on just about anything. Nonetheless, my goal is to watch a movie online, and so far the site has never failed to let me down.</p>
 <p>Here is an example page with a thumbnail image for each movie along with its total number of upvotes, downvotes, and views received since the first upload. The site allows you to sort the movies based on upvotes, views, and date of upload. I'm going to scrape all such pages and use the information about movies to efficiently rank them using a pseudo-Bayesian procedure.</p>
 <p><img alt="Movies" src="https://stathwang.github.io/images/movies.png"></p>
-<p>Below is a full working R script to scrape movie titles, upvotes, downvotes, views, and image urls.</p>
+<p>Below is a full working R script to grab movie titles, upvotes, downvotes, views, and image urls. There are about </p>
 <div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">plyr</span><span class="p">)</span>
 <span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
 <span class="n">library</span><span class="p">(</span><span class="n">rvest</span><span class="p">)</span>
