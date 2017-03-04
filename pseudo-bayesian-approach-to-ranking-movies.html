@@ -162,7 +162,7 @@
 <span class="n">g</span> <span class="o">&lt;-</span> <span class="n">ggplot</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">Rank</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Score</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">Type</span><span class="p">))</span> <span class="o">+</span> 
   <span class="n">geom_point</span><span class="p">()</span> <span class="o">+</span>
   <span class="n">theme</span><span class="p">(</span><span class="n">legend</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">),</span> <span class="n">legend</span><span class="o">.</span><span class="n">background</span> <span class="o">=</span> <span class="n">element_rect</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">linetype</span> <span class="o">=</span> <span class="s2">&quot;dotted&quot;</span><span class="p">))</span> <span class="o">+</span> 
-  <span class="n">ggtitle</span><span class="p">(</span><span class="s2">&quot;Comparison of Different Types of Bayesian Heuristic Ranking&quot;</span><span class="p">)</span>
+  <span class="n">ggtitle</span><span class="p">(</span><span class="s2">&quot;Comparison of Different Types of Pseudo-Bayesian Ranking&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
 </pre></div>
 
@@ -183,7 +183,7 @@
 </ul>
 <p><img alt="Aggregate" src="https://stathwang.github.io/images/rank3.png"></p>
 <p>Whether this kind of shuffle in rank is effective in recommending which movies to watch I am not sure. We need to measure the performance of each type of rank through A/B testing and then compute precision and recall of which of the movies recommended as top-k are actually clicked or seen.</p>
-<p>The drawback of this pseudo-Bayesian approach to ranking is that the prior informations are added independently. Some information may be correlated with others, and this may be something that need to be addressed. However, the beauty of this technique lies in efficiency and effectiveness despite simplicity.</p>
+<p>The drawback of this pseudo-Bayesian approach to ranking is that the prior informations are added independently. Some information may be correlated with others, and this may be something that needs to be addressed. However, the beauty of this technique lies in efficiency and effectiveness despite simplicity.</p>
   </div>
   <div class="tag-cloud">
     <p>
