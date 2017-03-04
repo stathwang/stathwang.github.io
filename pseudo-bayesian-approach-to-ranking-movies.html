@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/pygments/monokai.min.css">
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://stathwang.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Seong Hyun Hwang Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="author" content="Seong Hyun Hwang" />
+<meta name="description" content="Many people like watching movies, and I do too. Recently I've discovered this somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a …" />
+<meta name="keywords" content="ranking, recommender system, statistics, machine learning, r">
+<meta property="og:site_name" content="Seong Hyun Hwang"/>
+<meta property="og:title" content="Pseudo-Bayesian Approach to Ranking Movies"/>
+<meta property="og:description" content="Many people like watching movies, and I do too. Recently I've discovered this somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://stathwang.github.io/pseudo-bayesian-approach-to-ranking-movies.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2017-03-03 15:10:00-05:00"/>
+<meta property="article:modified_time" content="2017-03-03 20:11:00-05:00"/>
+<meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
+<meta property="article:section" content="Statistics"/>
+<meta property="article:tag" content="ranking"/>
+<meta property="article:tag" content="recommender system"/>
+<meta property="article:tag" content="statistics"/>
+<meta property="article:tag" content="machine learning"/>
+<meta property="article:tag" content="r"/>
+<meta property="og:image" content="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg">
+  <title>Seong Hyun Hwang &ndash; Pseudo-Bayesian Approach to Ranking Movies</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="https://stathwang.github.io">
+        <img src="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg" alt="Seong Hyun Hwang" title="Seong Hyun Hwang">
+      </a>
+      <h1><a href="https://stathwang.github.io">Seong Hyun Hwang</a></h1>
+<p>Data Scientist - Product Developer</p>      <nav>
+        <ul class="list">
+          <li><a href="https://stathwang.github.io/pages/about.html#about">about</a></li>
+          <li><a href="https://stathwang.github.io/pages/projects.html#projects">projects</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/stathwang" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-twitter" href="https://twitter.com/superhugehwang" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a class="sc-rss" href="//stathwang.github.io/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+    <nav>
+      <a href="https://stathwang.github.io">Home</a>
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+      <a href="https://stathwang.github.io/feeds/all.atom.xml">Atom</a>
+    </nav>
+
+<article>
+  <header>
+    <h1 id="pseudo-bayesian-approach-to-ranking-movies">Pseudo-Bayesian Approach to Ranking Movies</h1>
+    <p>Posted on Fri 03 March 2017 in <a href="https://stathwang.github.io/category/statistics.html">Statistics</a></p>
+  </header>
+  <div>
+    <p>Many people like watching movies, and I do too. Recently I've discovered <a href="http://nojehu.com/bbs/board.php?bo_table=streaming05">this</a> somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a deadly virus and also few inappropriate ads on the side of a page. Nonetheless, my goal is to watch a movie online, and so far the site has never failed to let me down.</p>
+<p>Here is an example page with a thumbnail image for each movie along with its total number of upvotes, downvotes, and views received since the first upload. The site allows you to sort the movies based on upvotes, views, and date of upload. I'm going to scrape all such pages and use the information about movies to efficiently rank them using a pseudo-Bayesian procedure.</p>
+<p><img alt="Movies" src="https://stathwang.github.io/images/movies.png"></p>
+<p>Below is a full working R script to scrape movie titles, upvotes, downvotes, views, and image urls.</p>
+<div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">plyr</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">rvest</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">doMC</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+
+<span class="n">registerDoMC</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">base_url</span> <span class="o">&lt;-</span> <span class="s2">&quot;http://nojehu.com/bbs/board.php?bo_table=streaming05&amp;page=&quot;</span>
+<span class="n">page_end</span> <span class="o">&lt;-</span> <span class="mi">500</span>
+<span class="n">starttime</span> <span class="o">&lt;-</span> <span class="n">Sys</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">dat</span> <span class="o">&lt;-</span> <span class="n">llply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">page_end</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">movies</span> <span class="o">&lt;-</span> <span class="n">read_html</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="n">base_url</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+  <span class="n">titles</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span> 
+    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_text_href&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span> 
+    <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;댓글[0-9]+개&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">.</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">s+&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="o">.</span><span class="p">)</span>
+  <span class="n">upvotes</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span> 
+    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_con li:nth-child(4) strong&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span>
+    <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">()</span>
+  <span class="n">downvotes</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span>
+    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_con li:nth-child(5) strong&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span>
+    <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">()</span>
+  <span class="n">views</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span>
+    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_text_href+ li&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="n">html_text</span><span class="p">()</span> <span class="o">%&gt;%</span>
+    <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;.*([0-9]+)$&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">1&quot;</span><span class="p">,</span> <span class="o">.</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">()</span>
+  <span class="n">image_urls</span> <span class="o">&lt;-</span> <span class="n">movies</span> <span class="o">%&gt;%</span>
+    <span class="n">html_nodes</span><span class="p">(</span><span class="s2">&quot;.gall_href img&quot;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="n">html_attr</span><span class="p">(</span><span class="s2">&quot;src&quot;</span><span class="p">)</span>
+  <span class="n">output</span> <span class="o">&lt;-</span> <span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">cbind</span><span class="p">(</span><span class="n">titles</span><span class="p">,</span> <span class="n">upvotes</span><span class="p">,</span> <span class="n">downvotes</span><span class="p">,</span> <span class="n">views</span><span class="p">,</span> <span class="n">image_urls</span><span class="p">))</span>
+  <span class="n">cat</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;Page &quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;scraped!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+  <span class="k">return</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+<span class="p">},</span> <span class="o">.</span><span class="n">parallel</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Sys</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">starttime</span><span class="p">)</span>
+</pre></div>
+
+
+<div class="math">\begin{equation*}
+\end{equation*}</div>
+<div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">&lt;-</span> <span class="n">rbindlist</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">fill</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">)</span>
+<span class="n">cols</span> <span class="o">&lt;-</span> <span class="n">c</span><span class="p">(</span><span class="s1">&#39;upvotes&#39;</span><span class="p">,</span> <span class="s1">&#39;downvotes&#39;</span><span class="p">,</span> <span class="s1">&#39;views&#39;</span><span class="p">)</span>
+<span class="n">f</span><span class="p">[,</span> <span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="p">:</span><span class="o">=</span> <span class="n">lapply</span><span class="p">(</span><span class="o">.</span><span class="n">SD</span><span class="p">,</span> <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">),</span> <span class="o">.</span><span class="n">SDcols</span> <span class="o">=</span> <span class="n">cols</span><span class="p">]</span>
+
+<span class="n">upvote_total</span> <span class="o">&lt;-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="err">$</span><span class="n">upvote</span><span class="p">)</span>
+<span class="n">downvote_total</span> <span class="o">&lt;-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="err">$</span><span class="n">downvote</span><span class="p">)</span>
+<span class="n">f</span><span class="p">[,</span> <span class="n">totalvotes</span> <span class="p">:</span><span class="o">=</span> <span class="n">upvotes</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">]</span>
+<span class="n">f</span><span class="p">[,</span> <span class="n">rank_naive</span> <span class="p">:</span><span class="o">=</span> <span class="n">qbeta</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">)</span> <span class="o">+</span> <span class="n">upvotes</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">))</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">)]</span>
+<span class="n">f</span><span class="p">[,</span> <span class="n">rank_popular</span> <span class="p">:</span><span class="o">=</span> <span class="n">qbeta</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">)</span> <span class="o">+</span> <span class="n">upvotes</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span> <span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">))</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">)]</span>
+<span class="n">f</span><span class="p">[,</span> <span class="n">rank_agg</span> <span class="p">:</span><span class="o">=</span> <span class="n">qbeta</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">views</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">views</span><span class="p">)</span> <span class="o">+</span> <span class="n">upvotes</span><span class="p">,</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">upvote_total</span><span class="o">/</span><span class="p">(</span><span class="n">upvote_total</span> <span class="o">+</span> <span class="n">downvote_total</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span> <span class="n">totalvotes</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">totalvotes</span><span class="p">))</span> <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">views</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">views</span><span class="p">))</span> <span class="o">+</span> <span class="n">downvotes</span><span class="p">)]</span>
+<span class="n">f1</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">rank_naive</span><span class="p">)]</span>
+<span class="n">f2</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">rank_popular</span><span class="p">)]</span>
+<span class="n">f3</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">rank_agg</span><span class="p">)]</span>
+
+<span class="n">f1</span><span class="p">[,</span> <span class="n">Type</span> <span class="p">:</span><span class="o">=</span> <span class="s2">&quot;Naive Rank&quot;</span><span class="p">]</span>
+<span class="n">f2</span><span class="p">[,</span> <span class="n">Type</span> <span class="p">:</span><span class="o">=</span> <span class="s2">&quot;Popularity Rank&quot;</span><span class="p">]</span>
+<span class="n">f3</span><span class="p">[,</span> <span class="n">Type</span> <span class="p">:</span><span class="o">=</span> <span class="s2">&quot;Aggregate Rank&quot;</span><span class="p">]</span>
+<span class="n">total</span> <span class="o">&lt;-</span> <span class="n">rbind</span><span class="p">(</span><span class="n">f1</span><span class="p">[,</span> <span class="o">.</span><span class="p">(</span><span class="n">Type</span><span class="p">,</span> <span class="n">Rank</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">nrow</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">Score</span> <span class="o">=</span> <span class="n">rank_naive</span><span class="p">)],</span> 
+               <span class="n">f2</span><span class="p">[,</span> <span class="o">.</span><span class="p">(</span><span class="n">Type</span><span class="p">,</span> <span class="n">Rank</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">nrow</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">Score</span> <span class="o">=</span> <span class="n">rank_popular</span><span class="p">)],</span>
+               <span class="n">f3</span><span class="p">[,</span> <span class="o">.</span><span class="p">(</span><span class="n">Type</span><span class="p">,</span> <span class="n">Rank</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">nrow</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">Score</span> <span class="o">=</span> <span class="n">rank_agg</span><span class="p">)])</span>
+<span class="n">g</span> <span class="o">&lt;-</span> <span class="n">ggplot</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">Rank</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">Score</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">Type</span><span class="p">))</span> <span class="o">+</span> 
+  <span class="n">geom_point</span><span class="p">()</span> <span class="o">+</span>
+  <span class="n">theme</span><span class="p">(</span><span class="n">legend</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">),</span> <span class="n">legend</span><span class="o">.</span><span class="n">background</span> <span class="o">=</span> <span class="n">element_rect</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">linetype</span> <span class="o">=</span> <span class="s2">&quot;dotted&quot;</span><span class="p">))</span> <span class="o">+</span> 
+  <span class="n">ggtitle</span><span class="p">(</span><span class="s2">&quot;Comparison of Different Types of Bayesian Heuristic Ranking&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+</pre></div>
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://stathwang.github.io/tag/ranking.html">ranking</a>
+      <a href="https://stathwang.github.io/tag/recommender-system.html">recommender system</a>
+      <a href="https://stathwang.github.io/tag/statistics.html">statistics</a>
+      <a href="https://stathwang.github.io/tag/machine-learning.html">machine learning</a>
+      <a href="https://stathwang.github.io/tag/r.html">r</a>
+    </p>
+  </div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'thedatalogical';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</article>
+
+    <hr />
+    <p />
+    <!-- Begin MailChimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+  #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
+  /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+     We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+<form action="//github.us1.list-manage.com/subscribe/post?u=0f2c943c221c777ef88591fb6&amp;id=6cf4236c90" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+  <label for="mce-EMAIL">Subscribe to my sporadic data science newsletter and blog post</label>
+  <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0f2c943c221c777ef88591fb6_6cf4236c90" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+<br />
+<br />
+
+<!--End mc_embed_signup-->
+
+    <footer>
+        <p>&copy; Seong Hyun Hwang 2017</p>
+    </footer>
+  </main>
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69797568-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+  <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us1.list-manage.com","uuid":"0f2c943c221c777ef88591fb6","lid":"6cf4236c90"}) })</script>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Seong Hyun Hwang ",
+  "url" : "https://stathwang.github.io",
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "description": "Seong Hyun Hwang's Thoughts and Writings"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Pseudo-Bayesian Approach to Ranking Movies",
+  "headline": "Pseudo-Bayesian Approach to Ranking Movies",
+  "datePublished": "2017-03-03 15:10:00-05:00",
+  "dateModified": "2017-03-03 20:11:00-05:00",
+  "author": {
+    "@type": "Person",
+    "name": "Seong Hyun Hwang",
+    "url": "https://stathwang.github.io/author/seong-hyun-hwang.html"
+  },
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "url": "https://stathwang.github.io/pseudo-bayesian-approach-to-ranking-movies.html",
+  "description": "Many people like watching movies, and I do too. Recently I've discovered this somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a …"
+}
+</script></body>
+</html>
