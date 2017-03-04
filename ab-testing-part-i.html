@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/pygments/monokai.min.css">
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://stathwang.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Seong Hyun Hwang Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="author" content="Seong Hyun Hwang" />
+<meta name="description" content="This is going to be my first post on a topic in data science, and in the next few posts including this one, I will talk about A/B testing, specifically how to do it right using Bayesian methods in comparison with the traditional Frequentist hypothesis testing. the basic concept …" />
+<meta name="keywords" content="a/b testing, bayesian statistics, statistics, machine learning">
+<meta property="og:site_name" content="Seong Hyun Hwang"/>
+<meta property="og:title" content="A/B Testing Part I"/>
+<meta property="og:description" content="This is going to be my first post on a topic in data science, and in the next few posts including this one, I will talk about A/B testing, specifically how to do it right using Bayesian methods in comparison with the traditional Frequentist hypothesis testing. the basic concept …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://stathwang.github.io/ab-testing-part-i.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2015-04-03 20:25:00-04:00"/>
+<meta property="article:modified_time" content="2015-10-09 18:48:00-04:00"/>
+<meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
+<meta property="article:section" content="Statistics"/>
+<meta property="article:tag" content="a/b testing"/>
+<meta property="article:tag" content="bayesian statistics"/>
+<meta property="article:tag" content="statistics"/>
+<meta property="article:tag" content="machine learning"/>
+<meta property="og:image" content="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg">
+  <title>Seong Hyun Hwang &ndash; A/B Testing Part I</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="https://stathwang.github.io">
+        <img src="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg" alt="Seong Hyun Hwang" title="Seong Hyun Hwang">
+      </a>
+      <h1><a href="https://stathwang.github.io">Seong Hyun Hwang</a></h1>
+<p>Data Scientist - Product Developer</p>      <nav>
+        <ul class="list">
+          <li><a href="https://stathwang.github.io/pages/about.html#about">about</a></li>
+          <li><a href="https://stathwang.github.io/pages/projects.html#projects">projects</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/stathwang" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-twitter" href="https://twitter.com/superhugehwang" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a class="sc-rss" href="//stathwang.github.io/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+    <nav>
+      <a href="https://stathwang.github.io">Home</a>
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+      <a href="https://stathwang.github.io/feeds/all.atom.xml">Atom</a>
+    </nav>
+
+<article>
+  <header>
+    <h1 id="ab-testing-part-i">A/B Testing Part I</h1>
+    <p>Posted on Fri 03 April 2015 in <a href="https://stathwang.github.io/category/statistics.html">Statistics</a></p>
+  </header>
+  <div>
+    <p>This is going to be my first post on a topic in data science, and in the next few posts including this one, I will talk about A/B testing, specifically how to do it right using Bayesian methods in comparison with the traditional Frequentist hypothesis testing.</p>
+<p><strong>the basic concept</strong></p>
+<p>As the name implies, A/B testing is a way of testing which one of the two variants, A and B, where A represents the control and B the treatment in a controlled experiment, is statistically significantly better than the other. A and B could be web pages, for example, where in a simplified setting A is the currently deployed web page with a yellow button in the center, and we want to test whether web page B with a blue button in the center is better than A, given that all other elements of the two web pages such as copy text, layouts, background colors, and images are the same.</p>
+<p>In search engine marketing, a user types a query <em>health insurance</em> in a search engine say, Google, possibly because he or she wants to enroll in one, and Google shows ads, or so called creatives, at the top and on the side of the search results page. Let's say that an advertiser currently shows a creative like the one below:</p>
+<p><img alt="Creative" src="https://stathwang.github.io/images/creative.png"></p>
+<p>At the time of writing, Obamacare enrollment deadline for 2015 has already passed as it was on February 15th but those few who didn't make the deadline due to special circumstances including, but not limited to, marriage or divorce, technical glitches during the enrollment process, or birth of a new baby were given a week of extension in some states, so it makes sense to have drafted a creative like the one above. Now as the advertiser, can we make this creative better so as to attract more users to click on it? In other words, we want to test whether changing the description lines from the original <em>Deadline Extended in Your State? Check for Updates. Get Insured Now!</em> which we'll label as A to <em>Missed Deadline? You Can Still Get Insured!</em> as B. Of course, we can say there is no measurable difference between these two seemingly similar languages, and it's useless and too time-consuming to test for changes in minor details, such as testing whether adding an exclamation mark at the end of a sentence significantly improves ad clicks, but let's just argue that the former implies a caveat that not all states offer extension and the latter doesn't and testing which creative is more effective is of importance.</p>
+<p>How then are we going to measure the effectiveness of the creatives? What does it mean by when one is better than the other? Here the metric of interest is the click-through-rate, or simply CTR, which is basically the number of times an ad is clicked divided by the number of times an ad is shown, clicks over impressions. If there are 5 clicks resulting from a total of 100 impressions for creative A, then A has a CTR of 5/100 or 5%. If A gets a higher CTR than B, then A is defined to be <em>better</em> than B, and vice versa. Now let's set up an A/B test.</p>
+<p>Assume creative A that we are currently showing is the control and creative B is the treatment or the test that we compare against A. An A/B test is basically a randomized controlled experiment; that is, let's assume there is a simple random sample of 2000 users who missed the enrollment deadline and are actively searching for their health insurance plans. I show creative A to a randomly chosen 1000 users and creative B to the rest 1000 users. In reality this randomization of showing each user a random creative A or B is done automatically and algorithmically by Google, and we would stop when we reach a total of 2000 users. It would be easier to understand if we think somewhere along the line of first drawing 1000 random numbers without replacement from 1 through 2000 where each number represents a different user and showing A to those 1000 users whose numbers were drawn and otherwise show B. You can then gather the binary data on whether each user in each group clicked 1 or not 0. Also assume in this example that we count only unique clicks. If a user clicks a creative but goes back and clicks again then such action will still be counted as 1. Stop the test when the number of users reaches a total of 2000. Make sure not to stop the test early or continue further testing for the reasons that will be explained in later posts.</p>
+<p>After testing, A has received a total of 380 clicks and B 370. In other words, A has a CTR of 0.38 and B 0.37. The primary focus of A/B testing is on which of these two creatives did better in terms of higher CTR and hence should supersede the other. A simple way to do this is to carry out a two-sided proportion test as CTR is a proportion.</p>
+<p><strong>the frequentist way</strong></p>
+<p>A classical hypothesis testing is the frequentist alternative to the Bayesian method I will write about in later posts. The null hypothesis is that the CTR of A is same as the CTR of B, whereas the alternative hypothesis is the CTR of A is not same as, or different from, the CTR of B. We assume that the null hypothesis is true to begin with and calculate a statistic - a number derived from data - as follows:</p>
+<div class="math">\begin{equation*} 
+z = \dfrac{P_T - P_C}{\sqrt{p(1 - p)(\frac{1}{n_T} + \frac{1}{n_C})}}
+\end{equation*}</div>
+<p>where our statistic <span class="math">\(z\)</span> will be normally distributed given that our sample size grows large, by the central limit theorem. We have a sample of 1000 users in each group. Note that <span class="math">\(P_T\)</span> is the observed CTR of the treatment or test group, <span class="math">\(P_T\)</span> the observed CTR of the control group, and <span class="math">\(N_T\)</span> and <span class="math">\(N_C\)</span> refer to the total number of observations in the treatment and control group, respectively.</p>
+<p>If our null hypothesis is true, <em>z-statistic</em> will follow the standard normal distribution with mean 0 and standard deviation 1. Let's assume our significance level is 5%. This means that if the value of the z-statistic falls outside the range where 95% of the values from a standard normal distribution fall, we reject the null hypothesis at the 5% significance level. If not, we fail to reject the null. A significance level is basically a false-positive rate, the probability of rejecting the null when the null is true, so setting the significance level to 0.05 means we would erroneously reject the null 5 out of 100 times the experiment is conducted.</p>
+<p><strong>the results</strong></p>
+<p>In R, the above calculation of z-statistic and comparing it to the point where 95% of the values from a standard normal distribution fall, approximately -1.96 as a lower bound and 1.96 as an upper bound, is done using the function <em>prop.test</em>. Since the p-value is 0.003653 which is less than 0.05, we reject the null that the CTR between A and B are same. <strong>The interval (0.01497, 0.1008) contains the true population CTR difference between A and B 95 times out of 100 A/B tests done under the same conditions</strong>.</p>
+<p>Whew! That's it. Now we say A and B are different in terms of CTR. But so what? To what extent are they different? What is the probability of that extent? That we need to use the Bayesian method to find out. I will discuss the Bayesian alternative which is more intuitive and robust than the frequentist hypothesis testing.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://stathwang.github.io/tag/ab-testing.html">a/b testing</a>
+      <a href="https://stathwang.github.io/tag/bayesian-statistics.html">bayesian statistics</a>
+      <a href="https://stathwang.github.io/tag/statistics.html">statistics</a>
+      <a href="https://stathwang.github.io/tag/machine-learning.html">machine learning</a>
+    </p>
+  </div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'thedatalogical';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</article>
+
+    <hr />
+    <p />
+    <!-- Begin MailChimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+  #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
+  /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+     We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+<form action="//github.us1.list-manage.com/subscribe/post?u=0f2c943c221c777ef88591fb6&amp;id=6cf4236c90" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+  <label for="mce-EMAIL">Subscribe to my sporadic data science newsletter and blog post</label>
+  <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0f2c943c221c777ef88591fb6_6cf4236c90" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+<br />
+<br />
+
+<!--End mc_embed_signup-->
+
+    <footer>
+        <p>&copy; Seong Hyun Hwang 2017</p>
+    </footer>
+  </main>
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69797568-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+  <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us1.list-manage.com","uuid":"0f2c943c221c777ef88591fb6","lid":"6cf4236c90"}) })</script>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Seong Hyun Hwang ",
+  "url" : "https://stathwang.github.io",
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "description": "Seong Hyun Hwang's Thoughts and Writings"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "A/B Testing Part I",
+  "headline": "A/B Testing Part I",
+  "datePublished": "2015-04-03 20:25:00-04:00",
+  "dateModified": "2015-10-09 18:48:00-04:00",
+  "author": {
+    "@type": "Person",
+    "name": "Seong Hyun Hwang",
+    "url": "https://stathwang.github.io/author/seong-hyun-hwang.html"
+  },
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "url": "https://stathwang.github.io/ab-testing-part-i.html",
+  "description": "This is going to be my first post on a topic in data science, and in the next few posts including this one, I will talk about A/B testing, specifically how to do it right using Bayesian methods in comparison with the traditional Frequentist hypothesis testing. the basic concept …"
+}
+</script></body>
+</html>
