@@ -85,7 +85,7 @@
 
 &lt;p&gt;&lt;img alt="Rank" src="https://stathwang.github.io/images/ranking_plot.png"&gt;&lt;/p&gt;
 &lt;p&gt;As I add more information as prior, the curve becomes smoother. This means that there are less flat lines where movies can have same rank scores. Eventually the curve is expected to look like a reciprocal function as more information is added as pseudo counts. For example, we can further use an exponential decay function to take into account the upload date of each movie in order to distinguish scores among movies that are uploaded on the same day. We can also add information about the overall popularity of movies in other sites such as Netflix and IMDB.&lt;/p&gt;
-&lt;p&gt;Here are the top 5 movies for each type of rank:&lt;/p&gt;
+&lt;p&gt;Here are the top 5 movies for each type of ranking methods:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Naive Rank&lt;/li&gt;
 &lt;/ul&gt;
