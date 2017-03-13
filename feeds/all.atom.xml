@@ -15,7 +15,7 @@
 &lt;/ul&gt;
 &lt;p&gt;A more detailed description of the dataset can be found &lt;a href="http://sing.stanford.edu/cs303-sp10/assignments/U500k_README.txt"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;My goal is to find clusters of queries or url domains that are semantically and syntactically similar based on queries submitted or urls visited by a set of users. For example, a query &lt;code&gt;find baby food&lt;/code&gt; is correlated with &lt;code&gt;healthy baby food&lt;/code&gt; or &lt;code&gt;Gerber Good Start&lt;/code&gt;, a brand name for baby food. For URL domains, domains &lt;code&gt;healthplans.com&lt;/code&gt; and &lt;code&gt;ehealthinsurance.com&lt;/code&gt; can be grouped under the health insurance category. I've decided to cluster url domains, but you can always try with queries instead and compare which of the two results gives the better cluster representation.&lt;/p&gt;
-&lt;p&gt;The dataset is quite large, so I took careful steps to sample about 1000 users and 7500 domains after removing rows with generic, non-informative queries such as &lt;code&gt;google&lt;/code&gt; and &lt;code&gt;yahoo&lt;/code&gt; along with domains like &lt;code&gt;google.com&lt;/code&gt; or &lt;code&gt;-&lt;/code&gt; and after defining an active user to be a user with more than 10 rows. Only &lt;code&gt;usr&lt;/code&gt; and &lt;code&gt;click_url&lt;/code&gt; columns are used to cluster url domains.&lt;/p&gt;
+&lt;p&gt;The data is somewhat large, so I took careful steps to sample about 1000 users and 7500 domains after removing rows with generic, non-informative queries such as &lt;code&gt;google&lt;/code&gt; and &lt;code&gt;yahoo&lt;/code&gt; along with domains like &lt;code&gt;google.com&lt;/code&gt; or &lt;code&gt;-&lt;/code&gt; and after defining an active user to be a user with more than 10 rows. Only &lt;code&gt;usr&lt;/code&gt; and &lt;code&gt;click_url&lt;/code&gt; columns are used to cluster url domains. Below is the R script that preprocesses the dataset.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;plyr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;table&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
@@ -43,7 +43,7 @@
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Once I've sampled a subset of the users, I'll create a matrix of url similarity where each element of the matrix is a Jaccard similarity &lt;/p&gt;
+&lt;p&gt;Once I've sampled a subset of the users, I create a &lt;span class="math"&gt;\(N\)&lt;/span&gt; by &lt;span class="math"&gt;\(N\)&lt;/span&gt; matrix of url similarity where &lt;span class="math"&gt;\(N\)&lt;/span&gt; is the total number of urls and each element of the matrix is the &lt;a href="https://en.wikipedia.org/wiki/Jaccard_index"&gt;Jaccard similarity index&lt;/a&gt; between a set of users to the first url and to the second url. For example, let's say that a set of users numbered 1, 2, and 3 visited the webpage &lt;code&gt;healthplans.com&lt;/code&gt; and a set of users 1, 3, 4, and 5 visited &lt;code&gt;ehealthinsurance.com&lt;/code&gt;. The Jaccard index between the two webpages is &lt;span class="math"&gt;\(2/5\)&lt;/span&gt; because there are two overlapping users (1 and 2) out of 5 total users (1, 2, 3, 4 and 5).&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/python&lt;/span&gt;
 
 &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;array&lt;/span&gt;
@@ -124,7 +124,66 @@
 
 &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="vm"&gt;__name__&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;__main__&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
     &lt;span class="n"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</content><category term="community detection"></category><category term="network"></category><category term="graph"></category><category term="machine learning"></category><category term="python"></category></entry><entry><title>Pseudo-Bayesian Approach to Ranking Movies</title><link href="https://stathwang.github.io/pseudo-bayesian-approach-to-ranking-movies.html" rel="alternate"></link><published>2017-03-03T15:10:00-05:00</published><updated>2017-03-03T20:11:00-05:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2017-03-03:/pseudo-bayesian-approach-to-ranking-movies.html</id><summary type="html">&lt;p&gt;Many people like watching movies, and I do too. Recently I've discovered &lt;a href="http://nojehu.com/bbs/board.php?bo_table=streaming05"&gt;this&lt;/a&gt; somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Many people like watching movies, and I do too. Recently I've discovered &lt;a href="http://nojehu.com/bbs/board.php?bo_table=streaming05"&gt;this&lt;/a&gt; somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a deadly virus whenever I click on just about anything. Nonetheless, my goal is to watch a movie online, and so far the site has never failed to let me down.&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="community detection"></category><category term="network"></category><category term="graph"></category><category term="machine learning"></category><category term="python"></category></entry><entry><title>Pseudo-Bayesian Approach to Ranking Movies</title><link href="https://stathwang.github.io/pseudo-bayesian-approach-to-ranking-movies.html" rel="alternate"></link><published>2017-03-03T15:10:00-05:00</published><updated>2017-03-03T20:11:00-05:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2017-03-03:/pseudo-bayesian-approach-to-ranking-movies.html</id><summary type="html">&lt;p&gt;Many people like watching movies, and I do too. Recently I've discovered &lt;a href="http://nojehu.com/bbs/board.php?bo_table=streaming05"&gt;this&lt;/a&gt; somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Many people like watching movies, and I do too. Recently I've discovered &lt;a href="http://nojehu.com/bbs/board.php?bo_table=streaming05"&gt;this&lt;/a&gt; somewhat sketchy Korean site that hosts quite a few movies online. I call it sketchy because I almost always see ads asking me to download a piece of software that's supposed to protect my computer from a deadly virus whenever I click on just about anything. Nonetheless, my goal is to watch a movie online, and so far the site has never failed to let me down.&lt;/p&gt;
 &lt;p&gt;Here is an example page with a thumbnail image for each movie along with its total number of upvotes, downvotes, and views received since the first upload. The site allows you to sort the movies based on the upvotes, views, or upload dates. I'm going to scrape all such pages and use the information about movies to efficiently rank them using a pseudo-Bayesian procedure.&lt;/p&gt;
 &lt;p&gt;&lt;img alt="Movies" src="https://stathwang.github.io/images/movies.png"&gt;&lt;/p&gt;
 &lt;p&gt;Below is a full working R script to grab movie titles and the associated upvotes, downvotes, views, and image urls. Make sure to set &lt;code&gt;.parallel = FALSE&lt;/code&gt; when running the loop for the first time and let it run for few iterations. Then set &lt;code&gt;.parallel = TRUE&lt;/code&gt; and run it again fully. I used the &lt;code&gt;rvest&lt;/code&gt; library to make my web scraping easier and more robust. The code runs in about a minute using a single physical CPU with 8 cores on a Mac. If you are using a Windows, then you might want to use &lt;code&gt;doSNOW&lt;/code&gt; or &lt;code&gt;doParallel&lt;/code&gt; instead of &lt;code&gt;doMC&lt;/code&gt;. Use &lt;code&gt;detectCores()&lt;/code&gt; function to check how many cores your laptop has available.&lt;/p&gt;
