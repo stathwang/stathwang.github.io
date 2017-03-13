@@ -28,11 +28,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="author" content="Seong Hyun Hwang" />
-<meta name="description" content="Recently I discovered a dataset online that is a large collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006. The columns are listed as follows: User ID - an anonymous user ID number Query - the query submitted by the user Query …" />
+<meta name="description" content="Recently I've discovered a dataset online that is a collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006. The columns are listed as follows: User ID - an anonymous user ID number Query - the query submitted by the user Query Time …" />
 <meta name="keywords" content="community detection, network, graph, machine learning, python">
 <meta property="og:site_name" content="Seong Hyun Hwang"/>
 <meta property="og:title" content="Multilevel URL Community Detection with Infomap"/>
-<meta property="og:description" content="Recently I discovered a dataset online that is a large collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006. The columns are listed as follows: User ID - an anonymous user ID number Query - the query submitted by the user Query …"/>
+<meta property="og:description" content="Recently I've discovered a dataset online that is a collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006. The columns are listed as follows: User ID - an anonymous user ID number Query - the query submitted by the user Query Time …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://stathwang.github.io/multilevel-url-community-detection-with-infomap.html"/>
 <meta property="og:type" content="article"/>
@@ -83,7 +83,7 @@
     <p>Posted on Sun 12 March 2017 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
   </header>
   <div>
-    <p>Recently I discovered a dataset online that is a large collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006.</p>
+    <p>Recently I've discovered a dataset online that is a collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006.</p>
 <p>The columns are listed as follows:</p>
 <ul>
 <li>User ID - an anonymous user ID number</li>
@@ -207,7 +207,7 @@
 
 
 <p>It's possible to convert a url similarity matrix into a graphical network where a node is a url and an edge between two nodes is a degree of similarity between two urls. I use the state-of-the-art multilevel community detection with the map equation framework and its accompanying search algorithm Infomap. <a href="http://www.mapequation.org/assets/publications/mapequationtutorial.pdf">This</a> paper provides a detailed explanation and tutorial of the method. Basically, this algorithm allows one to find structure within a large network by detecting different communities where we say that a set of nodes form a community when there are more edges among nodes within the community than between other nodes not in the community. Unlike other community detection algorithms out there, the Infomap algorithm finds communities of hierarchical structure where nested communities become semantically more specific.</p>
-<p>I downloaded the Infomap source code from its site <a href="http://www.mapequation.org/code.html">here</a>. Inside the folder, run the following code.</p>
+<p>I downloaded the Infomap source code from its main site <a href="http://www.mapequation.org/code.html">here</a>. In the folder, run the following code.</p>
 <div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">output</span>
 <span class="o">./</span><span class="n">Infomap</span> <span class="n">link_list</span><span class="o">.</span><span class="n">net</span> <span class="n">output</span><span class="o">/</span> <span class="o">-</span><span class="n">N</span> <span class="mi">10</span> <span class="o">--</span><span class="n">tree</span> <span class="o">--</span><span class="n">bftree</span>
 </pre></div>
@@ -363,7 +363,7 @@
   },
   "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
   "url": "https://stathwang.github.io/multilevel-url-community-detection-with-infomap.html",
-  "description": "Recently I discovered a dataset online that is a large collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006. The columns are listed as follows: User ID - an anonymous user ID number Query - the query submitted by the user Query …"
+  "description": "Recently I've discovered a dataset online that is a collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006. The columns are listed as follows: User ID - an anonymous user ID number Query - the query submitted by the user Query Time …"
 }
 </script></body>
 </html>
