@@ -28,20 +28,20 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="author" content="Seong Hyun Hwang" />
-<meta name="description" content="Networks can be organized into clusters or communities #!/usr/bin/python from numpy import array from collections import deque import csv def main(): usr_qry_pairs = set() queries = set() users = set() qry_dict = {} with open('user-ct-test-collection-01.txt', 'r') as f: reader = csv.reader(f, delimiter = '\t') for row in reader: usr_qry_pairs.add((row …" />
-<meta name="keywords" content="community detection, clustering, graph, machine learning, python">
+<meta name="description" content="Recently I discovered a dataset online that is a large collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006. The columns are listed as follows: User ID - an anonymous user ID number Query - the query submitted by the user Query …" />
+<meta name="keywords" content="community detection, network, graph, machine learning, python">
 <meta property="og:site_name" content="Seong Hyun Hwang"/>
 <meta property="og:title" content="Multilevel URL Community Detection with Infomap"/>
-<meta property="og:description" content="Networks can be organized into clusters or communities #!/usr/bin/python from numpy import array from collections import deque import csv def main(): usr_qry_pairs = set() queries = set() users = set() qry_dict = {} with open('user-ct-test-collection-01.txt', 'r') as f: reader = csv.reader(f, delimiter = '\t') for row in reader: usr_qry_pairs.add((row …"/>
+<meta property="og:description" content="Recently I discovered a dataset online that is a large collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006. The columns are listed as follows: User ID - an anonymous user ID number Query - the query submitted by the user Query …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://stathwang.github.io/drafts/multilevel-url-community-detection-with-infomap.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2017-03-08 17:25:00-05:00"/>
+<meta property="article:published_time" content="2017-03-12 19:13:00-04:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
 <meta property="article:section" content="Machine Learning"/>
 <meta property="article:tag" content="community detection"/>
-<meta property="article:tag" content="clustering"/>
+<meta property="article:tag" content="network"/>
 <meta property="article:tag" content="graph"/>
 <meta property="article:tag" content="machine learning"/>
 <meta property="article:tag" content="python"/>
@@ -80,10 +80,49 @@
 <article>
   <header>
     <h1 id="multilevel-url-community-detection-with-infomap">Multilevel URL Community Detection with Infomap</h1>
-    <p>Posted on Wed 08 March 2017 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
+    <p>Posted on Sun 12 March 2017 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
   </header>
   <div>
-    <p>Networks can be organized into clusters or communities</p>
+    <p>Recently I discovered a dataset online that is a large collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006.</p>
+<p>The columns are listed as follows:</p>
+<ul>
+<li>User ID - an anonymous user ID number</li>
+<li>Query - the query submitted by the user</li>
+<li>Query Time - the time at which the query was submitted for search</li>
+<li>Item Rank - if the user clicked on a search result, the rank of the item on which they clicked is listed</li>
+<li>Click URL - if the user clicked on a search result, the domain portion of the URL in the clicked result is listed</li>
+</ul>
+<p>A more detailed description of the dataset can be found <a href="http://sing.stanford.edu/cs303-sp10/assignments/U500k_README.txt">here</a>.</p>
+<p>My goal is to find clusters of queries or url domains that are semantically and syntactically similar based on queries submitted or urls visited by a set of users. For example, a query <code>find baby food</code> is correlated with <code>healthy baby food</code> or <code>Gerber Good Start</code>, a brand name for baby food. For URL domains, domains <code>healthplans.com</code> and <code>ehealthinsurance.com</code> can be grouped under the health insurance category. I've decided to cluster url domains, but you can always try with queries instead and compare which of the two results gives the better cluster representation.</p>
+<p>The data is somewhat large, so I took careful steps to sample about 1000 users and 7500 domains after removing rows with generic, non-informative queries such as <code>google</code> and <code>yahoo</code> along with domains like <code>google.com</code> or <code>-</code> and after defining an active user to be a user with more than 10 rows. Only <code>usr</code> and <code>click_url</code> columns are used to cluster url domains. Below is the R script that preprocesses the dataset.</p>
+<div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">plyr</span><span class="p">)</span>
+<span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+
+<span class="c1"># http://sing.stanford.edu/cs303-sp10/assignments</span>
+<span class="n">f</span> <span class="o">&lt;-</span> <span class="n">fread</span><span class="p">(</span><span class="s2">&quot;user-ct-test-collection-01.txt&quot;</span><span class="p">)</span>
+<span class="n">setnames</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">c</span><span class="p">(</span><span class="s1">&#39;usr&#39;</span><span class="p">,</span> <span class="s1">&#39;qry&#39;</span><span class="p">,</span> <span class="s1">&#39;qry_time&#39;</span><span class="p">,</span> <span class="s1">&#39;item_rank&#39;</span><span class="p">,</span> <span class="s1">&#39;click_url&#39;</span><span class="p">))</span>
+
+<span class="n">qdat</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[,</span> <span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">qry</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">rdat</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[,</span> <span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">click_url</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">f</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[</span><span class="err">!</span><span class="n">click_url</span> <span class="o">%</span><span class="ow">in</span><span class="o">%</span> <span class="n">rdat</span><span class="err">$</span><span class="n">click_url</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">100</span><span class="p">]][</span><span class="err">!</span><span class="n">qry</span> <span class="o">%</span><span class="ow">in</span><span class="o">%</span> <span class="n">qdat</span><span class="err">$</span><span class="n">qry</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">50</span><span class="p">]]</span>
+<span class="n">udat</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[,</span> <span class="o">.</span><span class="p">(</span><span class="n">rows</span> <span class="o">=</span> <span class="o">.</span><span class="n">N</span><span class="p">,</span> 
+              <span class="n">qrys</span> <span class="o">=</span> <span class="n">uniqueN</span><span class="p">(</span><span class="n">qry</span><span class="p">),</span>
+              <span class="n">urls</span> <span class="o">=</span> <span class="n">uniqueN</span><span class="p">(</span><span class="n">click_url</span><span class="p">)),</span> <span class="n">usr</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">rows</span><span class="p">)]</span>
+<span class="n">udat</span> <span class="o">&lt;-</span> <span class="n">udat</span><span class="p">[</span><span class="n">rows</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">]</span>
+
+<span class="nb">set</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">23456</span><span class="p">)</span>
+<span class="n">udat</span> <span class="o">&lt;-</span> <span class="n">udat</span><span class="p">[</span><span class="n">usr</span> <span class="o">%</span><span class="ow">in</span><span class="o">%</span> <span class="n">sample</span><span class="p">(</span><span class="n">usr</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)]</span>
+
+<span class="nb">set</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">65432</span><span class="p">)</span>
+<span class="n">fsub2</span> <span class="o">&lt;-</span> <span class="n">f</span><span class="p">[</span><span class="n">usr</span> <span class="o">%</span><span class="ow">in</span><span class="o">%</span> <span class="n">udat</span><span class="err">$</span><span class="n">usr</span><span class="p">][</span><span class="n">click_url</span> <span class="o">%</span><span class="ow">in</span><span class="o">%</span> <span class="n">sample</span><span class="p">(</span><span class="n">click_url</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)]</span>
+<span class="n">fr</span> <span class="o">&lt;-</span> <span class="n">unique</span><span class="p">(</span><span class="n">fsub2</span><span class="p">[,</span> <span class="o">.</span><span class="p">(</span><span class="n">usr</span><span class="p">,</span> <span class="n">click_url</span><span class="p">)])</span>
+<span class="n">uniqueN</span><span class="p">(</span><span class="n">fr</span><span class="err">$</span><span class="n">usr</span><span class="p">);</span> <span class="n">uniqueN</span><span class="p">(</span><span class="n">fr</span><span class="err">$</span><span class="n">click_url</span><span class="p">)</span> <span class="c1"># 998 users, 7735 urls</span>
+
+<span class="n">fwrite</span><span class="p">(</span><span class="n">fr</span><span class="p">,</span> <span class="nb">file</span> <span class="o">=</span> <span class="s2">&quot;session-url-data.csv&quot;</span><span class="p">,</span> <span class="n">col</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Once I've sampled a subset of the users, I create a <span class="math">\(N\)</span> by <span class="math">\(N\)</span> matrix of url similarity where <span class="math">\(N\)</span> is the total number of urls and each element of the matrix is the <a href="https://en.wikipedia.org/wiki/Jaccard_index">Jaccard index</a> between a set of users to the first url and to the second url. For example, let's assume that a set of users numbered 1, 2, and 3 visited the webpage <code>healthplans.com</code> and a set of users 1, 3, 4, and 5 visited <code>ehealthinsurance.com</code>. The Jaccard similarity index between the two webpages is <span class="math">\(2/5\)</span> since there are two overlapping users (1 and 2) out of 5 total users (1, 2, 3, 4 and 5). Note that I say urls when in fact I mean domains. Below is the Python code where the <code>main()</code> function computes the url similarity matrix, while the <code>metric()</code> function gives different options to calculate similarity score between urls and the <code>write_pajek_list()</code> function writes the resulting matrix into a <code>.net</code> format. Only the elements whose Jaccard indices are greater than 0.85 get written to the output file.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python</span>
 
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">array</span>
@@ -91,59 +130,57 @@
 <span class="kn">import</span> <span class="nn">csv</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">usr_qry_pairs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="n">queries</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">usr_url_pairs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">urls</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">users</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="n">qry_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">url_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;user-ct-test-collection-01.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">delimiter</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;session-url-data.csv&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">delimiter</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
-            <span class="n">usr_qry_pairs</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-            <span class="n">queries</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">usr_url_pairs</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">urls</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">users</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">qry_dict</span><span class="p">:</span>
-                <span class="n">qry_dict</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">url_dict</span><span class="p">:</span>
+                <span class="n">url_dict</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">qry_dict</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">url_dict</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="c1"># Convert a set into a list gives a deduped ordered list of the queries</span>
-    <span class="n">queries</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
-    <span class="n">query_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+    <span class="c1"># Convert a set into a list gives a deduped ordered list of the urls</span>
+    <span class="n">urls</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
+    <span class="n">url_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
     <span class="n">user_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
-    <span class="k">print</span> <span class="s1">&#39;Number of Queries: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">query_count</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s1">&#39;Number of URL Domains: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">url_count</span><span class="p">)</span>
     <span class="k">print</span> <span class="s1">&#39;Number of Users: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">user_count</span><span class="p">)</span>
 
     <span class="n">distance_matrix</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">link_list</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
 
-    <span class="c1"># Construct a matrix of query-query similarity</span>
+    <span class="c1"># Construct a matrix of url-url similarity</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
-        <span class="n">distance_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">query_count</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
+        <span class="n">distance_matrix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">url_count</span><span class="p">))</span>
         <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">)</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s1">&#39;Queries computed: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s1">&#39;URL domains computed: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">:</span>
-            <span class="n">r</span> <span class="o">=</span> <span class="n">queries</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-            <span class="n">similarity</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="n">qry_dict</span><span class="p">[</span><span class="n">q</span><span class="p">],</span> <span class="n">qry_dict</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;jaccard&#39;</span><span class="p">,</span> <span class="n">total_users</span> <span class="o">=</span> <span class="n">user_count</span><span class="p">)</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">urls</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">similarity</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="n">url_dict</span><span class="p">[</span><span class="n">q</span><span class="p">],</span> <span class="n">url_dict</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;jaccard&#39;</span><span class="p">,</span> <span class="n">total_users</span> <span class="o">=</span> <span class="n">user_count</span><span class="p">)</span>
             <span class="n">distance_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">similarity</span>
             <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">i</span><span class="p">:</span>
                 <span class="n">link_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]))</span>
             <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="n">write_pajek_list</span><span class="p">(</span><span class="n">link_list</span><span class="p">,</span> <span class="n">queries</span><span class="p">,</span> <span class="n">query_count</span><span class="p">)</span>
-</pre></div>
+    <span class="n">write_pajek_list</span><span class="p">(</span><span class="n">link_list</span><span class="p">,</span> <span class="n">urls</span><span class="p">,</span> <span class="n">url_count</span><span class="p">)</span>
 
-
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">write_pajek_list</span><span class="p">(</span><span class="n">link_list</span><span class="p">,</span> <span class="n">query_list</span><span class="p">,</span> <span class="n">query_count</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">write_pajek_list</span><span class="p">(</span><span class="n">link_list</span><span class="p">,</span> <span class="n">url_list</span><span class="p">,</span> <span class="n">url_count</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;link_list.net&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;*Vertices &#39;</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">query_count</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">url_count</span><span class="p">))</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">query_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">url_list</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &quot;&#39;</span> <span class="o">+</span> <span class="n">row</span> <span class="o">+</span> <span class="s1">&#39;&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;*Edges &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">link_list</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -151,23 +188,93 @@
             <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">.</span><span class="mi">85</span><span class="p">:</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="se">\t</span><span class="si">%s</span><span class="se">\t</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
 
-<span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">total_users</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;jaccard&#39;</span> <span class="ow">or</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">metric</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;jaccard&#39;</span><span class="p">,</span> <span class="n">total_users</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;jaccard&#39;</span><span class="p">:</span>
         <span class="n">J</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span> <span class="o">&amp;</span> <span class="n">w</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span> <span class="o">|</span> <span class="n">w</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">J</span>
     <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;normalized&#39;</span><span class="p">:</span>
-        <span class="n">K</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span> <span class="o">&amp;</span> <span class="n">w</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">total_users</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">K</span>
+        <span class="n">J</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span> <span class="o">&amp;</span> <span class="n">w</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">total_users</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">J</span>
     <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;distance&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="n">w</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="n">v</span><span class="p">))</span>
+        <span class="n">J</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="n">w</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span> <span class="o">-</span> <span class="n">v</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">J</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">0</span>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </pre></div>
+
+
+<p>It's possible to convert a url similarity matrix into a graphical network where a node is a url and an edge between two nodes is a degree of similarity between two urls. I use the state-of-the-art multilevel community detection with the map equation framework and its accompanying search algorithm Infomap. <a href="http://www.mapequation.org/assets/publications/mapequationtutorial.pdf">This</a> paper provides a detailed explanation and tutorial of the method. Basically, this algorithm allows one to find structure within a large network by detecting different communities where we say that a set of nodes form a community when there are more edges among nodes within the community than between other nodes not in the community. Unlike other community detection algorithms out there, the Infomap algorithm finds communities of hierarchical structure where nested communities become semantically more specific.</p>
+<p>I downloaded the Infomap source code from its main site <a href="http://www.mapequation.org/code.html">here</a>. In the folder, run the following code.</p>
+<div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">output</span>
+<span class="o">./</span><span class="n">Infomap</span> <span class="n">link_list</span><span class="o">.</span><span class="n">net</span> <span class="n">output</span><span class="o">/</span> <span class="o">-</span><span class="n">N</span> <span class="mi">10</span> <span class="o">--</span><span class="n">tree</span> <span class="o">--</span><span class="n">bftree</span>
+</pre></div>
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
   </div>
   <div class="tag-cloud">
     <p>
       <a href="https://stathwang.github.io/tag/community-detection.html">community detection</a>
-      <a href="https://stathwang.github.io/tag/clustering.html">clustering</a>
+      <a href="https://stathwang.github.io/tag/network.html">network</a>
       <a href="https://stathwang.github.io/tag/graph.html">graph</a>
       <a href="https://stathwang.github.io/tag/machine-learning.html">machine learning</a>
       <a href="https://stathwang.github.io/tag/python.html">python</a>
@@ -247,7 +354,7 @@
   "@type": "BlogPosting",
   "name": "Multilevel URL Community Detection with Infomap",
   "headline": "Multilevel URL Community Detection with Infomap",
-  "datePublished": "2017-03-08 17:25:00-05:00",
+  "datePublished": "2017-03-12 19:13:00-04:00",
   "dateModified": "",
   "author": {
     "@type": "Person",
@@ -256,7 +363,7 @@
   },
   "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
   "url": "https://stathwang.github.io/drafts/multilevel-url-community-detection-with-infomap.html",
-  "description": "Networks can be organized into clusters or communities #!/usr/bin/python from numpy import array from collections import deque import csv def main(): usr_qry_pairs = set() queries = set() users = set() qry_dict = {} with open('user-ct-test-collection-01.txt', 'r') as f: reader = csv.reader(f, delimiter = '\t') for row in reader: usr_qry_pairs.add((row …"
+  "description": "Recently I discovered a dataset online that is a large collection of 20M web queries from about 650k users over three months from March 1 to May 31 2006. The columns are listed as follows: User ID - an anonymous user ID number Query - the query submitted by the user Query …"
 }
 </script></body>
 </html>
