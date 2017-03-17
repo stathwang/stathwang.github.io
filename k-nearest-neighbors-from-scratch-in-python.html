@@ -82,7 +82,7 @@
   </header>
   <div>
     <p><img alt="MNIST" src="https://stathwang.github.io/images/mnist.png"></p>
-<p>The <span class="math">\(k\)</span>-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if <span class="math">\(k = 3\)</span>, then we'd use 3 nearest neighbors of a point in the test set. In this post, I'm going to use <code>kNN</code> for classifying hand-written digits from 0 to 9. Here's the pseudocode for classification:</p>
+<p>The <span class="math">\(k\)</span>-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if <span class="math">\(k = 3\)</span>, then we'd use 3 nearest neighbors of a point in the test set. In this post, I'm going to use <code>kNN</code> for classifying hand-written digits from 0 to 9 as shown in the picture above. Here's the pseudocode for classification:</p>
 <ol>
 <li>Choose the number of nearest neighbors i.e. <span class="math">\(k = 5\)</span>.</li>
 <li>For each data point in the test set:<ul>
@@ -204,9 +204,8 @@
 </pre></div>
 
 
-<p>Here is the plot of misclassification error by <span class="math">\(k\)</span> from repeated cross validation:</p>
+<p>Here is the plot of misclassification error by <span class="math">\(k\)</span> from repeated cross validation. The minimum validation error is 0.0974 achieved when <span class="math">\(k = 3\)</span>. Using this optimal value of <span class="math">\(k\)</span>, we'd fit a <code>kNN</code> on the entire training set and predict on the test set. The test error is 0.1 which is very close to the validation error we got for <span class="math">\(k = 3\)</span>. The model prediction takes about a minute. For more information about the mechanism of <code>kNN</code>, take a look at <a href="https://kevinzakka.github.io/2016/07/13/k-nearest-neighbor/">this</a> blog post.</p>
 <p><img alt="ErrorPlot" src="https://stathwang.github.io/images/misclass.png"></p>
-<p>The minimum validation error is 0.0974 achieved when <span class="math">\(k = 3\)</span>. Using this optimal value of <span class="math">\(k\)</span>, we'd fit a <code>kNN</code> on the entire training set and predict on the test set. The test error is 0.1 which is very close to the validation error we got for <span class="math">\(k = 3\)</span>. The model prediction takes about a minute. For more information about the mechanism of <code>kNN</code>, take a look at <a href="https://kevinzakka.github.io/2016/07/13/k-nearest-neighbor/">this</a> blog post.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
