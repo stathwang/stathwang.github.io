@@ -28,11 +28,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="author" content="Seong Hyun Hwang" />
-<meta name="description" content="The k-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if k = 3, then we'd use 3 nearest neighbors of a point in the test set. In …" />
+<meta name="description" content="The \(k\)-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if \(k = 3\), then we'd use 3 nearest neighbors of a point in the test set …" />
 <meta name="keywords" content="k-nearest neighbors, classification, python">
 <meta property="og:site_name" content="Seong Hyun Hwang"/>
 <meta property="og:title" content="K-Nearest Neighbors in Python"/>
-<meta property="og:description" content="The k-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if k = 3, then we'd use 3 nearest neighbors of a point in the test set. In …"/>
+<meta property="og:description" content="The \(k\)-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if \(k = 3\), then we'd use 3 nearest neighbors of a point in the test set …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://stathwang.github.io/k-nearest-neighbors-in-python.html"/>
 <meta property="og:type" content="article"/>
@@ -81,16 +81,16 @@
     <p>Posted on Tue 14 March 2017 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
   </header>
   <div>
-    <p>The k-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if k = 3, then we'd use 3 nearest neighbors of a point in the test set. In this post, I'm going to use <code>kNN</code> for classifying hand-written digits from 0 to 9. Here's the pseudocode for classification:</p>
+    <p>The <span class="math">\(k\)</span>-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if <span class="math">\(k = 3\)</span>, then we'd use 3 nearest neighbors of a point in the test set. In this post, I'm going to use <code>kNN</code> for classifying hand-written digits from 0 to 9. Here's the pseudocode for classification:</p>
 <ol>
-<li>Choose the number of nearest neighbors i.e. k = 5.</li>
+<li>Choose the number of nearest neighbors i.e. <span class="math">\(k = 5\)</span>.</li>
 <li>For each data point in the test set:<ul>
-<li>Calculate the distance from the point to each of k nearest neighbors in the training set.</li>
-<li>Use the majority class voting among k training points to assign the best class to the test point.</li>
+<li>Calculate the distance from the point to each of <span class="math">\(k\)</span> nearest neighbors in the training set.</li>
+<li>Use the majority class voting among <span class="math">\(k\)</span> training points to assign the best class to the test point.</li>
 </ul>
 </li>
 </ol>
-<p>For regression, the algorithm takes the average of k training points instead of the majority class vote. It's important to be able to reimplement machine learning algorithms from scratch without using scikit-learn. Below is the Python script I've written that searches a sorted list in <span class="math">\(O(logK)\)</span> which could be improved with a ball tree or a kd tree. The <code>get_data()</code> function retrieves the training <a href="https://www.kaggle.com/c/digit-recognizer/data">MNIST dataset</a> downloaded to my working directory, <code>fit()</code> function just stores the training data and class labels, and the <code>predict()</code> function does all the job of classifying the test labels. I choose the best k value that minimizes the misclassification error on a validation set. I use a repeated cross-validation here, running 10 repeats of 10-fold CV of the training set for each k from 1 to 19, but since the CV score of each repeat doesn't vary much, it should be fine to do a single 10-fold CV to increase computational efficiency.</p>
+<p>For regression, the algorithm takes the average of <span class="math">\(k\)</span> training points instead of the majority class vote. It's important to be able to reimplement machine learning algorithms from scratch without using scikit-learn. Below is the Python script I've written that searches a sorted list in <span class="math">\(O(logK)\)</span> which could be improved with a ball tree or a kd tree. The <code>get_data()</code> function retrieves the training <a href="https://www.kaggle.com/c/digit-recognizer/data">MNIST dataset</a> downloaded to my working directory, <code>fit()</code> function just stores the training data and class labels, and the <code>predict()</code> function does all the job of classifying the test labels. I choose the best k value that minimizes the misclassification error on a validation set. I use a repeated cross-validation here, running 10 repeats of 10-fold CV of the training set for each <span class="math">\(k\)</span> from 1 to 19, but since the CV score of each repeat doesn't vary much, it should be fine to do a single 10-fold CV to increase computational efficiency.</p>
 <div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python</span>
 
 <span class="kn">import</span> <span class="nn">math</span>
@@ -203,9 +203,9 @@
 </pre></div>
 
 
-<p>Here is the plot of misclassification error by k from repeated cross validation:</p>
+<p>Here is the plot of misclassification error by <span class="math">\(k\)</span> from repeated cross validation:</p>
 <p><img alt="ErrorPlot" src="https://stathwang.github.io/images/misclass.png"></p>
-<p>The minimum validation error is 0.0974 achieved when k = 3. Using this optimal value of k, we'd fit a <code>kNN</code> on the entire training set and predict on the test set. The test error is 0.1 which is very close to the validation error we got for k = 3. The model prediction takes about a minute.</p>
+<p>The minimum validation error is 0.0974 achieved when <span class="math">\(k = 3\)</span>. Using this optimal value of <span class="math">\(k\)</span>, we'd fit a <code>kNN</code> on the entire training set and predict on the test set. The test error is 0.1 which is very close to the validation error we got for <span class="math">\(k = 3\)</span>. The model prediction takes about a minute.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -354,7 +354,7 @@
   },
   "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
   "url": "https://stathwang.github.io/k-nearest-neighbors-in-python.html",
-  "description": "The k-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if k = 3, then we'd use 3 nearest neighbors of a point in the test set. In …"
+  "description": "The \(k\)-nearest neighbors algorithm is a simple, yet powerful machine learning technique used for classification and regression. The basic premise is to use closest known data points to make a prediction; for instance, if \(k = 3\), then we'd use 3 nearest neighbors of a point in the test set …"
 }
 </script></body>
 </html>
