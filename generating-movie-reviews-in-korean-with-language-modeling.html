@@ -28,11 +28,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="author" content="Seong Hyun Hwang" />
-<meta name="description" content="A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is I …" />
+<meta name="description" content="A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved …" />
 <meta name="keywords" content="language modeling, markov chain, natural language processing, python">
 <meta property="og:site_name" content="Seong Hyun Hwang"/>
 <meta property="og:title" content="Generating Movie Reviews in Korean with Language Modeling"/>
-<meta property="og:description" content="A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is I …"/>
+<meta property="og:description" content="A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://stathwang.github.io/generating-movie-reviews-in-korean-with-language-modeling.html"/>
 <meta property="og:type" content="article"/>
@@ -85,28 +85,28 @@
     <p>Posted on March 23 2017 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
   </header>
   <div>
-    <p>A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is  I downloaded a <a href="https://github.com/e9t/nsmc">dataset</a> that contains movie reviews in Korean scraped from <a href="http://movie.naver.com/movie/point/af/list.nhn">Naver Movies</a>. In this post, I'll create a language model </p>
+    <p>A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved by using neural networks such as <code>RNN</code> and <code>LSTM</code> and using variants of probabilistic context-free grammars to produce grammatically sound sentences. I'll write about deep learning methods later when I have more free time, so stay tuned. In this post, I write a set of Python scripts to build unigram, bigram, trigram, and linearly interpolated language models using the <code>ratings.txt</code> <a href="https://github.com/e9t/nsmc">dataset</a> that contains movie reviews in Korean scraped from <a href="http://movie.naver.com/movie/point/af/list.nhn">Naver Movies</a> dataset in order to randomly generated movie reviews.</p>
 <ul>
 <li>
-<p><code>tokenize_tag()</code>: tokenizes each sentence in a corpus and tags it with an appropriate part-of-speech according to the set of grammatical rules in Korean language.</p>
+<p><code>tokenize_tag()</code> tokenizes each sentence in a corpus and tags it with an appropriate part-of-speech according to the set of grammatical rules in Korean language.</p>
 </li>
 <li>
-<p><code>calc_ngram</code>: calculates ngrams for each sentence without the help of <code>nltk</code> module.</p>
+<p><code>calc_ngram</code> calculates ngrams for each sentence without the help of <code>nltk</code> module.</p>
 </li>
 <li>
-<p><code>calc_probabilities()</code>: calculates unigram, bigram, and trigram probabilities given a training corpus, which is a list of sentences where each sentence is a string with tokens separates by spaces, ending in a newline character. This function outputs three python dictionaries where the keys are tuples expressing the ngram and the value is the log probability of that ngram.</p>
+<p><code>calc_probabilities()</code> calculates unigram, bigram, and trigram probabilities given a training corpus, which is a list of sentences where each sentence is a string with tokens separates by spaces, ending in a newline character. This function outputs three python dictionaries where the keys are tuples expressing the ngram and the value is the log probability of that ngram.</p>
 </li>
 <li>
-<p><code>q1_output()</code>: writes unigram, bigram, trigrams, and their respective log probabilities to a text file.</p>
+<p><code>q1_output()</code> writes unigram, bigram, trigrams, and their respective log probabilities to a text file.</p>
 </li>
 <li>
-<p><code>score()</code>: assigns a probability to each training sentence based on ngrams and their probabilities.</p>
+<p><code>score()</code> assigns a probability to each training sentence based on ngrams and their probabilities.</p>
 </li>
 <li>
-<p><code>score_output()</code>: writes sentence probabilities to a text file.</p>
+<p><code>score_output()</code> writes sentence probabilities to a text file.</p>
 </li>
 <li>
-<p><code>linearscore()</code>: assigns a probability to each training sentence based on a linear interpolation among ngrams with <span class="math">\(\lambda\)</span> fixed to <span class="math">\(1/3\)</span>.</p>
+<p><code>linearscore()</code> assigns a probability to each training sentence based on a linear interpolation among ngrams with <span class="math">\(\lambda\)</span> fixed to <span class="math">\(1/3\)</span>, but the optimal value of <span class="math">\(\lambda\)</span> can be found using a cross-validation.</p>
 </li>
 </ul>
 <div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3</span>
@@ -225,7 +225,7 @@
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">time</span><span class="o">.</span><span class="n">clock</span><span class="p">()</span>
 
-    <span class="n">infile</span> <span class="o">=</span> <span class="n">DATA_PATH</span> <span class="o">+</span> <span class="s1">&#39;ratings_train.txt&#39;</span>
+    <span class="n">infile</span> <span class="o">=</span> <span class="n">DATA_PATH</span> <span class="o">+</span> <span class="s1">&#39;ratings.txt&#39;</span>
     <span class="n">train</span> <span class="o">=</span> <span class="n">read_data</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
     <span class="n">doc</span> <span class="o">=</span> <span class="p">[</span><span class="n">tokenize_tag</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">train</span><span class="p">]</span>
 
@@ -241,21 +241,144 @@
 
     <span class="n">unigrams</span><span class="p">,</span> <span class="n">bigrams</span><span class="p">,</span> <span class="n">trigrams</span> <span class="o">=</span> <span class="n">calc_probabilities</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
 
-    <span class="n">q1_output</span><span class="p">(</span><span class="n">unigrams</span><span class="p">,</span> <span class="n">bigrams</span><span class="p">,</span> <span class="n">trigrams</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A1.txt&#39;</span><span class="p">)</span>
+    <span class="n">q1_output</span><span class="p">(</span><span class="n">unigrams</span><span class="p">,</span> <span class="n">bigrams</span><span class="p">,</span> <span class="n">trigrams</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;ngram_probs.txt&#39;</span><span class="p">)</span>
 
     <span class="n">uniscores</span> <span class="o">=</span> <span class="n">score</span><span class="p">(</span><span class="n">unigrams</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">corpus</span><span class="p">)</span>
     <span class="n">biscores</span> <span class="o">=</span> <span class="n">score</span><span class="p">(</span><span class="n">bigrams</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">corpus</span><span class="p">)</span>
     <span class="n">triscores</span> <span class="o">=</span> <span class="n">score</span><span class="p">(</span><span class="n">trigrams</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">corpus</span><span class="p">)</span>
 
-    <span class="n">score_output</span><span class="p">(</span><span class="n">uniscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A2.txt&#39;</span><span class="p">)</span>
-    <span class="n">score_output</span><span class="p">(</span><span class="n">biscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A2.bi.txt&#39;</span><span class="p">)</span>
-    <span class="n">score_output</span><span class="p">(</span><span class="n">triscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A2.tri.txt&#39;</span><span class="p">)</span>
+    <span class="n">score_output</span><span class="p">(</span><span class="n">uniscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;unigram_scores.txt&#39;</span><span class="p">)</span>
+    <span class="n">score_output</span><span class="p">(</span><span class="n">biscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;bigram_scores.txt&#39;</span><span class="p">)</span>
+    <span class="n">score_output</span><span class="p">(</span><span class="n">triscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;trigram_scores.txt&#39;</span><span class="p">)</span>
 
     <span class="n">linearscores</span> <span class="o">=</span> <span class="n">linearscore</span><span class="p">(</span><span class="n">unigrams</span><span class="p">,</span> <span class="n">bigrams</span><span class="p">,</span> <span class="n">trigrams</span><span class="p">,</span> <span class="n">corpus</span><span class="p">)</span>
 
-    <span class="n">score_output</span><span class="p">(</span><span class="n">linearscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A3.txt&#39;</span><span class="p">)</span>
+    <span class="n">score_output</span><span class="p">(</span><span class="n">linearscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;linear_scores.txt&#39;</span><span class="p">)</span>
 
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Time: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">clock</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39; sec&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+
+<p>Once we have <code>unigram_scores.txt</code>, <code>bigram_scores.txt</code>, <code>trigram_scores.txt</code>, and <code>linear_scores.txt</code> files, we can compute their perplexities on <code>ratings.txt</code> using the Python script below. The resulting perplexities of different language models are shown:</p>
+<ul>
+<li>Unigram LM: <span class="math">\(1279.036\)</span></li>
+<li>Bigram LM: $52.768</li>
+<li>Trigram LM: <span class="math">\(10.357\)</span></li>
+<li>Linear Interpolation: <span class="math">\(15.068\)</span></li>
+</ul>
+<p>As we can see, the trigram language model does the best on the training set since it has the lowest perplexity. The linear interpolation model actually does worse than the trigram model because we are calculating the perplexity on the entire training set where trigrams are always seen. If we were to calculate the perplexity on the test set where new trigrams exist, then we'd expect to see lower score on the linear interpolation than on the trigram model.</p>
+<div class="highlight"><pre><span></span><span class="c1"># an example usage</span>
+<span class="n">python3</span> <span class="n">perplexity</span><span class="o">.</span><span class="n">py</span> <span class="n">trigram_scores</span><span class="o">.</span><span class="n">txt</span> <span class="n">corpus</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Usage: python perplexity.py &lt;file of scores&gt; &lt;file of sentences that were scored&gt;&#39;</span><span class="p">)</span>
+        <span class="nb">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">infile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">infile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">M</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">:</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="n">sentence</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">M</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="n">perplexity</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">:</span>
+        <span class="n">perplexity</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">score</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># assume log probability</span>
+
+    <span class="n">perplexity</span> <span class="o">/=</span> <span class="n">M</span>
+    <span class="n">perplexity</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">perplexity</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;The perplexity is&#39;</span><span class="p">,</span> <span class="n">perplexity</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+
+<p>Now, I'm going to randomly generate sentences based on the trigram language model. The following Python script outputs 20 randomly generated movie reviews.</p>
+<ul>
+<li>
+<p><code>partial_match()</code> finds all key-value pairs in the trigram model dictionary</p>
+</li>
+<li>
+<p><code>weighted_pick()</code> picks the next word in a sequence of words using a probability distribution</p>
+</li>
+<li>
+<p><code>generate_sentence()</code> randomly creates a sentence</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="n">START_SYMBOL</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+<span class="n">STOP_SYMBOL</span> <span class="o">=</span> <span class="s1">&#39;STOP&#39;</span>
+
+<span class="k">def</span> <span class="nf">partial_match</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">ngram_dict</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ngram_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">k1</span> <span class="o">==</span> <span class="n">k2</span> <span class="ow">or</span> <span class="n">k2</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">key</span><span class="p">)):</span>
+            <span class="k">yield</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span>
+
+<span class="k">def</span> <span class="nf">weighted_pick</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">ngram_dict</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">partial_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">partial_match</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">ngram_dict</span><span class="p">))</span>
+    <span class="n">next_words</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">partial_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">trigram</span><span class="p">,</span> <span class="n">log_prob</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="n">next_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trigram</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="nb">float</span><span class="p">(</span><span class="n">log_prob</span><span class="p">))</span>
+    <span class="n">norm_probs</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">]</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">next_words</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">norm_probs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">generate_sentence</span><span class="p">(</span><span class="n">ngram_dict</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">sentence</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">START_SYMBOL</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span>
+
+    <span class="n">word</span> <span class="o">=</span> <span class="n">weighted_pick</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">ngram_dict</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">word</span> <span class="o">!=</span> <span class="n">STOP_SYMBOL</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">words</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+            <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+        <span class="n">sentence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">weighted_pick</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">ngram_dict</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentence</span><span class="p">))</span>
+
+<span class="n">OUTPUT_PATH</span> <span class="o">=</span> <span class="s1">&#39;/Users/seonghwang/SLMoutput/&#39;</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;ngram_probs.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">ngrams</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()]</span>
+        <span class="n">trigram_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">ngrams</span> <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;TRIGRAM&#39;</span><span class="p">]</span>
+        <span class="n">trigram_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">trigram_list</span><span class="p">:</span>
+            <span class="n">trigram_dict</span><span class="p">[(</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Generating random sentences...&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+        <span class="n">generate_sentence</span><span class="p">(</span><span class="n">trigram_dict</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
@@ -424,7 +547,7 @@
   },
   "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
   "url": "https://stathwang.github.io/generating-movie-reviews-in-korean-with-language-modeling.html",
-  "description": "A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is I …"
+  "description": "A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved …"
 }
 </script></body>
 </html>
