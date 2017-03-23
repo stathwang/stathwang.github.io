@@ -264,10 +264,10 @@
 
 <p>Once we have <code>unigram_scores.txt</code>, <code>bigram_scores.txt</code>, <code>trigram_scores.txt</code>, and <code>linear_scores.txt</code> files, we can compute their perplexities on <code>ratings.txt</code> using the Python script below. The resulting perplexities of different language models are shown:</p>
 <ul>
-<li>Unigram LM: <span class="math">\(1279.036\)</span></li>
-<li>Bigram LM: <span class="math">\(52.768\)</span></li>
-<li>Trigram LM: <span class="math">\(10.357\)</span></li>
-<li>Linear Interpolation: <span class="math">\(15.068\)</span></li>
+<li>Unigram LM: 1279.036</li>
+<li>Bigram LM: 52.768</li>
+<li>Trigram LM: 10.357</li>
+<li>Linear Interpolation: 15.068</li>
 </ul>
 <p>As we can see, the trigram language model does the best on the training set since it has the lowest perplexity. The linear interpolation model actually does worse than the trigram model because we are calculating the perplexity on the entire training set where trigrams are always seen. If we were to calculate the perplexity on the test set where new trigrams exist, then we'd expect to see lower score on the linear interpolation than on the trigram model.</p>
 <div class="highlight"><pre><span></span><span class="c1"># an example usage</span>
