@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Seong Hyun Hwang</title><link href="https://stathwang.github.io/" rel="alternate"></link><link href="https://stathwang.github.io/feeds/all.atom.xml" rel="self"></link><id>https://stathwang.github.io/</id><updated>2017-03-23T13:45:00-04:00</updated><entry><title>Generating Movie Reviews in Korean with Language Modeling</title><link href="https://stathwang.github.io/generating-movie-reviews-in-korean-with-language-modeling.html" rel="alternate"></link><published>2017-03-23T13:45:00-04:00</published><updated>2017-03-23T13:45:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2017-03-23:/generating-movie-reviews-in-korean-with-language-modeling.html</id><summary type="html">&lt;p&gt;A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved …&lt;/p&gt;</summary><content type="html">&lt;p&gt;A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved by using neural networks such as &lt;code&gt;RNN&lt;/code&gt; and &lt;code&gt;LSTM&lt;/code&gt; and using variants of probabilistic context-free grammars to produce grammatically sound sentences. I'll write about deep learning methods later when I have more free time, so stay tuned. In this post, I write a set of Python scripts to build unigram, bigram, trigram, and linearly interpolated language models using the &lt;code&gt;ratings.txt&lt;/code&gt; &lt;a href="https://github.com/e9t/nsmc"&gt;dataset&lt;/a&gt; that contains movie reviews in Korean scraped from &lt;a href="http://movie.naver.com/movie/point/af/list.nhn"&gt;Naver Movies&lt;/a&gt; dataset in order to randomly generated movie reviews.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;code&gt;tokenize_tag()&lt;/code&gt; tokenizes each sentence in a corpus and tags it with an appropriate part-of-speech according to the set of grammatical rules in Korean language.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;tokenize_tag()&lt;/code&gt; tokenizes each sentence in a corpus and tags it with an appropriate part-of-speech according to the set of grammatical rules in Korean language with the help of &lt;code&gt;konlpy&lt;/code&gt; module.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;code&gt;calc_ngram&lt;/code&gt; calculates ngrams for each sentence without the help of &lt;code&gt;nltk&lt;/code&gt; module.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;calc_ngram&lt;/code&gt; calculates ngrams for each sentence without using &lt;code&gt;nltk&lt;/code&gt; module.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;calc_probabilities()&lt;/code&gt; calculates unigram, bigram, and trigram probabilities given a training corpus, which is a list of sentences where each sentence is a string with tokens separates by spaces, ending in a newline character. This function outputs three python dictionaries where the keys are tuples expressing the ngram and the value is the log probability of that ngram.&lt;/p&gt;
@@ -178,10 +178,18 @@
 
 &lt;p&gt;Once we have &lt;code&gt;unigram_scores.txt&lt;/code&gt;, &lt;code&gt;bigram_scores.txt&lt;/code&gt;, &lt;code&gt;trigram_scores.txt&lt;/code&gt;, and &lt;code&gt;linear_scores.txt&lt;/code&gt; files, we can compute their perplexities on &lt;code&gt;ratings.txt&lt;/code&gt; using the Python script below. The resulting perplexities of different language models are shown:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Unigram LM: &lt;span class="math"&gt;\(1279.036\)&lt;/span&gt;&lt;/li&gt;
-&lt;li&gt;Bigram LM: $52.768&lt;/li&gt;
-&lt;li&gt;Trigram LM: &lt;span class="math"&gt;\(10.357\)&lt;/span&gt;&lt;/li&gt;
-&lt;li&gt;Linear Interpolation: &lt;span class="math"&gt;\(15.068\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Unigram LM: &lt;span class="math"&gt;\(1279.036\)&lt;/span&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Bigram LM: &lt;span class="math"&gt;\(52.768\)&lt;/span&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Trigram LM: &lt;span class="math"&gt;\(10.357\)&lt;/span&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Linear Interpolation: &lt;span class="math"&gt;\(15.068\)&lt;/span&gt;&lt;/p&gt;
+&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;As we can see, the trigram language model does the best on the training set since it has the lowest perplexity. The linear interpolation model actually does worse than the trigram model because we are calculating the perplexity on the entire training set where trigrams are always seen. If we were to calculate the perplexity on the test set where new trigrams exist, then we'd expect to see lower score on the linear interpolation than on the trigram model.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# an example usage&lt;/span&gt;
@@ -229,13 +237,13 @@
 &lt;p&gt;Now, I'm going to randomly generate sentences based on the trigram language model. The following Python script outputs 20 randomly generated movie reviews.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;code&gt;partial_match()&lt;/code&gt; finds all key-value pairs in the trigram model dictionary&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;partial_match()&lt;/code&gt; outputs all key-value pairs in the trigram model dictionary that have the same first two elements of an input key.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;code&gt;weighted_pick()&lt;/code&gt; picks the next word in a sequence of words using a probability distribution&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;weighted_pick()&lt;/code&gt; picks the next word in a sequence of words from a conditional probability distribution.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;code&gt;generate_sentence()&lt;/code&gt; randomly creates a sentence&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;generate_sentence()&lt;/code&gt; randomly creates a sentence.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/usr/bin/python3&lt;/span&gt;
@@ -299,6 +307,26 @@
 &lt;/pre&gt;&lt;/div&gt;
 
 
+&lt;p&gt;Few interesting sentences that got generated:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;진짜 엄청 신선하고 몰입도 있고 재밌었 어요 ~ &lt;/li&gt;
+&lt;li&gt;이민정 정말 이쁘 고 스토리 전개도 억지 스럽 다고 생각하는 데 이번 역 은 안 봐 지 하고 개속 봣 는 데 .. 5 ~ 7 점 이 아깝 다 &lt;/li&gt;
+&lt;li&gt;여친 따라 봤 다 후회 없 음 &lt;/li&gt;
+&lt;li&gt;ㄷㄷㄷ 담배 만 피우다 끝나는 영화 . 다 들 연기 안습 ㅡㅡ 스토리 가 주 운송 수단 이라는 점 에서 그 이상 의 디테 일도 쉣 ... 디테 일도 좋 았 어요 . 이 드라마 한가지 만 집중 적 으로 성동일 팬 이라 봤 지만 역시 재미있네 요 &lt;/li&gt;
+&lt;li&gt;잔잔 하니 감동 도 없는 영화 &lt;/li&gt;
+&lt;li&gt;영화 끝나고 스트레스 받았 다 는 것 ... &lt;/li&gt;
+&lt;li&gt;어쩔 수 없이 1 점 이다 . &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Other movie reviews that seem grammatically incorrect or sarcastic:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;미국 판 두 개 는 과거 들 과거 속 으로 들어가서 머리카락 이 영수증 분쇄기 에 찡 함&lt;/li&gt;
+&lt;li&gt;이 것 이 아 무 생각 없이 볼 만 했 던 신의 ... 지금 도 가슴 설레는 영화 ost 앨범 도 구매 해서 봤 다 . &lt;/li&gt;
+&lt;li&gt;한 남자 를 돌려 애써 모면 하려 하 는데 내 가 느와르 를 원한 다 진짜 !!!"""" 처음 엔 재밌게 만 봤 는데도 눈시울 붉 혔 네 요 ... 어디 유쾌 한 공정 드라마 . 로튼 토마토 가 모든 것 들 은 멋진 훈남 훈녀 다 .&lt;/li&gt;
+&lt;li&gt;1 점 드립니 다 . 최고 ! &lt;/li&gt;
+&lt;li&gt;잔잔 한 감동 을 주는 공포영화 는 절대 영화관 가서 봣다 가 S 급 &lt;/li&gt;
+&lt;li&gt;현재 tv 시트콤 수준 이 1998 년 당시 에는 파격 적 인 제목 은 기술자 들 이야 말로 다른 배트맨 시리즈 를 다시 찍어 봐 . 38 분 까지 역겨운 짓 하던 니 들 이 이 것 보단 재밌겠 다 능 &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Most short sentences that got generated seemed okay, while long sentences or sentences with movie names in them sounded a bit weird.&lt;/p&gt;
 &lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
