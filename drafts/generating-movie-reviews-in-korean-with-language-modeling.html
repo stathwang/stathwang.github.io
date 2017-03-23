@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/pygments/monokai.min.css">
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://stathwang.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Seong Hyun Hwang Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="author" content="Seong Hyun Hwang" />
+<meta name="description" content="A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is I …" />
+<meta name="keywords" content="language modeling, markov chain, natural language processing, python">
+<meta property="og:site_name" content="Seong Hyun Hwang"/>
+<meta property="og:title" content="Generating Movie Reviews in Korean with Language Modeling"/>
+<meta property="og:description" content="A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is I …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://stathwang.github.io/drafts/generating-movie-reviews-in-korean-with-language-modeling.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2017-03-23 13:45:00-04:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
+<meta property="article:section" content="Machine Learning"/>
+<meta property="article:tag" content="language modeling"/>
+<meta property="article:tag" content="markov chain"/>
+<meta property="article:tag" content="natural language processing"/>
+<meta property="article:tag" content="python"/>
+<meta property="og:image" content="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg">
+  <title>Seong Hyun Hwang &ndash; Generating Movie Reviews in Korean with Language Modeling</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="https://stathwang.github.io">
+        <img src="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg" alt="Seong Hyun Hwang" title="Seong Hyun Hwang">
+      </a>
+      <h1><a href="https://stathwang.github.io">Seong Hyun Hwang</a></h1>
+<p>Data Scientist - Product Developer</p>      <nav>
+        <ul class="list">
+          <li><a href="https://stathwang.github.io/pages/about.html#about">about</a></li>
+          <li><a href="https://stathwang.github.io/pages/photos.html#photos">photos</a></li>
+          <li><a href="https://stathwang.github.io/pages/projects.html#projects">projects</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-linkedin" href="https://www.linkedin.com/in/seonghyunhwang" target="_blank"><i class="fa fa-linkedin"></i></a></li>
+        <li><a class="sc-github" href="https://github.com/stathwang" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-google" href="https://plus.google.com/112356517445062778569" target="_blank"><i class="fa fa-google"></i></a></li>
+        <li><a class="sc-twitter" href="https://twitter.com/superhugehwang" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a class="sc-rss" href="//stathwang.github.io/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+    <nav>
+      <a href="https://stathwang.github.io">Home</a>
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+      <a href="https://stathwang.github.io/feeds/all.atom.xml">Atom</a>
+    </nav>
+
+<article>
+  <header>
+    <h1 id="generating-movie-reviews-in-korean-with-language-modeling">Generating Movie Reviews in Korean with Language Modeling</h1>
+    <p>Posted on March 23 2017 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
+  </header>
+  <div>
+    <p>A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is  I downloaded a <a href="https://github.com/e9t/nsmc">dataset</a> that contains movie reviews in Korean scraped from <a href="http://movie.naver.com/movie/point/af/list.nhn">Naver Movies</a>. In this post, I'll create a language model </p>
+<ul>
+<li>
+<p><code>tokenize_tag()</code>: tokenizes each sentence in a corpus and tags it with an appropriate part-of-speech according to the set of grammatical rules in Korean language.</p>
+</li>
+<li>
+<p><code>calc_ngram</code>: calculates ngrams for each sentence without the help of <code>nltk</code> module.</p>
+</li>
+<li>
+<p><code>calc_probabilities()</code>: calculates unigram, bigram, and trigram probabilities given a training corpus, which is a list of sentences where each sentence is a string with tokens separates by spaces, ending in a newline character. This function outputs three python dictionaries where the keys are tuples expressing the ngram and the value is the log probability of that ngram.</p>
+</li>
+<li>
+<p><code>q1_output()</code>: writes unigram, bigram, trigrams, and their respective log probabilities to a text file.</p>
+</li>
+<li>
+<p><code>score()</code>: assigns a probability to each training sentence based on ngrams and their probabilities.</p>
+</li>
+<li>
+<p><code>score_output()</code>: writes sentence probabilities to a text file.</p>
+</li>
+<li>
+<p><code>linearscore()</code>: assigns a probability to each training sentence based on a linear interpolation among ngrams with <span class="math">\(\lambda\)</span> fixed to <span class="math">\(1/3\)</span>.</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">konlpy.tag</span> <span class="kn">import</span> <span class="n">Twitter</span>
+
+<span class="n">START_SYMBOL</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+<span class="n">STOP_SYMBOL</span> <span class="o">=</span> <span class="s1">&#39;STOP&#39;</span>
+<span class="n">MINUS_INFINITY_SENTENCE_LOG_PROB</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000</span>
+
+<span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">corpus</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()]</span>
+        <span class="n">corpus</span> <span class="o">=</span> <span class="n">corpus</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="n">corpus</span>
+
+<span class="k">def</span> <span class="nf">tokenize_tag</span><span class="p">(</span><span class="n">corpus</span><span class="p">):</span>
+    <span class="n">pos_tagger</span> <span class="o">=</span> <span class="n">Twitter</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">pos_tagger</span><span class="o">.</span><span class="n">pos</span><span class="p">(</span><span class="n">corpus</span><span class="p">)]</span>
+
+<span class="k">def</span> <span class="nf">calc_ngram</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">START_SYMBOL</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">sentence</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="n">STOP_SYMBOL</span><span class="p">]</span>
+    <span class="n">ngrams</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">-</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">ngrams</span>
+
+<span class="k">def</span> <span class="nf">calc_probabilities</span><span class="p">(</span><span class="n">training_corpus</span><span class="p">):</span>
+    <span class="n">unigram_c</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">bigram_c</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">trigram_c</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">training_corpus</span><span class="p">:</span>
+        <span class="n">tokens_u</span> <span class="o">=</span> <span class="n">calc_ngram</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">tokens_b</span> <span class="o">=</span> <span class="n">calc_ngram</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">tokens_t</span> <span class="o">=</span> <span class="n">calc_ngram</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">unigram</span> <span class="ow">in</span> <span class="n">tokens_u</span><span class="p">:</span>
+            <span class="n">unigram_c</span><span class="p">[</span><span class="n">unigram</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">bigram</span> <span class="ow">in</span> <span class="n">tokens_b</span><span class="p">:</span>
+            <span class="n">bigram_c</span><span class="p">[</span><span class="n">bigram</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">trigram</span> <span class="ow">in</span> <span class="n">tokens_t</span><span class="p">:</span>
+            <span class="n">trigram_c</span><span class="p">[</span><span class="n">trigram</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">unigram_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">unigram_c</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">unigram_p</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">unigram_c</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">unigram_total</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">unigram_c</span><span class="p">}</span>
+
+    <span class="n">unigram_c</span><span class="p">[</span><span class="n">START_SYMBOL</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">training_corpus</span><span class="p">)</span>
+    <span class="n">bigram_p</span> <span class="o">=</span> <span class="p">{(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">bigram_c</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">unigram_c</span><span class="p">[(</span><span class="n">a</span><span class="p">,)],</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bigram_c</span><span class="p">}</span>
+
+    <span class="n">bigram_c</span><span class="p">[(</span><span class="n">START_SYMBOL</span><span class="p">,</span> <span class="n">START_SYMBOL</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">training_corpus</span><span class="p">)</span>
+    <span class="n">trigram_p</span> <span class="o">=</span> <span class="p">{(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">trigram_c</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">bigram_c</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)],</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">trigram_c</span><span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">unigram_p</span><span class="p">,</span> <span class="n">bigram_p</span><span class="p">,</span> <span class="n">trigram_p</span>
+
+<span class="k">def</span> <span class="nf">q1_output</span><span class="p">(</span><span class="n">unigrams</span><span class="p">,</span> <span class="n">bigrams</span><span class="p">,</span> <span class="n">trigrams</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="n">outfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+    <span class="n">unigrams_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unigrams</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">unigrams_keys</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">unigram</span> <span class="ow">in</span> <span class="n">unigrams_keys</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;UNIGRAM &#39;</span> <span class="o">+</span> <span class="n">unigram</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">unigrams</span><span class="p">[</span><span class="n">unigram</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">bigrams_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bigrams</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">bigrams_keys</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">bigram</span> <span class="ow">in</span> <span class="n">bigrams_keys</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;BIGRAM &#39;</span> <span class="o">+</span> <span class="n">bigram</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">bigram</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bigrams</span><span class="p">[</span><span class="n">bigram</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">trigrams_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">trigrams</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">trigrams_keys</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">trigram</span> <span class="ow">in</span> <span class="n">trigrams_keys</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;TRIGRAM &#39;</span> <span class="o">+</span> <span class="n">trigram</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">trigram</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">trigram</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">trigrams</span><span class="p">[</span><span class="n">trigram</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">outfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">score</span><span class="p">(</span><span class="n">ngram_p</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">corpus</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">corpus</span><span class="p">:</span>
+        <span class="n">ngrams</span> <span class="o">=</span> <span class="n">calc_ngram</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">prob_sent</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">ngram</span> <span class="ow">in</span> <span class="n">ngram_p</span> <span class="k">for</span> <span class="n">ngram</span> <span class="ow">in</span> <span class="n">ngrams</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ngram</span> <span class="ow">in</span> <span class="n">ngrams</span><span class="p">:</span>
+                <span class="n">prob_sent</span> <span class="o">+=</span> <span class="n">ngram_p</span><span class="p">[</span><span class="n">ngram</span><span class="p">]</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prob_sent</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MINUS_INFINITY_SENTENCE_LOG_PROB</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">scores</span>
+
+<span class="k">def</span> <span class="nf">score_output</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="n">outfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">score</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">outfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">linearscore</span><span class="p">(</span><span class="n">unigrams</span><span class="p">,</span> <span class="n">bigrams</span><span class="p">,</span> <span class="n">trigrams</span><span class="p">,</span> <span class="n">corpus</span><span class="p">):</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">global_lambda</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">3</span>
+    <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">corpus</span><span class="p">:</span>
+        <span class="n">ngrams</span> <span class="o">=</span> <span class="n">calc_ngram</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">lin_interpolated_score</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">trigram</span> <span class="ow">in</span> <span class="n">ngrams</span><span class="p">:</span>
+            <span class="n">p3</span> <span class="o">=</span> <span class="n">trigrams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">trigram</span><span class="p">,</span> <span class="n">MINUS_INFINITY_SENTENCE_LOG_PROB</span><span class="p">)</span>
+            <span class="n">p2</span> <span class="o">=</span> <span class="n">bigrams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">trigram</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">MINUS_INFINITY_SENTENCE_LOG_PROB</span><span class="p">)</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="n">unigrams</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">trigram</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">MINUS_INFINITY_SENTENCE_LOG_PROB</span><span class="p">)</span>
+            <span class="n">lin_interpolated_score</span> <span class="o">+=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">global_lambda</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">p3</span> <span class="o">+</span> <span class="mi">2</span><span class="o">**</span><span class="n">p2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">**</span><span class="n">p1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lin_interpolated_score</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">scores</span>
+
+<span class="n">DATA_PATH</span> <span class="o">=</span> <span class="s1">&#39;PATH_TO_YOUR_DATA_FILES&#39;</span>
+<span class="n">OUTPUT_PATH</span> <span class="o">=</span> <span class="s1">&#39;PATH_TO_YOUR_OUTPUT&#39;</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">clock</span><span class="p">()</span>
+
+    <span class="n">infile</span> <span class="o">=</span> <span class="n">DATA_PATH</span> <span class="o">+</span> <span class="s1">&#39;ratings_train.txt&#39;</span>
+    <span class="n">train</span> <span class="o">=</span> <span class="n">read_data</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="p">[</span><span class="n">tokenize_tag</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">train</span><span class="p">]</span>
+
+    <span class="n">corpus</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tag_token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
+        <span class="n">sent</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">elem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">tag_token</span><span class="p">])</span>
+        <span class="n">corpus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span>
+
+    <span class="n">outfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;corpus.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">corpus</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">outfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">unigrams</span><span class="p">,</span> <span class="n">bigrams</span><span class="p">,</span> <span class="n">trigrams</span> <span class="o">=</span> <span class="n">calc_probabilities</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
+
+    <span class="n">q1_output</span><span class="p">(</span><span class="n">unigrams</span><span class="p">,</span> <span class="n">bigrams</span><span class="p">,</span> <span class="n">trigrams</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A1.txt&#39;</span><span class="p">)</span>
+
+    <span class="n">uniscores</span> <span class="o">=</span> <span class="n">score</span><span class="p">(</span><span class="n">unigrams</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">corpus</span><span class="p">)</span>
+    <span class="n">biscores</span> <span class="o">=</span> <span class="n">score</span><span class="p">(</span><span class="n">bigrams</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">corpus</span><span class="p">)</span>
+    <span class="n">triscores</span> <span class="o">=</span> <span class="n">score</span><span class="p">(</span><span class="n">trigrams</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">corpus</span><span class="p">)</span>
+
+    <span class="n">score_output</span><span class="p">(</span><span class="n">uniscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A2.txt&#39;</span><span class="p">)</span>
+    <span class="n">score_output</span><span class="p">(</span><span class="n">biscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A2.bi.txt&#39;</span><span class="p">)</span>
+    <span class="n">score_output</span><span class="p">(</span><span class="n">triscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A2.tri.txt&#39;</span><span class="p">)</span>
+
+    <span class="n">linearscores</span> <span class="o">=</span> <span class="n">linearscore</span><span class="p">(</span><span class="n">unigrams</span><span class="p">,</span> <span class="n">bigrams</span><span class="p">,</span> <span class="n">trigrams</span><span class="p">,</span> <span class="n">corpus</span><span class="p">)</span>
+
+    <span class="n">score_output</span><span class="p">(</span><span class="n">linearscores</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span> <span class="o">+</span> <span class="s1">&#39;A3.txt&#39;</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Time: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">clock</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39; sec&#39;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://stathwang.github.io/tag/language-modeling.html">language modeling</a>
+      <a href="https://stathwang.github.io/tag/markov-chain.html">markov chain</a>
+      <a href="https://stathwang.github.io/tag/natural-language-processing.html">natural language processing</a>
+      <a href="https://stathwang.github.io/tag/python.html">python</a>
+    </p>
+  </div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'thedatalogical';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</article>
+
+    <hr />
+    <p />
+    <!-- Begin MailChimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+  #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
+  /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+     We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+<form action="//github.us1.list-manage.com/subscribe/post?u=0f2c943c221c777ef88591fb6&amp;id=6cf4236c90" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+  <label for="mce-EMAIL">Subscribe to my sporadic data science newsletter and blog post</label>
+  <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0f2c943c221c777ef88591fb6_6cf4236c90" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+<br />
+<br />
+
+<!--End mc_embed_signup-->
+
+    <footer>
+<p>
+  &copy; Seong Hyun Hwang 2015 - 2017 - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69797568-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+  <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us1.list-manage.com","uuid":"0f2c943c221c777ef88591fb6","lid":"6cf4236c90"}) })</script>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Seong Hyun Hwang ",
+  "url" : "https://stathwang.github.io",
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "description": "Seong Hyun Hwang's Thoughts and Writings"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Generating Movie Reviews in Korean with Language Modeling",
+  "headline": "Generating Movie Reviews in Korean with Language Modeling",
+  "datePublished": "2017-03-23 13:45:00-04:00",
+  "dateModified": "",
+  "author": {
+    "@type": "Person",
+    "name": "Seong Hyun Hwang",
+    "url": "https://stathwang.github.io/author/seong-hyun-hwang.html"
+  },
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "url": "https://stathwang.github.io/drafts/generating-movie-reviews-in-korean-with-language-modeling.html",
+  "description": "A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is I …"
+}
+</script></body>
+</html>
