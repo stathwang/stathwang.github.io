@@ -178,18 +178,10 @@
 
 &lt;p&gt;Once we have &lt;code&gt;unigram_scores.txt&lt;/code&gt;, &lt;code&gt;bigram_scores.txt&lt;/code&gt;, &lt;code&gt;trigram_scores.txt&lt;/code&gt;, and &lt;code&gt;linear_scores.txt&lt;/code&gt; files, we can compute their perplexities on &lt;code&gt;ratings.txt&lt;/code&gt; using the Python script below. The resulting perplexities of different language models are shown:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Unigram LM: &lt;span class="math"&gt;\(1279.036\)&lt;/span&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Bigram LM: &lt;span class="math"&gt;\(52.768\)&lt;/span&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Trigram LM: &lt;span class="math"&gt;\(10.357\)&lt;/span&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Linear Interpolation: &lt;span class="math"&gt;\(15.068\)&lt;/span&gt;&lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;Unigram LM: &lt;span class="math"&gt;\(1279.036\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Bigram LM: &lt;span class="math"&gt;\(52.768\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Trigram LM: &lt;span class="math"&gt;\(10.357\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;Linear Interpolation: &lt;span class="math"&gt;\(15.068\)&lt;/span&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;As we can see, the trigram language model does the best on the training set since it has the lowest perplexity. The linear interpolation model actually does worse than the trigram model because we are calculating the perplexity on the entire training set where trigrams are always seen. If we were to calculate the perplexity on the test set where new trigrams exist, then we'd expect to see lower score on the linear interpolation than on the trigram model.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# an example usage&lt;/span&gt;
@@ -317,7 +309,7 @@
 &lt;li&gt;영화 끝나고 스트레스 받았 다 는 것 ... &lt;/li&gt;
 &lt;li&gt;어쩔 수 없이 1 점 이다 . &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Other movie reviews that seem grammatically incorrect or sarcastic:&lt;/p&gt;
+&lt;p&gt;Other sentences that seemed grammatically incorrect or sarcastic:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;미국 판 두 개 는 과거 들 과거 속 으로 들어가서 머리카락 이 영수증 분쇄기 에 찡 함&lt;/li&gt;
 &lt;li&gt;이 것 이 아 무 생각 없이 볼 만 했 던 신의 ... 지금 도 가슴 설레는 영화 ost 앨범 도 구매 해서 봤 다 . &lt;/li&gt;
@@ -326,7 +318,7 @@
 &lt;li&gt;잔잔 한 감동 을 주는 공포영화 는 절대 영화관 가서 봣다 가 S 급 &lt;/li&gt;
 &lt;li&gt;현재 tv 시트콤 수준 이 1998 년 당시 에는 파격 적 인 제목 은 기술자 들 이야 말로 다른 배트맨 시리즈 를 다시 찍어 봐 . 38 분 까지 역겨운 짓 하던 니 들 이 이 것 보단 재밌겠 다 능 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Most short sentences that got generated seemed okay, while long sentences or sentences with movie names in them sounded a bit weird.&lt;/p&gt;
+&lt;p&gt;Most short sentences that were generated seemed okay, while long sentences or sentences with movie names in them sounded awkward and unnatural. &lt;/p&gt;
 &lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
