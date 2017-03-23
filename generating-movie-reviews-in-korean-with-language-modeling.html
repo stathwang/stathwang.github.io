@@ -86,7 +86,7 @@
   </header>
   <div>
     <p><img alt="MovieReviews" src="https://stathwang.github.io/images/MovieReviews.png"></p>
-<p>A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved by using neural networks such as <code>RNN</code> and <code>LSTM</code> and incorporating variants of probabilistic context-free grammars to produce grammatically sound sentences. I'll write about deep learning methods later when I have more free time, so stay tuned. In this post, I write a set of Python scripts to build unigram, bigram, trigram, and linearly interpolated language models using the <code>ratings.txt</code> <a href="https://github.com/e9t/nsmc">dataset</a> that contains movie reviews in Korean scraped from <a href="http://movie.naver.com/movie/point/af/list.nhn">Naver Movies</a> dataset in order to randomly generated movie reviews.</p>
+<p>A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved by using neural networks such as <code>RNN</code> and <code>LSTM</code> and incorporating variants of probabilistic context-free grammars to produce grammatically sound sentences. I'll write about deep learning methods later when I have more free time, so stay tuned. In this post, I write a set of Python scripts to build unigram, bigram, trigram, and linearly interpolated language models using the <code>ratings.txt</code> <a href="https://github.com/e9t/nsmc">dataset</a> that contains movie reviews in Korean scraped from <a href="http://movie.naver.com/movie/point/af/list.nhn">Naver Movies</a> (screenshot above) dataset in order to randomly generated movie reviews.</p>
 <ul>
 <li>
 <p><code>tokenize_tag()</code> tokenizes each sentence in a corpus and tags it with an appropriate part-of-speech according to the set of grammatical rules in Korean language with the help of <code>konlpy</code> module.</p>
@@ -265,10 +265,10 @@
 
 <p>Once we have <code>unigram_scores.txt</code>, <code>bigram_scores.txt</code>, <code>trigram_scores.txt</code>, and <code>linear_scores.txt</code> files, we can compute their perplexities on <code>ratings.txt</code> using the Python script below. The resulting perplexities of different language models are shown:</p>
 <ul>
-<li>Unigram LM: 1279.036</li>
-<li>Bigram LM: 52.768</li>
-<li>Trigram LM: 10.357</li>
-<li>Linear Interpolation: 15.068</li>
+<li>Unigram LM: <span class="math">\(1279.036\)</span></li>
+<li>Bigram LM: <span class="math">\(52.768\)</span></li>
+<li>Trigram LM: <span class="math">\(10.357\)</span></li>
+<li>Linear Interpolation: <span class="math">\(15.068\)</span></li>
 </ul>
 <p>As we can see, the trigram language model does the best on the training set since it has the lowest perplexity. The linear interpolation model actually does worse than the trigram model because we are calculating the perplexity on the entire training set where trigrams are always seen. If we were to calculate the perplexity on the test set where new trigrams exist, then we'd expect to see lower score on the linear interpolation than on the trigram model.</p>
 <div class="highlight"><pre><span></span><span class="c1"># an example usage</span>
