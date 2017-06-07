@@ -187,7 +187,7 @@ P(o_i \mid q_i) = \dfrac{C(q_i, o_i)}{C(q_i)}
 \hat{q}_{1}^{n+1}
 = {argmax}_{q_{1}^{n+1}}{P(o_{1}^{n}, q_{1}^{n+1})}
 \end{equation}</div>
-<p>where the <code>arg max</code> is taken over all sequences <span class="math">\(q_{1}^{n}\)</span> such that <span class="math">\(q_i \in S\)</span> for <span class="math">\(i=1,...,n\)</span> and <span class="math">\(S\)</span> is the set of all tags. We further assume that <span class="math">\(P(o_{1}^{n}, q_{1}^{n})\)</span> takes the form</p>
+<p>where the <code>argmax</code> is taken over all sequences <span class="math">\(q_{1}^{n}\)</span> such that <span class="math">\(q_i \in S\)</span> for <span class="math">\(i=1,...,n\)</span> and <span class="math">\(S\)</span> is the set of all tags. We further assume that <span class="math">\(P(o_{1}^{n}, q_{1}^{n})\)</span> takes the form</p>
 <div class="math">\begin{equation}
 P(o_{1}^{n}, q_{1}^{n+1})
 = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P(o_i \mid q_i)
@@ -345,9 +345,9 @@ r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P
 <h4>Unknown Words</h4>
 <p>In all languages, new words and jargons such as acronyms and proper names are constantly being coined and added to a dictionary. Keep updating the dictionary of vocabularies is, however, too cumbersome and takes too much human effort. Thus, it is important to have a good model for dealing with unknown words to achieve a high accuracy with a trigram HMM POS tagger.</p>
 <h5>RARE</h5>
-<p><span class="math">\(RARE\)</span> is a simple way to replace every word or token with the special symbol <code>_RARE_</code> whose frequency of appearance in the training set is less than or equal to 5. Without this process, words like person names and places that do not appear in the training set but are seen in the test set can have their maximum likelihood estimates of <span class="math">\(P(q_i \mid o_i)\)</span> undefined.</p>
+<p><strong>RARE</strong> is a simple way to replace every word or token with the special symbol <code>_RARE_</code> whose frequency of appearance in the training set is less than or equal to 5. Without this process, words like person names and places that do not appear in the training set but are seen in the test set can have their maximum likelihood estimates of <span class="math">\(P(q_i \mid o_i)\)</span> undefined.</p>
 <h5>MORPHO</h5>
-<p><span class="math">\(MORPHO\)</span> is a modification of <span class="math">\(RARE\)</span> that serves as a better alternative in that every word token whose frequency is less than or equal to 5 in the training set is replaced by further subcategorization based on a set of morphological cues. For example, we all know that a word with suffix like <code>-ion</code>, <code>-ment</code>, <code>-ence</code>, and <code>-ness</code>, to name a few, will be a noun, and an adjective has a prefix like <code>un-</code> and <code>in-</code> or a suffix like <code>-ious</code> and <code>-ble</code>. Take a look at the following Python function.</p>
+<p><strong>MORPHO</strong> is a modification of <span class="math">\(RARE\)</span> that serves as a better alternative in that every word token whose frequency is less than or equal to 5 in the training set is replaced by further subcategorization based on a set of morphological cues. For example, we all know that a word with suffix like <code>-ion</code>, <code>-ment</code>, <code>-ence</code>, and <code>-ness</code>, to name a few, will be a noun, and an adjective has a prefix like <code>un-</code> and <code>in-</code> or a suffix like <code>-ious</code> and <code>-ble</code>. Take a look at the following Python function.</p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
 
 <span class="n">RARE_SYMBOL</span> <span class="o">=</span> <span class="s1">&#39;_RARE_&#39;</span>
@@ -374,15 +374,16 @@ r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P
 <h3>Results</h3>
 <p>The most frequent tag baseline <code>(Most Frequent Tag)</code> where every word is tagged with its most frequent tag and the unknown or rare words are tagged as nouns by default already produces high tag accuracy of around 90%. This is partly because many words are unambiguous and we get points for determiners like <code>the</code> and <code>a</code> and for punctuation marks. The average run time for a trigram HMM tagger is between 350 to 400 seconds. The weights <span class="math">\(\lambda_1\)</span>, <span class="math">\(\lambda_2\)</span>, and <span class="math">\(\lambda_3\)</span> from deleted interpolation are 0.125, 0.394, and 0.481, respectively.</p>
 <ul>
-<li>Most Frequent Tag: <span class="math">\(90%\)</span></li>
-<li>Trigram HMM Viterbi (+ Deleted Interpolation + RARE): <span class="math">\(91.15%\)</span></li>
-<li>Trigram HMM Viterbi (+ Deleted Interpolation + MORPHO): 92.18%</li>
-<li>Trigram HMM Viterbi (- Deleted Interpolation + RARE): 93.32%</li>
-<li>Trigram HMM Viterbi (- Deleted Interpolation + MORPHO): 94.25%</li>
-<li>Upper Bound (Human Agreement): 98%</li>
+<li><code>Most Frequent Tag</code>: <code>90%</code></li>
+<li><code>Trigram HMM Viterbi (+ Deleted Interpolation + RARE)</code>: <code>91.15%</code></li>
+<li><code>Trigram HMM Viterbi (+ Deleted Interpolation + MORPHO)</code>: <code>92.18%</code></li>
+<li><code>Trigram HMM Viterbi (- Deleted Interpolation + RARE)</code>: <code>93.32%</code></li>
+<li><code>Trigram HMM Viterbi (- Deleted Interpolation + MORPHO)</code>: <code>94.25%</code></li>
+<li><code>Upper Bound (Human Agreement)</code>: <code>98%</code></li>
 </ul>
 <p>The trigram HMM tagger with no deleted interpolation and with MORPHO results in the highest overall accuracy of 94.25% but still well below the human agreement upper bound of 98%. Such 4 percentage point increase in accuracy from the most frequent tag baseline is quite significant in that it translates to <span class="math">\(10000 \times 0.04 = 400\)</span> additional sentences accurately tagged. Also note that using the weights from deleted interpolation to calculate trigram tag probabilities has an adverse effect in overall accuracy. This is most likely because many trigrams found in the training set are also found in the devset, rendering useless bigram and unigram tag probabilities.</p>
 <p>In this post, we introduced the application of hidden Markov models to a well-known problem in natural language processing called part-of-speech tagging, explained the Viterbi algorithm that reduces the time complexity of the trigram HMM tagger, and evaluated different trigram HMM-based taggers with deleted interpolation and unknown word treatments on the subset of the Brown corpus. The result is quite promising with over 4 percentage point increase from the most frequent tag baseline but can still be improved comparing with the human agreement upper bound. The hidden Markov models are intuitive, yet powerful enough to uncover hidden states based on the observed sequences, and they form the backbone of more complex algorithms.</p>
+<p>Stay tuned! I will be uploading all of my codes and datasets shortly!</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",

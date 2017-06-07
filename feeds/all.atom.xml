@@ -101,7 +101,7 @@ P(o_i \mid q_i) = \dfrac{C(q_i, o_i)}{C(q_i)}
 \hat{q}_{1}^{n+1}
 = {argmax}_{q_{1}^{n+1}}{P(o_{1}^{n}, q_{1}^{n+1})}
 \end{equation}&lt;/div&gt;
-&lt;p&gt;where the &lt;code&gt;arg max&lt;/code&gt; is taken over all sequences &lt;span class="math"&gt;\(q_{1}^{n}\)&lt;/span&gt; such that &lt;span class="math"&gt;\(q_i \in S\)&lt;/span&gt; for &lt;span class="math"&gt;\(i=1,...,n\)&lt;/span&gt; and &lt;span class="math"&gt;\(S\)&lt;/span&gt; is the set of all tags. We further assume that &lt;span class="math"&gt;\(P(o_{1}^{n}, q_{1}^{n})\)&lt;/span&gt; takes the form&lt;/p&gt;
+&lt;p&gt;where the &lt;code&gt;argmax&lt;/code&gt; is taken over all sequences &lt;span class="math"&gt;\(q_{1}^{n}\)&lt;/span&gt; such that &lt;span class="math"&gt;\(q_i \in S\)&lt;/span&gt; for &lt;span class="math"&gt;\(i=1,...,n\)&lt;/span&gt; and &lt;span class="math"&gt;\(S\)&lt;/span&gt; is the set of all tags. We further assume that &lt;span class="math"&gt;\(P(o_{1}^{n}, q_{1}^{n})\)&lt;/span&gt; takes the form&lt;/p&gt;
 &lt;div class="math"&gt;\begin{equation}
 P(o_{1}^{n}, q_{1}^{n+1})
 = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P(o_i \mid q_i)
@@ -259,9 +259,9 @@ r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P
 &lt;h4&gt;Unknown Words&lt;/h4&gt;
 &lt;p&gt;In all languages, new words and jargons such as acronyms and proper names are constantly being coined and added to a dictionary. Keep updating the dictionary of vocabularies is, however, too cumbersome and takes too much human effort. Thus, it is important to have a good model for dealing with unknown words to achieve a high accuracy with a trigram HMM POS tagger.&lt;/p&gt;
 &lt;h5&gt;RARE&lt;/h5&gt;
-&lt;p&gt;&lt;span class="math"&gt;\(RARE\)&lt;/span&gt; is a simple way to replace every word or token with the special symbol &lt;code&gt;_RARE_&lt;/code&gt; whose frequency of appearance in the training set is less than or equal to 5. Without this process, words like person names and places that do not appear in the training set but are seen in the test set can have their maximum likelihood estimates of &lt;span class="math"&gt;\(P(q_i \mid o_i)\)&lt;/span&gt; undefined.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;RARE&lt;/strong&gt; is a simple way to replace every word or token with the special symbol &lt;code&gt;_RARE_&lt;/code&gt; whose frequency of appearance in the training set is less than or equal to 5. Without this process, words like person names and places that do not appear in the training set but are seen in the test set can have their maximum likelihood estimates of &lt;span class="math"&gt;\(P(q_i \mid o_i)\)&lt;/span&gt; undefined.&lt;/p&gt;
 &lt;h5&gt;MORPHO&lt;/h5&gt;
-&lt;p&gt;&lt;span class="math"&gt;\(MORPHO\)&lt;/span&gt; is a modification of &lt;span class="math"&gt;\(RARE\)&lt;/span&gt; that serves as a better alternative in that every word token whose frequency is less than or equal to 5 in the training set is replaced by further subcategorization based on a set of morphological cues. For example, we all know that a word with suffix like &lt;code&gt;-ion&lt;/code&gt;, &lt;code&gt;-ment&lt;/code&gt;, &lt;code&gt;-ence&lt;/code&gt;, and &lt;code&gt;-ness&lt;/code&gt;, to name a few, will be a noun, and an adjective has a prefix like &lt;code&gt;un-&lt;/code&gt; and &lt;code&gt;in-&lt;/code&gt; or a suffix like &lt;code&gt;-ious&lt;/code&gt; and &lt;code&gt;-ble&lt;/code&gt;. Take a look at the following Python function.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;MORPHO&lt;/strong&gt; is a modification of &lt;span class="math"&gt;\(RARE\)&lt;/span&gt; that serves as a better alternative in that every word token whose frequency is less than or equal to 5 in the training set is replaced by further subcategorization based on a set of morphological cues. For example, we all know that a word with suffix like &lt;code&gt;-ion&lt;/code&gt;, &lt;code&gt;-ment&lt;/code&gt;, &lt;code&gt;-ence&lt;/code&gt;, and &lt;code&gt;-ness&lt;/code&gt;, to name a few, will be a noun, and an adjective has a prefix like &lt;code&gt;un-&lt;/code&gt; and &lt;code&gt;in-&lt;/code&gt; or a suffix like &lt;code&gt;-ious&lt;/code&gt; and &lt;code&gt;-ble&lt;/code&gt;. Take a look at the following Python function.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;re&lt;/span&gt;
 
 &lt;span class="n"&gt;RARE_SYMBOL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_RARE_&amp;#39;&lt;/span&gt;
@@ -288,15 +288,16 @@ r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P
 &lt;h3&gt;Results&lt;/h3&gt;
 &lt;p&gt;The most frequent tag baseline &lt;code&gt;(Most Frequent Tag)&lt;/code&gt; where every word is tagged with its most frequent tag and the unknown or rare words are tagged as nouns by default already produces high tag accuracy of around 90%. This is partly because many words are unambiguous and we get points for determiners like &lt;code&gt;the&lt;/code&gt; and &lt;code&gt;a&lt;/code&gt; and for punctuation marks. The average run time for a trigram HMM tagger is between 350 to 400 seconds. The weights &lt;span class="math"&gt;\(\lambda_1\)&lt;/span&gt;, &lt;span class="math"&gt;\(\lambda_2\)&lt;/span&gt;, and &lt;span class="math"&gt;\(\lambda_3\)&lt;/span&gt; from deleted interpolation are 0.125, 0.394, and 0.481, respectively.&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Most Frequent Tag: &lt;span class="math"&gt;\(90%\)&lt;/span&gt;&lt;/li&gt;
-&lt;li&gt;Trigram HMM Viterbi (+ Deleted Interpolation + RARE): &lt;span class="math"&gt;\(91.15%\)&lt;/span&gt;&lt;/li&gt;
-&lt;li&gt;Trigram HMM Viterbi (+ Deleted Interpolation + MORPHO): 92.18%&lt;/li&gt;
-&lt;li&gt;Trigram HMM Viterbi (- Deleted Interpolation + RARE): 93.32%&lt;/li&gt;
-&lt;li&gt;Trigram HMM Viterbi (- Deleted Interpolation + MORPHO): 94.25%&lt;/li&gt;
-&lt;li&gt;Upper Bound (Human Agreement): 98%&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Most Frequent Tag&lt;/code&gt;: &lt;code&gt;90%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Trigram HMM Viterbi (+ Deleted Interpolation + RARE)&lt;/code&gt;: &lt;code&gt;91.15%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Trigram HMM Viterbi (+ Deleted Interpolation + MORPHO)&lt;/code&gt;: &lt;code&gt;92.18%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Trigram HMM Viterbi (- Deleted Interpolation + RARE)&lt;/code&gt;: &lt;code&gt;93.32%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Trigram HMM Viterbi (- Deleted Interpolation + MORPHO)&lt;/code&gt;: &lt;code&gt;94.25%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Upper Bound (Human Agreement)&lt;/code&gt;: &lt;code&gt;98%&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;The trigram HMM tagger with no deleted interpolation and with MORPHO results in the highest overall accuracy of 94.25% but still well below the human agreement upper bound of 98%. Such 4 percentage point increase in accuracy from the most frequent tag baseline is quite significant in that it translates to &lt;span class="math"&gt;\(10000 \times 0.04 = 400\)&lt;/span&gt; additional sentences accurately tagged. Also note that using the weights from deleted interpolation to calculate trigram tag probabilities has an adverse effect in overall accuracy. This is most likely because many trigrams found in the training set are also found in the devset, rendering useless bigram and unigram tag probabilities.&lt;/p&gt;
 &lt;p&gt;In this post, we introduced the application of hidden Markov models to a well-known problem in natural language processing called part-of-speech tagging, explained the Viterbi algorithm that reduces the time complexity of the trigram HMM tagger, and evaluated different trigram HMM-based taggers with deleted interpolation and unknown word treatments on the subset of the Brown corpus. The result is quite promising with over 4 percentage point increase from the most frequent tag baseline but can still be improved comparing with the human agreement upper bound. The hidden Markov models are intuitive, yet powerful enough to uncover hidden states based on the observed sequences, and they form the backbone of more complex algorithms.&lt;/p&gt;
+&lt;p&gt;Stay tuned! I will be uploading all of my codes and datasets shortly!&lt;/p&gt;
 &lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
