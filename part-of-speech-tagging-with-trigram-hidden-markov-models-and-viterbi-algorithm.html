@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,400italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/stylesheet/style.min.css">
+
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/pygments/monokai.min.css">
+  <link rel="stylesheet" type="text/css" href="https://stathwang.github.io/theme/font-awesome/css/font-awesome.min.css">
+
+
+    <link href="https://stathwang.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Seong Hyun Hwang Atom">
+
+
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="" />
+
+    <!-- Chrome, Firefox OS and Opera -->
+    <meta name="theme-color" content="#333333">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#333333">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="author" content="Seong Hyun Hwang" />
+<meta name="description" content="1 The Hidden Markov Model The hidden Markov model or HMM for short is a probabilistic sequence model that assigns a label to each unit in a sequence of observations. The model computes a probability distribution over possible sequences of labels and chooses the best label sequence that maximizes the …" />
+<meta name="keywords" content="pos tagging, markov chain, viterbi algorithm, natural language processing, machine learning, python">
+<meta property="og:site_name" content="Seong Hyun Hwang"/>
+<meta property="og:title" content="Part-of-Speech Tagging with Trigram Hidden Markov Models and Viterbi Algorithm"/>
+<meta property="og:description" content="1 The Hidden Markov Model The hidden Markov model or HMM for short is a probabilistic sequence model that assigns a label to each unit in a sequence of observations. The model computes a probability distribution over possible sequences of labels and chooses the best label sequence that maximizes the …"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://stathwang.github.io/part-of-speech-tagging-with-trigram-hidden-markov-models-and-viterbi-algorithm.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2017-06-07 01:00:00-04:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
+<meta property="article:section" content="Machine Learning"/>
+<meta property="article:tag" content="pos tagging"/>
+<meta property="article:tag" content="markov chain"/>
+<meta property="article:tag" content="viterbi algorithm"/>
+<meta property="article:tag" content="natural language processing"/>
+<meta property="article:tag" content="machine learning"/>
+<meta property="article:tag" content="python"/>
+<meta property="og:image" content="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg">
+  <title>Seong Hyun Hwang &ndash; Part-of-Speech Tagging with Trigram Hidden Markov Models and Viterbi Algorithm</title>
+</head>
+<body>
+  <aside>
+    <div>
+      <a href="https://stathwang.github.io">
+        <img src="http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg" alt="Seong Hyun Hwang" title="Seong Hyun Hwang">
+      </a>
+      <h1><a href="https://stathwang.github.io">Seong Hyun Hwang</a></h1>
+<p>Data Scientist - Product Developer</p>      <nav>
+        <ul class="list">
+          <li><a href="https://stathwang.github.io/pages/about.html#about">about</a></li>
+          <li><a href="https://stathwang.github.io/pages/photos.html#photos">photos</a></li>
+          <li><a href="https://stathwang.github.io/pages/projects.html#projects">projects</a></li>
+        </ul>
+      </nav>
+      <ul class="social">
+        <li><a class="sc-github" href="https://github.com/stathwang" target="_blank"><i class="fa fa-github"></i></a></li>
+        <li><a class="sc-google" href="https://plus.google.com/112356517445062778569" target="_blank"><i class="fa fa-google"></i></a></li>
+        <li><a class="sc-twitter" href="https://twitter.com/superhugehwang" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a class="sc-rss" href="//stathwang.github.io/feeds/all.atom.xml" target="_blank"><i class="fa fa-rss"></i></a></li>
+      </ul>
+    </div>
+  </aside>
+  <main>
+    <nav>
+      <a href="https://stathwang.github.io">Home</a>
+      <a href="/archives.html">Archives</a>
+      <a href="/categories.html">Categories</a>
+      <a href="/tags.html">Tags</a>
+      <a href="https://stathwang.github.io/feeds/all.atom.xml">Atom</a>
+    </nav>
+
+<article>
+  <header>
+    <h1 id="part-of-speech-tagging-with-trigram-hidden-markov-models-and-viterbi-algorithm">Part-of-Speech Tagging with Trigram Hidden Markov Models and Viterbi Algorithm</h1>
+    <p>Posted on June 07 2017 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
+  </header>
+  <div>
+    <h1>1 The Hidden Markov Model</h1>
+<p>The hidden Markov model or HMM for short is a probabilistic sequence model that assigns a label to each unit in a sequence of observations. The model computes a probability distribution over possible sequences of labels and chooses the best label sequence that maximizes the probability of generating the observed sequence. The HMM is widely used in natural language processing since language consists of sequences at many levels such as sentences, phrases, words, or even characters.</p>
+<p>In this post, I'm going to present the application of hidden Markov models to a classic problem in natural language processing called part-of-speech tagging, explain the key algorithm behind a trigram HMM tagger, and evaluate various trigram HMM-based taggers on the subset of a large real-world corpus.</p>
+<h1>2 Part of Speech Tagging</h1>
+<p>Part-of-speech tagging or POS tagging is the process of assigning a part-of-speech marker to each word in an input text. Tags are not only applied to words, but also punctuations as well, so we often tokenize the input text as part of the preprocessing step, separating out non-words like commas and quotation marks from words as well as disambiguating end-of-sentence punctuations such as period and exclamation point from part-of-word punctuation in the case of abbreviations like <code>i.e.</code> and decimals.</p>
+<p>POS tagging is extremely useful in text-to-speech; for example, the word <code>read</code> can be read in two different ways depending on its part-of-speech in a sentence. A tagging algorithm receives as input a sequence of words and a set of all different tags that a word can take and outputs a sequence of tags. The algorithm works to resolve ambiguities of choosing the proper tag that best represents the syntax and the semantics of the sentence. When someone says <code>(I just remembered that I forgot to bring my phone)</code>, the word <code>that</code> grammatically works as a complementizer that connects two sentences into one, whereas in the following sentence, <code>(Does that make you feel sad)</code>, the same word <code>that</code> works as a determiner just like <code>the</code>, <code>a</code>, and <code>an</code>. Designing a highly accurate POS tagger is a must so as to avoid assigning a wrong tag to such potentially ambiguous word since then it becomes difficult to solve more sophisticated problems in natural language processing ranging from named-entity recognition and question-answering that build upon POS tagging.</p>
+<h1>3 The Brown Corpus</h1>
+<p>In the sections that follow, we build a trigram HMM POS tagger and evaluate it on a real-world text called the Brown corpus which is a million word sample from 500 texts in different genres published in 1961 in the United States. We train the trigram HMM POS tagger on the subset of the Brown corpus containing nearly 27500 tagged sentences to reduce computation time and cost and use the model to tag 10000 sentences in the development test set, or devset. The accuracy of the tagger is measured by comparing the predicted tags with the true tags. The algorithm of tagging each word token in the devset to the tag it occurred the most often in the training set (<code>Most Frequenct Tag</code>) is the baseline against which the performances of various trigram HMM taggers are measured.</p>
+<p>It is useful to know as a reference how the part-of-speech tags are abbreviated, and the following table lists out few important part-of-speech tags and their corresponding descriptions.</p>
+<table>
+<thead>
+<tr>
+<th>Tag</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IN</td>
+<td>Preposition</td>
+<td>in, by, of</td>
+</tr>
+<tr>
+<td>JJ</td>
+<td>Adjective</td>
+<td>green, happy</td>
+</tr>
+<tr>
+<td>NN</td>
+<td>Singular Noun</td>
+<td>paper, word</td>
+</tr>
+<tr>
+<td>NNS</td>
+<td>Plural Noun</td>
+<td>papers, words</td>
+</tr>
+<tr>
+<td>PRP</td>
+<td>Personal Pronoun</td>
+<td>you, he, she</td>
+</tr>
+<tr>
+<td>VB</td>
+<td>Verb Base Form</td>
+<td>take, eat, run</td>
+</tr>
+<tr>
+<td>VBD</td>
+<td>Verb Past Tense</td>
+<td>took, ate, ran</td>
+</tr>
+<tr>
+<td>.</td>
+<td>Sentence-Final Punctuation</td>
+<td>. ! ?</td>
+</tr>
+</tbody>
+</table>
+<p>Here is an example sentence from the Brown training corpus.</p>
+<p><code>At/ADP that/DET time/NOUN highway/NOUN engineers/NOUN traveled/VERB rough/ADJ and/CONJ dirty/ADJ roads/NOUN to/PRT accomplish/VERB their/DET duties/NOUN ./.</code></p>
+<p>Each sentence is a string of space separated <code>WORD/TAG</code> tokens, with a newline character in the end. Notice how the Brown training corpus uses a slightly different notation than the standard part-of-speech notation in the table above. Let's now discuss the method for building a trigram HMM POS tagger.</p>
+<h1>4 Trigram HMM Part-of-Speech Tagger</h1>
+<p><strong>Decoding</strong> is the task of determining which sequence of variables is the underlying source of some sequence of observations. Mathematically, we want to find the most probable sequence of hidden states <span class="math">\(Q = q_1,q_2,q_3,...,q_N\)</span> given as input a HMM <span class="math">\(\lambda = (A,B)\)</span> and a sequence of observations <span class="math">\(O = o_1,o_2,o_3,...,o_N\)</span> where <span class="math">\(A\)</span> is a transition probability matrix, each element <span class="math">\(a_{ij}\)</span> represents the probability of moving from a hidden state <span class="math">\(q_i\)</span> to another <span class="math">\(q_j\)</span> such that <span class="math">\(\sum_{j=1}^{n} a_{ij} = 1\)</span> for <span class="math">\(\forall i\)</span> and <span class="math">\(B\)</span> a matrix of emission probabilities, each element representing the probability of an observation state <span class="math">\(o_i\)</span> being generated from a hidden state <span class="math">\(q_i\)</span>. In POS tagging, each hidden state corresponds to a single tag, and each observation state a word in a given sentence. For example, the task of the decoder is to find the best hidden tag sequence <code>(DT NNS VB)</code> that maximizes the probability of the observed sequence of words <code>(The dogs run)</code>. </p>
+<p>Define <span class="math">\(\hat{q}_{1}^{n} = \hat{q}_1,\hat{q}_2,\hat{q}_3,...,\hat{q}_n\)</span> to be the most probable tag sequence given the observed sequence of <span class="math">\(n\)</span> words <span class="math">\(o_{1}^{n} = o_1,o_2,o_3,...,o_n\)</span>. Then we have the decoding task:</p>
+<div class="math">\begin{equation}
+\hat{q}_{1}^{n}
+= \operatornamewithlimits{argmax}_{q_{1}^{n}}{P(q_{1}^{n} \mid o_{1}^{n})}
+= \operatornamewithlimits{argmax}_{q_{1}^{n}}{\dfrac{P(o_{1}^{n} \mid q_{1}^{n}) P(q_{1}^{n})}{P(o_{1}^{n})}}
+\end{equation}</div>
+<p>where the second equality is computed using Bayes' rule. Moreover, the denominator <span class="math">\(P(o_{1}^{n})\)</span> can be dropped in Eq. 1 since it does not depend on <span class="math">\(q_{1}^{n}\)</span>.</p>
+<div class="math">\begin{equation}
+\hat{q}_{1}^{n} 
+= \operatornamewithlimits{argmax}_{q_{1}^{n}}{P(o_{1}^{n} \mid q_{1}^{n}) P(q_{1}^{n})}
+= \operatornamewithlimits{argmax}_{q_{1}^{n}}{P(o_{1}^{n}, q_{1}^{n})}
+\end{equation}</div>
+<p>where <span class="math">\(P(q_{1}^{n})\)</span> is the probability of a tag sequence, <span class="math">\(P(o_{1}^{n} \mid q_{1}^{n})\)</span> is the probability of the observed sequence of words given the tag sequence, and <span class="math">\(P(o_{1}^{n}, q_{1}^{n})\)</span> is the joint probabilty of the tag and the word sequence. The trigram HMM tagger makes two assumptions to simplify the computation of <span class="math">\(P(q_{1}^{n})\)</span> and <span class="math">\(P(o_{1}^{n} \mid q_{1}^{n})\)</span>. The first is that the <strong>emission</strong> probability of a word appearing depends only on its own tag and is independent of neighboring words and tags:</p>
+<div class="math">\begin{equation}
+P(o_{1}^{n} \mid q_{1}^{n}) = \prod_{i=1}^{n} P(o_i \mid q_i)
+\end{equation}</div>
+<p>The second is a Markov assumption that the <strong>transition</strong> probability of a tag is dependent only on the previous two tags rather than the entire tag sequence:</p>
+<div class="math">\begin{equation}
+P(q_{1}^{n}) \approx \prod_{i=1}^{n+1} P(q_i \mid q_{i-1}, q_{i-2})
+\end{equation}</div>
+<p>where <span class="math">\(q_{-1} = q_{-2} = *\)</span> is the special start symbol appended to the beginning of every tag sequence and <span class="math">\(q_{n+1} = STOP\)</span> is the unique stop symbol marked at the end of every tag sequence.</p>
+<p>In many cases, we have a labeled corpus of sentences paired with the correct POS tag sequences <code>(The/DT dogs/NNS run/VB)</code> such as the Brown corpus, so the problem of POS tagging is that of the supervised learning where we easily calculate the maximum likelihood estimate of a transition probability <span class="math">\(P(q_i \mid q_{i-1}, q_{i-2})\)</span> by counting how often we see the third tag <span class="math">\(q_{i}\)</span> followed by its previous two tags <span class="math">\(q_{i-1}\)</span> and <span class="math">\(q_{i-2}\)</span> divided by the number of occurrences of the two tags <span class="math">\(q_{i-1}\)</span> and <span class="math">\(q_{i-2}\)</span>:</p>
+<div class="math">\begin{equation}
+P(q_i \mid q_{i-1}, q_{i-2}) = \dfrac{C(q_{i-2}, q_{i-1}, q_i)}{C(q_{i-2}, q_{i-1})}
+\end{equation}</div>
+<p>Similarly we compute an emission probability <span class="math">\(P(o_i \mid q_i)\)</span> as follows:</p>
+<div class="math">\begin{equation}
+P(o_i \mid q_i) = \dfrac{C(q_i, o_i)}{C(q_i)}
+\end{equation}</div>
+<h2>3.1 The Viterbi Algorithm</h2>
+<p>Recall that the decoding task is to find</p>
+<div class="math">\begin{equation}
+\hat{q}_{1}^{n+1}
+= \operatornamewithlimits{argmax}_{q_{1}^{n+1}}{P(o_{1}^{n}, q_{1}^{n+1})}
+\end{equation}</div>
+<p>where the <code>arg max</code> is taken over all sequences <span class="math">\(q_{1}^{n}\)</span> such that <span class="math">\(q_i \in S\)</span> for <span class="math">\(i=1,...,n\)</span> and <span class="math">\(S\)</span> is the set of all tags. We further assume that <span class="math">\(P(o_{1}^{n}, q_{1}^{n})\)</span> takes the form</p>
+<div class="math">\begin{equation}
+P(o_{1}^{n}, q_{1}^{n+1})
+= \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P(o_i \mid q_i)
+\end{equation}</div>
+<p>assuming <span class="math">\(q_{-1} = q_{-2} = *\)</span> and <span class="math">\(q_{n+1} = STOP\)</span>. Because the <code>arg max</code> is taken over all different tag sequences, brute force search where we compute the likelihood of the observation sequence given each possible hidden state sequence is hopelessly inefficient as it is <span class="math">\(O(|S|^3)\)</span> in complexity. Instead, the Viterbi algorithm, a kind of dynamic programming algorithm, is used to make the search computationally more efficient.</p>
+<p>Define <span class="math">\(n\)</span> to be the length of the input sentence and <span class="math">\(S_k\)</span> for <span class="math">\(k = -1,0,...,n\)</span> to be the set of possible tags at position k such that <span class="math">\(S_{-1} = S_0 = {*}\)</span> and <span class="math">\(S_k = S k \in {1,...,n}\)</span>. Define</p>
+<div class="math">\begin{equation}
+r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P(o_i \mid q_i)
+\end{equation}</div>
+<p>and a dynamic programming table, or a cell, to be</p>
+<div class="math">\begin{equation}
+\pi(k, u, v) = \operatornamewithlimits{max}_{q_{-1}^{k}: q_{k-1}=u, q_{k}=v} r(q_{-1}^{k})
+\end{equation}</div>
+<p>which is the maximum probability of a tag sequence ending in tags <span class="math">\(u\)</span>, <span class="math">\(v\)</span> at position <span class="math">\(k\)</span>. The Viterbi algorithm fills each cell recursively such that the most probable of the extensions of the paths that lead to the current cell at time <span class="math">\(k\)</span> given that we had already computed the probability of being in every state at time <span class="math">\(k-1\)</span>. In a nutshell, the algorithm works by initializing the first cell as</p>
+<div class="math">\begin{equation}
+\pi(0, *, *) = 1
+\end{equation}</div>
+<p>and for any <span class="math">\(k \in {1,...,n}\)</span>, for any <span class="math">\(u \in S_{k-1}\)</span> and <span class="math">\(v \in S_k\)</span>, recursively compute</p>
+<div class="math">\begin{equation}
+\pi(k, u, v) = \operatornamewithlimits{max}_{w \in S_{k-2}} (\pi(k-1, w, u) \cdot q(v \mid w, u) \cdot P(o_k \mid v))
+\end{equation}</div>
+<p>and return</p>
+<div class="math">\begin{equation}
+\operatornamewithlimits{max}_{w \in S_{n-1}, v \in S_{n}} (\pi(n, u, v) \cdot q(STOP \mid u, v))
+\end{equation}</div>
+<p>The last component of the Viterbi algorithm is <strong>backpointers</strong>. The goal of the decoder is to not only produce a probability of the most probable tag sequence but also the resulting tag sequence itself. The best state sequence is computed by keeping track of the path of hidden state that led to each state and backtracing the best path in reverse from the end to the start. A full implementation of the Viterbi algorithm is shown.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+
+<span class="n">START_SYMBOL</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+<span class="n">STOP_SYMBOL</span> <span class="o">=</span> <span class="s1">&#39;STOP&#39;</span>
+<span class="n">LOG_PROB_OF_ZERO</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1000</span>
+
+<span class="k">def</span> <span class="nf">viterbi</span><span class="p">(</span><span class="n">brown_dev_words</span><span class="p">,</span> <span class="n">taglist</span><span class="p">,</span> <span class="n">known_words</span><span class="p">,</span> <span class="n">q_values</span><span class="p">,</span> <span class="n">e_values</span><span class="p">):</span>
+    <span class="c1"># pi[(k, u, v)]: max probability of a tag sequence ending in tags u, v </span>
+    <span class="c1"># at position k</span>
+    <span class="c1"># bp[(k, u, v)]: backpointers to recover the argmax of pi[(k, u, v)]</span>
+    <span class="n">tagged</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pi</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">bp</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Initialization</span>
+    <span class="n">pi</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">START_SYMBOL</span><span class="p">,</span> <span class="n">START_SYMBOL</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Define tagsets S(k)</span>
+    <span class="k">def</span> <span class="nf">S</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="n">START_SYMBOL</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">taglist</span>
+
+    <span class="c1"># The Viterbi algorithm</span>
+    <span class="k">for</span> <span class="n">sent_words_actual</span> <span class="ow">in</span> <span class="n">brown_dev_words</span><span class="p">:</span>
+        <span class="n">sent_words</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">known_words</span> <span class="k">else</span> <span class="n">subcategorize</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> \
+                      <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sent_words_actual</span><span class="p">]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sent_words</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">S</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">S</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                    <span class="n">max_score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-Inf&#39;</span><span class="p">)</span>
+                    <span class="n">max_tag</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">S</span><span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">e_values</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">sent_words</span><span class="p">[</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">score</span> <span class="o">=</span> <span class="n">pi</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">u</span><span class="p">),</span> <span class="n">LOG_PROB_OF_ZERO</span><span class="p">)</span> <span class="o">+</span> \
+                                    <span class="n">q_values</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">w</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">LOG_PROB_OF_ZERO</span><span class="p">)</span> <span class="o">+</span> \
+                                    <span class="n">e_values</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">sent_words</span><span class="p">[</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">))</span>
+                            <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">max_score</span><span class="p">:</span>
+                                <span class="n">max_score</span> <span class="o">=</span> <span class="n">score</span>
+                                <span class="n">max_tag</span> <span class="o">=</span> <span class="n">w</span>
+                    <span class="n">pi</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)]</span> <span class="o">=</span> <span class="n">max_score</span>
+                    <span class="n">bp</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)]</span> <span class="o">=</span> <span class="n">max_tag</span>
+
+        <span class="n">max_score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-Inf&#39;</span><span class="p">)</span>
+        <span class="n">u_max</span><span class="p">,</span> <span class="n">v_max</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">S</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">S</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="n">pi</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">LOG_PROB_OF_ZERO</span><span class="p">)</span> <span class="o">+</span> \
+                        <span class="n">q_values</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">STOP_SYMBOL</span><span class="p">),</span> <span class="n">LOG_PROB_OF_ZERO</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">max_score</span><span class="p">:</span>
+                    <span class="n">max_score</span> <span class="o">=</span> <span class="n">score</span>
+                    <span class="n">u_max</span> <span class="o">=</span> <span class="n">u</span>
+                    <span class="n">v_max</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="n">tags</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v_max</span><span class="p">)</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u_max</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp</span><span class="p">[(</span><span class="n">k</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">tags</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span> <span class="n">tags</span><span class="p">[</span><span class="n">i</span><span class="p">])])</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+        <span class="n">tagged_sentence</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="n">tagged_sentence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sent_words_actual</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">tags</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="n">tagged_sentence</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">tagged</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tagged_sentence</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">tagged</span>
+</pre></div>
+
+
+<p>Note that the function takes in data to tag <code>(brown_dev_words)</code>, a set of all possible tags <code>(taglist)</code>, and a set of all known words <code>(known_words)</code>, trigram probabilities <code>(q_values)</code>, and emission probabilities <code>(e_values)</code>, and outputs a list where every element is a tagged sentence in the <code>WORD/TAG</code> format, separated by spaces with a newline character in the end, just like the input tagged data. Please refer to the full Python codes attached in a separate file for more details.</p>
+<h2>3.2 Deleted Interpolation</h2>
+<p>Previously, a transition probability is calculated with Eq. 5. However, many times these counts will return a zero in a training corpus which erroneously predicts that a given tag sequence will never occur at all. A common, effective remedy to this zero division error is to estimate a trigram transition probability by aggregating weaker, yet more robust estimators such as a bigram and a unigram probability. For instance, assume we have never seen the tag sequence <code>DT NNS VB</code> in a training corpus, so the trigram transition probability <span class="math">\(P(VB \mid DT, NNS) = 0\)</span> but it may still be possible to compute the bigram transition probability <span class="math">\(P(VB | NNS)\)</span> as well as the unigram probability <span class="math">\(P(VB)\)</span>.</p>
+<p>More generally, the maximum likelihood estimates of the following transition probabilities can be computed using counts from a training corpus and subsequenty setting them to zero if the denominator happens to be zero:</p>
+<div class="math">\begin{equation}
+\hat{P}(q_i \mid q_{i-1}, q_{i-2}) = \dfrac{C(q_{i-2}, q_{i-1}, q_i)}{C(q_{i-2}, q_{i-1})}
+\end{equation}</div>
+<div class="math">\begin{equation}
+\hat{P}(q_i \mid q_{i-1}) = \dfrac{C(q_{i-1}, q_i)}{C(q_{i-1})}
+\end{equation}</div>
+<div class="math">\begin{equation}
+\hat{P}(q_i) = \dfrac{C(q_i)}{N}
+\end{equation}</div>
+<p>where <span class="math">\(N\)</span> is the total number of tokens, not unique words, in the training corpus. The final trigram probability estimate <span class="math">\(\tilde{P}(q_i \mid q_{i-1}, q_{i-2})\)</span> is calculated by a weighted sum of the trigram, bigram, and unigram probability estimates above:</p>
+<div class="math">\begin{equation}
+\tilde{P}(q_i \mid q_{i-1}, q_{i-2}) = \lambda_{3} \cdot \hat{P}(q_i \mid q_{i-1}, q_{i-2}) + \lambda_{2} \cdot \hat{P}(q_i \mid q_{i-1}) + \lambda_{1} \cdot \hat{P}(q_i)
+\end{equation}</div>
+<p>under the constraint <span class="math">\(\lambda_{1} + \lambda_{2} + \lambda_{3} = 1\)</span>. These values of <span class="math">\(\lambda\)</span>s are generally set using the algorithm called <strong>deleted interpolation</strong> which is conceptually similar to leave-one-out cross-validation <code>LOOCV</code> in that each trigram is successively deleted from the training corpus and the <span class="math">\(\lambda\)</span>s are chosen to maximize the likelihood of the rest of the corpus. The deletion mechanism thereby helps set the <span class="math">\(\lambda\)</span>s so as to not overfit the training corpus and aid in generalization. The Python function that implements the deleted interpolation algorithm for tag trigrams is shown.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="k">def</span> <span class="nf">deleted_interpolation</span><span class="p">(</span><span class="n">unigram_c</span><span class="p">,</span> <span class="n">bigram_c</span><span class="p">,</span> <span class="n">trigram_c</span><span class="p">):</span>
+    <span class="n">lambda1</span> <span class="o">=</span> <span class="n">lambda2</span> <span class="o">=</span> <span class="n">lambda3</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">trigram_c</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">trigram_c</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">c1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">bigram_c</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+                <span class="n">c1</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">c2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">bigram_c</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">unigram_c</span><span class="p">[(</span><span class="n">a</span><span class="p">,)]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+                <span class="n">c2</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">c3</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">unigram_c</span><span class="p">[(</span><span class="n">a</span><span class="p">,)]</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">unigram_c</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+                <span class="n">c3</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">([</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lambda3</span> <span class="o">+=</span> <span class="n">v</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">lambda2</span> <span class="o">+=</span> <span class="n">v</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">lambda1</span> <span class="o">+=</span> <span class="n">v</span>
+
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">lambda1</span><span class="p">,</span> <span class="n">lambda2</span><span class="p">,</span> <span class="n">lambda3</span><span class="p">]</span>
+    <span class="n">norm_w</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">weights</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">norm_w</span>
+</pre></div>
+
+
+<p>Note that the inputs are the Python dictionaries of unigram, bigram, and trigram counts, respectively, where the keys are the tuples that represent the tag trigram, and the values are the counts of the tag trigram in the training corpus. The function returns the normalized values of <span class="math">\(\lambda\)</span>s.</p>
+<h2>3.3 Unknown Words</h2>
+<p>In all languages, new words and jargons such as acronyms and proper names are constantly being coined and added to a dictionary. Keep updating the dictionary of vocabularies is, however, too cumbersome and takes too much human effort. Thus, it is important to have a good model for dealing with unknown words to achieve a high accuracy with a trigram HMM POS tagger.</p>
+<h3>3.3.1 RARE</h3>
+<p><span class="math">\(RARE\)</span> is a simple way to replace every word or token with the special symbol <code>_RARE_</code> whose frequency of appearance in the training set is less than or equal to 5. Without this process, words like person names and places that do not appear in the training set but are seen in the test set can have their maximum likelihood estimates of <span class="math">\(P(q_i \mid o_i)\)</span> undefined.</p>
+<h3>3.3.2 MORPHO</h3>
+<p><span class="math">\(MORPHO\)</span> is a modification of <span class="math">\(RARE\)</span> that serves as a better alternative in that every word token whose frequency is less than or equal to 5 in the training set is replaced by further subcategorization based on a set of morphological cues. For example, we all know that a word with suffix like <code>-ion</code>, <code>-ment</code>, <code>-ence</code>, and <code>-ness</code>, to name a few, will be a noun, and an adjective has a prefix like <code>un-</code> and <code>in-</code> or a suffix like <code>-ious</code> and <code>-ble</code>. Take a look at the following Python function.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">RARE_SYMBOL</span> <span class="o">=</span> <span class="s1">&#39;_RARE_&#39;</span>
+<span class="n">RARE_WORD_MAX_FREQ</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="k">def</span> <span class="nf">subcategorize</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\w&#39;</span><span class="p">,</span> <span class="n">word</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;_PUNCS_&#39;</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[A-Z]&#39;</span><span class="p">,</span> <span class="n">word</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;_CAPITAL_&#39;</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\d&#39;</span><span class="p">,</span> <span class="n">word</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;_NUM_&#39;</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(ion\b|ty\b|ics\b|ment\b|ence\b|ance\b|ness\b|ist\b|ism\b)&#39;</span><span class="p">,</span><span class="n">word</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;_NOUNLIKE_&#39;</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(ate\b|fy\b|ize\b|\ben|\bem)&#39;</span><span class="p">,</span> <span class="n">word</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;_VERBLIKE_&#39;</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\bun|\bin|ble\b|ry\b|ish\b|ious\b|ical\b|\bnon)&#39;</span><span class="p">,</span><span class="n">word</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;_ADJLIKE_&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">RARE_SYMBOL</span>
+</pre></div>
+
+
+<h1>4 Results and Discussions</h1>
+<p>The most frequent tag baseline <code>(Most Frequent Tag)</code> where every word is tagged with its most frequent tag and the unknown or rare words are tagged as nouns by default already produces high tag accuracy of around 90%. This is partly because many words are unambiguous and we get points for determiners like <code>the</code> and <code>a</code> and for punctuation marks. The average run time for a trigram HMM tagger is between 350 to 400 seconds. The weights <span class="math">\(\lambda_1\)</span>, <span class="math">\(\lambda_2\)</span>, and <span class="math">\(\lambda_3\)</span> from deleted interpolation are 0.125, 0.394, and 0.481, respectively.</p>
+<ul>
+<li><code>Most Frequent Tag</code>: <code>90%</code></li>
+<li><code>Trigram HMM Viterbi (+ Deleted Interpolation + RARE)</code>: <code>91.15%</code></li>
+<li><code>Trigram HMM Viterbi (+ Deleted Interpolation + MORPHO)</code>: <code>92.18%</code></li>
+<li><code>Trigram HMM Viterbi (- Deleted Interpolation + RARE)</code>: <code>93.32%</code></li>
+<li><code>Trigram HMM Viterbi (- Deleted Interpolation + MORPHO)</code>: <code>94.25%</code></li>
+<li><code>Upper Bound (Human Agreement)</code>: <code>98%</code></li>
+</ul>
+<p>The trigram HMM tagger with no deleted interpolation and with MORPHO results in the highest overall accuracy of 94.25% but still well below the human agreement upper bound of 98%. Such 4 percentage point increase in accuracy from the most frequent tag baseline is quite significant in that it translates to <span class="math">\(10000 \times 0.04 = 400\)</span> additional sentences accurately tagged. Also note that using the weights from deleted interpolation to calculate trigram tag probabilities has an adverse effect in overall accuracy. This is most likely because many trigrams found in the training set are also found in the devset, rendering useless bigram and unigram tag probabilities.</p>
+<h1>5 Conclusions</h1>
+<p>In this post, I introduced the application of hidden Markov models to a well-known problem in natural language processing called part-of-speech tagging, explained the Viterbi algorithm that reduces the time complexity of the trigram HMM tagger, and evaluated different trigram HMM-based taggers with deleted interpolation and unknown word treatments on the subset of the Brown corpus. The result is quite promising with over 4 percentage point increase from the most frequent tag baseline but can still be improved comparing with the human agreement upper bound. The hidden Markov models are intuitive, yet powerful enough to uncover hidden states based on the observed sequences, and they form the backbone of more complex algorithms.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://stathwang.github.io/tag/pos-tagging.html">pos tagging</a>
+      <a href="https://stathwang.github.io/tag/markov-chain.html">markov chain</a>
+      <a href="https://stathwang.github.io/tag/viterbi-algorithm.html">viterbi algorithm</a>
+      <a href="https://stathwang.github.io/tag/natural-language-processing.html">natural language processing</a>
+      <a href="https://stathwang.github.io/tag/machine-learning.html">machine learning</a>
+      <a href="https://stathwang.github.io/tag/python.html">python</a>
+    </p>
+  </div>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'thedatalogical';
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</article>
+
+    <hr />
+    <p />
+    <!-- Begin MailChimp Signup Form -->
+<link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+  #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
+  /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+     We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+</style>
+<div id="mc_embed_signup">
+<form action="//github.us1.list-manage.com/subscribe/post?u=0f2c943c221c777ef88591fb6&amp;id=6cf4236c90" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <div id="mc_embed_signup_scroll">
+  <label for="mce-EMAIL">Subscribe to my sporadic data science newsletter and blog post</label>
+  <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0f2c943c221c777ef88591fb6_6cf4236c90" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </div>
+</form>
+</div>
+<br />
+<br />
+
+<!--End mc_embed_signup-->
+
+    <footer>
+<p>
+  &copy; Seong Hyun Hwang 2015 - 2017 - This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>
+</p>
+<p>
+  <a rel="license"
+     href="http://creativecommons.org/licenses/by-sa/4.0/"
+     target="_blank">
+    <img alt="Creative Commons License"
+         title="Creative Commons License"
+         style="border-width:0"
+         src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png"
+         width="80"
+         height="15"/>
+  </a>
+</p>    </footer>
+  </main>
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-69797568-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+  <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us1.list-manage.com","uuid":"0f2c943c221c777ef88591fb6","lid":"6cf4236c90"}) })</script>
+
+
+
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//" + stathwang.piwikpro.com + "/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 1]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<noscript><p><img src="//bnjbvr.alwaysdata.net/piwik/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>
+<!-- End Piwik Code -->
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Seong Hyun Hwang ",
+  "url" : "https://stathwang.github.io",
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "description": "Seong Hyun Hwang's Thoughts and Writings"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  "name": "Part-of-Speech Tagging with Trigram Hidden Markov Models and Viterbi Algorithm",
+  "headline": "Part-of-Speech Tagging with Trigram Hidden Markov Models and Viterbi Algorithm",
+  "datePublished": "2017-06-07 01:00:00-04:00",
+  "dateModified": "",
+  "author": {
+    "@type": "Person",
+    "name": "Seong Hyun Hwang",
+    "url": "https://stathwang.github.io/author/seong-hyun-hwang.html"
+  },
+  "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
+  "url": "https://stathwang.github.io/part-of-speech-tagging-with-trigram-hidden-markov-models-and-viterbi-algorithm.html",
+  "description": "1 The Hidden Markov Model The hidden Markov model or HMM for short is a probabilistic sequence model that assigns a label to each unit in a sequence of observations. The model computes a probability distribution over possible sequences of labels and chooses the best label sequence that maximizes the …"
+}
+</script></body>
+</html>
