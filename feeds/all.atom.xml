@@ -1,5 +1,361 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Seong Hyun Hwang</title><link href="https://stathwang.github.io/" rel="alternate"></link><link href="https://stathwang.github.io/feeds/all.atom.xml" rel="self"></link><id>https://stathwang.github.io/</id><updated>2017-03-23T13:45:00-04:00</updated><entry><title>Generating Movie Reviews in Korean with Language Modeling</title><link href="https://stathwang.github.io/generating-movie-reviews-in-korean-with-language-modeling.html" rel="alternate"></link><published>2017-03-23T13:45:00-04:00</published><updated>2017-03-23T13:45:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2017-03-23:/generating-movie-reviews-in-korean-with-language-modeling.html</id><summary type="html">&lt;p&gt;&lt;img alt="MovieReviews" src="https://stathwang.github.io/images/MovieReviews.png"&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Seong Hyun Hwang</title><link href="https://stathwang.github.io/" rel="alternate"></link><link href="https://stathwang.github.io/feeds/all.atom.xml" rel="self"></link><id>https://stathwang.github.io/</id><updated>2017-06-07T01:00:00-04:00</updated><entry><title>Part-of-Speech Tagging with Trigram Hidden Markov Models and Viterbi Algorithm</title><link href="https://stathwang.github.io/part-of-speech-tagging-with-trigram-hidden-markov-models-and-viterbi-algorithm.html" rel="alternate"></link><published>2017-06-07T01:00:00-04:00</published><updated>2017-06-07T01:00:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2017-06-07:/part-of-speech-tagging-with-trigram-hidden-markov-models-and-viterbi-algorithm.html</id><summary type="html">&lt;h3&gt;Hidden Markov Model&lt;/h3&gt;
+&lt;p&gt;The hidden Markov model or &lt;strong&gt;HMM&lt;/strong&gt; for short is a probabilistic sequence model that assigns a label to each unit in a sequence of observations. The model computes a probability distribution over possible sequences of labels and chooses the best label sequence that maximizes the probability of …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Hidden Markov Model&lt;/h3&gt;
+&lt;p&gt;The hidden Markov model or &lt;strong&gt;HMM&lt;/strong&gt; for short is a probabilistic sequence model that assigns a label to each unit in a sequence of observations. The model computes a probability distribution over possible sequences of labels and chooses the best label sequence that maximizes the probability of generating the observed sequence. The HMM is widely used in natural language processing since language consists of sequences at many levels such as sentences, phrases, words, or even characters.&lt;/p&gt;
+&lt;p&gt;This post presents the application of hidden Markov models to a classic problem in natural language processing called part-of-speech tagging, explains the key algorithm behind a trigram HMM tagger, and evaluates various trigram HMM-based taggers on the subset of a large real-world corpus.&lt;/p&gt;
+&lt;h3&gt;Part of Speech Tagging&lt;/h3&gt;
+&lt;p&gt;&lt;img alt="POSTagging" src="https://stathwang.github.io/images/tagged.png"&gt;&lt;/p&gt;
+&lt;p&gt;Part-of-speech tagging or &lt;strong&gt;POS tagging&lt;/strong&gt; is the process of assigning a part-of-speech marker to each word in an input text. Tags are not only applied to words, but also punctuations as well, so we often tokenize the input text as part of the preprocessing step, separating out non-words like commas and quotation marks from words as well as disambiguating end-of-sentence punctuations such as period and exclamation point from part-of-word punctuation in the case of abbreviations like &lt;code&gt;i.e.&lt;/code&gt; and decimals.&lt;/p&gt;
+&lt;p&gt;POS tagging is extremely useful in text-to-speech; for example, the word &lt;code&gt;read&lt;/code&gt; can be read in two different ways depending on its part-of-speech in a sentence. A tagging algorithm receives as input a sequence of words and a set of all different tags that a word can take and outputs a sequence of tags. The algorithm works to resolve ambiguities of choosing the proper tag that best represents the syntax and the semantics of the sentence. When someone says &lt;code&gt;I just remembered that I forgot to bring my phone&lt;/code&gt;, the word &lt;code&gt;that&lt;/code&gt; grammatically works as a complementizer that connects two sentences into one, whereas in the following sentence, &lt;code&gt;Does that make you feel sad&lt;/code&gt;, the same word &lt;code&gt;that&lt;/code&gt; works as a determiner just like &lt;code&gt;the&lt;/code&gt;, &lt;code&gt;a&lt;/code&gt;, and &lt;code&gt;an&lt;/code&gt;. Designing a highly accurate POS tagger is a must so as to avoid assigning a wrong tag to such potentially ambiguous word since then it becomes difficult to solve more sophisticated problems in natural language processing ranging from named-entity recognition and question-answering that build upon POS tagging.&lt;/p&gt;
+&lt;h3&gt;The Brown Corpus&lt;/h3&gt;
+&lt;p&gt;In the following sections, we are going to build a trigram HMM POS tagger and evaluate it on a real-world text called the &lt;strong&gt;Brown corpus&lt;/strong&gt; which is a million word sample from 500 texts in different genres published in 1961 in the United States. We train the trigram HMM POS tagger on the subset of the Brown corpus containing nearly 27500 tagged sentences in the development test set, or devset &lt;code&gt;Brown_dev.txt&lt;/code&gt;. The accuracy of the tagger is measured by comparing the predicted tags with the true tags in &lt;code&gt;Brown_tagged_dev.txt&lt;/code&gt;. The algorithm of tagging each word token in the devset to the tag it occurred the most often in the training set &lt;code&gt;Most Frequenct Tag&lt;/code&gt; is the baseline against which the performances of various trigram HMM taggers are measured.&lt;/p&gt;
+&lt;p&gt;It is useful to know as a reference how the part-of-speech tags are abbreviated, and the following table lists out few important part-of-speech tags and their corresponding descriptions.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Tag&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;th&gt;Example&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;IN&lt;/td&gt;
+&lt;td&gt;Preposition&lt;/td&gt;
+&lt;td&gt;in, by, of&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;JJ&lt;/td&gt;
+&lt;td&gt;Adjective&lt;/td&gt;
+&lt;td&gt;green, happy&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;NN&lt;/td&gt;
+&lt;td&gt;Singular Noun&lt;/td&gt;
+&lt;td&gt;paper, word&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;NNS&lt;/td&gt;
+&lt;td&gt;Plural Noun&lt;/td&gt;
+&lt;td&gt;papers, words&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;PRP&lt;/td&gt;
+&lt;td&gt;Personal Pronoun&lt;/td&gt;
+&lt;td&gt;you, he, she&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;VB&lt;/td&gt;
+&lt;td&gt;Verb Base Form&lt;/td&gt;
+&lt;td&gt;take, eat, run&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;VBD&lt;/td&gt;
+&lt;td&gt;Verb Past Tense&lt;/td&gt;
+&lt;td&gt;took, ate, ran&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;.&lt;/td&gt;
+&lt;td&gt;Sentence-Final Punctuation&lt;/td&gt;
+&lt;td&gt;. ! ?&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Here is an example sentence from the Brown training corpus.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;At/ADP that/DET time/NOUN highway/NOUN engineers/NOUN traveled/VERB&lt;/code&gt;
+&lt;code&gt;rough/ADJ and/CONJ dirty/ADJ roads/NOUN to/PRT accomplish/VERB their/DET duties/NOUN ./.&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Each sentence is a string of space separated &lt;code&gt;WORD/TAG&lt;/code&gt; tokens, with a newline character in the end. Notice how the Brown training corpus uses a slightly different notation than the standard part-of-speech notation in the table above. Let's now discuss the method for building a trigram HMM POS tagger.&lt;/p&gt;
+&lt;h3&gt;Trigram HMM Part-of-Speech Tagger&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Decoding&lt;/strong&gt; is the task of determining which sequence of variables is the underlying source of some sequence of observations. Mathematically, we want to find the most probable sequence of hidden states &lt;span class="math"&gt;\(Q = q_1,q_2,q_3,...,q_N\)&lt;/span&gt; given as input a HMM &lt;span class="math"&gt;\(\lambda = (A,B)\)&lt;/span&gt; and a sequence of observations &lt;span class="math"&gt;\(O = o_1,o_2,o_3,...,o_N\)&lt;/span&gt; where &lt;span class="math"&gt;\(A\)&lt;/span&gt; is a transition probability matrix, each element &lt;span class="math"&gt;\(a_{ij}\)&lt;/span&gt; represents the probability of moving from a hidden state &lt;span class="math"&gt;\(q_i\)&lt;/span&gt; to another &lt;span class="math"&gt;\(q_j\)&lt;/span&gt; such that &lt;span class="math"&gt;\(\sum_{j=1}^{n} a_{ij} = 1\)&lt;/span&gt; for &lt;span class="math"&gt;\(\forall i\)&lt;/span&gt; and &lt;span class="math"&gt;\(B\)&lt;/span&gt; a matrix of emission probabilities, each element representing the probability of an observation state &lt;span class="math"&gt;\(o_i\)&lt;/span&gt; being generated from a hidden state &lt;span class="math"&gt;\(q_i\)&lt;/span&gt;. In POS tagging, each hidden state corresponds to a single tag, and each observation state a word in a given sentence. For example, the task of the decoder is to find the best hidden tag sequence &lt;code&gt;DT NNS VB&lt;/code&gt; that maximizes the probability of the observed sequence of words &lt;code&gt;The dogs run&lt;/code&gt;. &lt;/p&gt;
+&lt;p&gt;Define &lt;span class="math"&gt;\(\hat{q}_{1}^{n} = \hat{q}_1,\hat{q}_2,\hat{q}_3,...,\hat{q}_n\)&lt;/span&gt; to be the most probable tag sequence given the observed sequence of &lt;span class="math"&gt;\(n\)&lt;/span&gt; words &lt;span class="math"&gt;\(o_{1}^{n} = o_1,o_2,o_3,...,o_n\)&lt;/span&gt;. Then we have the decoding task:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\hat{q}_{1}^{n}
+= {argmax}_{q_{1}^{n}}{P(q_{1}^{n} \mid o_{1}^{n})}
+= {argmax}_{q_{1}^{n}}{\dfrac{P(o_{1}^{n} \mid q_{1}^{n}) P(q_{1}^{n})}{P(o_{1}^{n})}}
+\end{equation}&lt;/div&gt;
+&lt;p&gt;where the second equality is computed using Bayes' rule. Moreover, the denominator &lt;span class="math"&gt;\(P(o_{1}^{n})\)&lt;/span&gt; can be dropped in Eq. 1 since it does not depend on &lt;span class="math"&gt;\(q_{1}^{n}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\hat{q}_{1}^{n} 
+= {argmax}_{q_{1}^{n}}{P(o_{1}^{n} \mid q_{1}^{n}) P(q_{1}^{n})}
+= {argmax}_{q_{1}^{n}}{P(o_{1}^{n}, q_{1}^{n})}
+\end{equation}&lt;/div&gt;
+&lt;p&gt;where &lt;span class="math"&gt;\(P(q_{1}^{n})\)&lt;/span&gt; is the probability of a tag sequence, &lt;span class="math"&gt;\(P(o_{1}^{n} \mid q_{1}^{n})\)&lt;/span&gt; is the probability of the observed sequence of words given the tag sequence, and &lt;span class="math"&gt;\(P(o_{1}^{n}, q_{1}^{n})\)&lt;/span&gt; is the joint probabilty of the tag and the word sequence. The trigram HMM tagger makes two assumptions to simplify the computation of &lt;span class="math"&gt;\(P(q_{1}^{n})\)&lt;/span&gt; and &lt;span class="math"&gt;\(P(o_{1}^{n} \mid q_{1}^{n})\)&lt;/span&gt;. The first is that the &lt;strong&gt;emission&lt;/strong&gt; probability of a word appearing depends only on its own tag and is independent of neighboring words and tags:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+P(o_{1}^{n} \mid q_{1}^{n}) = \prod_{i=1}^{n} P(o_i \mid q_i)
+\end{equation}&lt;/div&gt;
+&lt;p&gt;The second is a Markov assumption that the &lt;strong&gt;transition&lt;/strong&gt; probability of a tag is dependent only on the previous two tags rather than the entire tag sequence:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+P(q_{1}^{n}) \approx \prod_{i=1}^{n+1} P(q_i \mid q_{i-1}, q_{i-2})
+\end{equation}&lt;/div&gt;
+&lt;p&gt;where &lt;span class="math"&gt;\(q_{-1} = q_{-2} = *\)&lt;/span&gt; is the special start symbol appended to the beginning of every tag sequence and &lt;span class="math"&gt;\(q_{n+1} = STOP\)&lt;/span&gt; is the unique stop symbol marked at the end of every tag sequence.&lt;/p&gt;
+&lt;p&gt;In many cases, we have a labeled corpus of sentences paired with the correct POS tag sequences &lt;code&gt;(The/DT dogs/NNS run/VB)&lt;/code&gt; such as the Brown corpus, so the problem of POS tagging is that of the supervised learning where we easily calculate the maximum likelihood estimate of a transition probability &lt;span class="math"&gt;\(P(q_i \mid q_{i-1}, q_{i-2})\)&lt;/span&gt; by counting how often we see the third tag &lt;span class="math"&gt;\(q_{i}\)&lt;/span&gt; followed by its previous two tags &lt;span class="math"&gt;\(q_{i-1}\)&lt;/span&gt; and &lt;span class="math"&gt;\(q_{i-2}\)&lt;/span&gt; divided by the number of occurrences of the two tags &lt;span class="math"&gt;\(q_{i-1}\)&lt;/span&gt; and &lt;span class="math"&gt;\(q_{i-2}\)&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+P(q_i \mid q_{i-1}, q_{i-2}) = \dfrac{C(q_{i-2}, q_{i-1}, q_i)}{C(q_{i-2}, q_{i-1})}
+\end{equation}&lt;/div&gt;
+&lt;p&gt;Similarly we compute an emission probability &lt;span class="math"&gt;\(P(o_i \mid q_i)\)&lt;/span&gt; as follows:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+P(o_i \mid q_i) = \dfrac{C(q_i, o_i)}{C(q_i)}
+\end{equation}&lt;/div&gt;
+&lt;h4&gt;The Viterbi Algorithm&lt;/h4&gt;
+&lt;p&gt;Recall that the decoding task is to find&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\hat{q}_{1}^{n+1}
+= {argmax}_{q_{1}^{n+1}}{P(o_{1}^{n}, q_{1}^{n+1})}
+\end{equation}&lt;/div&gt;
+&lt;p&gt;where the &lt;code&gt;argmax&lt;/code&gt; is taken over all sequences &lt;span class="math"&gt;\(q_{1}^{n}\)&lt;/span&gt; such that &lt;span class="math"&gt;\(q_i \in S\)&lt;/span&gt; for &lt;span class="math"&gt;\(i=1,...,n\)&lt;/span&gt; and &lt;span class="math"&gt;\(S\)&lt;/span&gt; is the set of all tags. We further assume that &lt;span class="math"&gt;\(P(o_{1}^{n}, q_{1}^{n})\)&lt;/span&gt; takes the form&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+P(o_{1}^{n}, q_{1}^{n+1})
+= \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P(o_i \mid q_i)
+\end{equation}&lt;/div&gt;
+&lt;p&gt;assuming &lt;span class="math"&gt;\(q_{-1} = q_{-2} = *\)&lt;/span&gt; and &lt;span class="math"&gt;\(q_{n+1} = STOP\)&lt;/span&gt;. Because the &lt;code&gt;argmax&lt;/code&gt; is taken over all different tag sequences, brute force search where we compute the likelihood of the observation sequence given each possible hidden state sequence is hopelessly inefficient as it is &lt;span class="math"&gt;\(O(|S|^3)\)&lt;/span&gt; in complexity. Instead, the &lt;strong&gt;Viterbi algorithm&lt;/strong&gt;, a kind of dynamic programming algorithm, is used to make the search computationally more efficient.&lt;/p&gt;
+&lt;p&gt;Define &lt;span class="math"&gt;\(n\)&lt;/span&gt; to be the length of the input sentence and &lt;span class="math"&gt;\(S_k\)&lt;/span&gt; for &lt;span class="math"&gt;\(k = -1,0,...,n\)&lt;/span&gt; to be the set of possible tags at position k such that &lt;span class="math"&gt;\(S_{-1} = S_0 = {*}\)&lt;/span&gt; and &lt;span class="math"&gt;\(S_k = S k \in {1,...,n}\)&lt;/span&gt;. Define&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P(o_i \mid q_i)
+\end{equation}&lt;/div&gt;
+&lt;p&gt;and a dynamic programming table, or a cell, to be&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\pi(k, u, v) = {max}_{q_{-1}^{k}: q_{k-1}=u, q_{k}=v} r(q_{-1}^{k})
+\end{equation}&lt;/div&gt;
+&lt;p&gt;which is the maximum probability of a tag sequence ending in tags &lt;span class="math"&gt;\(u\)&lt;/span&gt;, &lt;span class="math"&gt;\(v\)&lt;/span&gt; at position &lt;span class="math"&gt;\(k\)&lt;/span&gt;. The Viterbi algorithm fills each cell recursively such that the most probable of the extensions of the paths that lead to the current cell at time &lt;span class="math"&gt;\(k\)&lt;/span&gt; given that we had already computed the probability of being in every state at time &lt;span class="math"&gt;\(k-1\)&lt;/span&gt;. In a nutshell, the algorithm works by initializing the first cell as&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\pi(0, *, *) = 1
+\end{equation}&lt;/div&gt;
+&lt;p&gt;and for any &lt;span class="math"&gt;\(k \in {1,...,n}\)&lt;/span&gt;, for any &lt;span class="math"&gt;\(u \in S_{k-1}\)&lt;/span&gt; and &lt;span class="math"&gt;\(v \in S_k\)&lt;/span&gt;, recursively compute&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\pi(k, u, v) = {max}_{w \in S_{k-2}} (\pi(k-1, w, u) \cdot q(v \mid w, u) \cdot P(o_k \mid v))
+\end{equation}&lt;/div&gt;
+&lt;p&gt;and return&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+{max}_{w \in S_{n-1}, v \in S_{n}} (\pi(n, u, v) \cdot q(STOP \mid u, v))
+\end{equation}&lt;/div&gt;
+&lt;p&gt;The last component of the Viterbi algorithm is &lt;strong&gt;backpointers&lt;/strong&gt;. The goal of the decoder is to not only produce a probability of the most probable tag sequence but also the resulting tag sequence itself. The best state sequence is computed by keeping track of the path of hidden state that led to each state and backtracing the best path in reverse from the end to the start. A full implementation of the Viterbi algorithm is shown.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;collections&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;defaultdict&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;deque&lt;/span&gt;
+
+&lt;span class="n"&gt;START_SYMBOL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;STOP_SYMBOL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;STOP&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;LOG_PROB_OF_ZERO&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1000&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;viterbi&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;brown_dev_words&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;taglist&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;known_words&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;q_values&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;e_values&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="c1"&gt;# pi[(k, u, v)]: max probability of a tag sequence ending in tags u, v &lt;/span&gt;
+    &lt;span class="c1"&gt;# at position k&lt;/span&gt;
+    &lt;span class="c1"&gt;# bp[(k, u, v)]: backpointers to recover the argmax of pi[(k, u, v)]&lt;/span&gt;
+    &lt;span class="n"&gt;tagged&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[]&lt;/span&gt;
+    &lt;span class="n"&gt;pi&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;defaultdict&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;bp&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{}&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# Initialization&lt;/span&gt;
+    &lt;span class="n"&gt;pi&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;START_SYMBOL&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;START_SYMBOL&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.0&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# Define tagsets S(k)&lt;/span&gt;
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;S&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="n"&gt;START_SYMBOL&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;taglist&lt;/span&gt;
+
+    &lt;span class="c1"&gt;# The Viterbi algorithm&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;sent_words_actual&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;brown_dev_words&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;sent_words&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;word&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;word&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;known_words&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="n"&gt;subcategorize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;word&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; \
+                      &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;word&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;sent_words_actual&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+        &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sent_words&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+            &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;u&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+                &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+                    &lt;span class="n"&gt;max_score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;-Inf&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                    &lt;span class="n"&gt;max_tag&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+                    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;w&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+                        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;e_values&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;sent_words&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                            &lt;span class="n"&gt;score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;u&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;LOG_PROB_OF_ZERO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; \
+                                    &lt;span class="n"&gt;q_values&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;w&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;u&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;LOG_PROB_OF_ZERO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; \
+                                    &lt;span class="n"&gt;e_values&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;sent_words&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+                            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;score&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;max_score&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                                &lt;span class="n"&gt;max_score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;score&lt;/span&gt;
+                                &lt;span class="n"&gt;max_tag&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;w&lt;/span&gt;
+                    &lt;span class="n"&gt;pi&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;u&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;max_score&lt;/span&gt;
+                    &lt;span class="n"&gt;bp&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;u&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;max_tag&lt;/span&gt;
+
+        &lt;span class="n"&gt;max_score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;-Inf&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;u_max&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v_max&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="bp"&gt;None&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;u&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+            &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;S&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+                &lt;span class="n"&gt;score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;u&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;LOG_PROB_OF_ZERO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; \
+                        &lt;span class="n"&gt;q_values&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;u&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;STOP_SYMBOL&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;LOG_PROB_OF_ZERO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;score&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;max_score&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                    &lt;span class="n"&gt;max_score&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;score&lt;/span&gt;
+                    &lt;span class="n"&gt;u_max&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;u&lt;/span&gt;
+                    &lt;span class="n"&gt;v_max&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;
+
+        &lt;span class="n"&gt;tags&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;deque&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="n"&gt;tags&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;v_max&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;tags&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;u_max&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;enumerate&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)):&lt;/span&gt;
+            &lt;span class="n"&gt;tags&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bp&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;k&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;tags&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;tags&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;])])&lt;/span&gt;
+        &lt;span class="n"&gt;tags&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;reverse&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+        &lt;span class="n"&gt;tagged_sentence&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;deque&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+            &lt;span class="n"&gt;tagged_sentence&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sent_words_actual&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;tags&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+        &lt;span class="n"&gt;tagged_sentence&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="se"&gt;\n&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;tagged&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;append&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39; &amp;#39;&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tagged_sentence&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;tagged&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note that the function takes in data to tag &lt;code&gt;brown_dev_words&lt;/code&gt;, a set of all possible tags &lt;code&gt;taglist&lt;/code&gt;, and a set of all known words &lt;code&gt;known_words&lt;/code&gt;, trigram probabilities &lt;code&gt;q_values&lt;/code&gt;, and emission probabilities &lt;code&gt;e_values&lt;/code&gt;, and outputs a list where every element is a tagged sentence in the &lt;code&gt;WORD/TAG&lt;/code&gt; format, separated by spaces with a newline character in the end, just like the input tagged data. Please refer to the full Python codes attached in a separate file for more details.&lt;/p&gt;
+&lt;h4&gt;Deleted Interpolation&lt;/h4&gt;
+&lt;p&gt;Previously, a transition probability is calculated with Eq. 5. However, many times these counts will return a zero in a training corpus which erroneously predicts that a given tag sequence will never occur at all. A common, effective remedy to this zero division error is to estimate a trigram transition probability by aggregating weaker, yet more robust estimators such as a bigram and a unigram probability. For instance, assume we have never seen the tag sequence &lt;code&gt;DT NNS VB&lt;/code&gt; in a training corpus, so the trigram transition probability &lt;span class="math"&gt;\(P(VB \mid DT, NNS) = 0\)&lt;/span&gt; but it may still be possible to compute the bigram transition probability &lt;span class="math"&gt;\(P(VB | NNS)\)&lt;/span&gt; as well as the unigram probability &lt;span class="math"&gt;\(P(VB)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;More generally, the maximum likelihood estimates of the following transition probabilities can be computed using counts from a training corpus and subsequenty setting them to zero if the denominator happens to be zero:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\hat{P}(q_i \mid q_{i-1}, q_{i-2}) = \dfrac{C(q_{i-2}, q_{i-1}, q_i)}{C(q_{i-2}, q_{i-1})}
+\end{equation}&lt;/div&gt;
+&lt;div class="math"&gt;\begin{equation}
+\hat{P}(q_i \mid q_{i-1}) = \dfrac{C(q_{i-1}, q_i)}{C(q_{i-1})}
+\end{equation}&lt;/div&gt;
+&lt;div class="math"&gt;\begin{equation}
+\hat{P}(q_i) = \dfrac{C(q_i)}{N}
+\end{equation}&lt;/div&gt;
+&lt;p&gt;where &lt;span class="math"&gt;\(N\)&lt;/span&gt; is the total number of tokens, not unique words, in the training corpus. The final trigram probability estimate &lt;span class="math"&gt;\(\tilde{P}(q_i \mid q_{i-1}, q_{i-2})\)&lt;/span&gt; is calculated by a weighted sum of the trigram, bigram, and unigram probability estimates above:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\tilde{P}(q_i \mid q_{i-1}, q_{i-2}) = \lambda_{3} \cdot \hat{P}(q_i \mid q_{i-1}, q_{i-2}) + \lambda_{2} \cdot \hat{P}(q_i \mid q_{i-1}) + \lambda_{1} \cdot \hat{P}(q_i)
+\end{equation}&lt;/div&gt;
+&lt;p&gt;under the constraint &lt;span class="math"&gt;\(\lambda_{1} + \lambda_{2} + \lambda_{3} = 1\)&lt;/span&gt;. These values of &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt;s are generally set using the algorithm called &lt;strong&gt;deleted interpolation&lt;/strong&gt; which is conceptually similar to leave-one-out cross-validation &lt;code&gt;LOOCV&lt;/code&gt; in that each trigram is successively deleted from the training corpus and the &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt;s are chosen to maximize the likelihood of the rest of the corpus. The deletion mechanism thereby helps set the &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt;s so as to not overfit the training corpus and aid in generalization. The Python function that implements the deleted interpolation algorithm for tag trigrams is shown.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;numpy&lt;/span&gt; &lt;span class="kn"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;np&lt;/span&gt;
+&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;collections&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;defaultdict&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;deleted_interpolation&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;unigram_c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;bigram_c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;trigram_c&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;lambda1&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lambda2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lambda3&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;trigram_c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;keys&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+        &lt;span class="n"&gt;v&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;trigram_c&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;c1&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;v&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bigram_c&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;ZeroDivisionError&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;c1&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+            &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;c2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;bigram_c&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;unigram_c&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,)]&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;ZeroDivisionError&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;c2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+            &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;c3&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;unigram_c&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,)]&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;unigram_c&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;ZeroDivisionError&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;c3&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+
+            &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;argmax&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;c1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c3&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;lambda3&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;lambda2&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;
+            &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;k&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+                &lt;span class="n"&gt;lambda1&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;v&lt;/span&gt;
+
+    &lt;span class="n"&gt;weights&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;lambda1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;lambda2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;lambda3&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="n"&gt;norm_w&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nb"&gt;float&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;weights&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;weights&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;norm_w&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note that the inputs are the Python dictionaries of unigram, bigram, and trigram counts, respectively, where the keys are the tuples that represent the tag trigram, and the values are the counts of the tag trigram in the training corpus. The function returns the normalized values of &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt;s.&lt;/p&gt;
+&lt;h4&gt;Unknown Words&lt;/h4&gt;
+&lt;p&gt;In all languages, new words and jargons such as acronyms and proper names are constantly being coined and added to a dictionary. Keep updating the dictionary of vocabularies is, however, too cumbersome and takes too much human effort. Thus, it is important to have a good model for dealing with unknown words to achieve a high accuracy with a trigram HMM POS tagger.&lt;/p&gt;
+&lt;h5&gt;RARE&lt;/h5&gt;
+&lt;p&gt;&lt;strong&gt;RARE&lt;/strong&gt; is a simple way to replace every word or token with the special symbol &lt;code&gt;_RARE_&lt;/code&gt; whose frequency of appearance in the training set is less than or equal to 5. Without this process, words like person names and places that do not appear in the training set but are seen in the test set can have their maximum likelihood estimates of &lt;span class="math"&gt;\(P(q_i \mid o_i)\)&lt;/span&gt; undefined.&lt;/p&gt;
+&lt;h5&gt;MORPHO&lt;/h5&gt;
+&lt;p&gt;&lt;strong&gt;MORPHO&lt;/strong&gt; is a modification of &lt;strong&gt;RARE&lt;/strong&gt; that serves as a better alternative in that every word token whose frequency is less than or equal to 5 in the training set is replaced by further subcategorization based on a set of morphological cues. For example, we all know that a word with suffix like &lt;code&gt;-ion&lt;/code&gt;, &lt;code&gt;-ment&lt;/code&gt;, &lt;code&gt;-ence&lt;/code&gt;, and &lt;code&gt;-ness&lt;/code&gt;, to name a few, will be a noun, and an adjective has a prefix like &lt;code&gt;un-&lt;/code&gt; and &lt;code&gt;in-&lt;/code&gt; or a suffix like &lt;code&gt;-ious&lt;/code&gt; and &lt;code&gt;-ble&lt;/code&gt;. Take a look at the following Python function.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;re&lt;/span&gt;
+
+&lt;span class="n"&gt;RARE_SYMBOL&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_RARE_&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;RARE_WORD_MAX_FREQ&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
+
+&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;subcategorize&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;word&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;\w&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;word&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_PUNCS_&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;[A-Z]&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;word&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_CAPITAL_&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;\d&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;word&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_NUM_&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;(ion\b|ty\b|ics\b|ment\b|ence\b|ance\b|ness\b|ist\b|ism\b)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;word&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_NOUNLIKE_&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;(ate\b|fy\b|ize\b|\ben|\bem)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;word&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_VERBLIKE_&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;elif&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;(\bun|\bin|ble\b|ry\b|ish\b|ious\b|ical\b|\bnon)&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;word&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;_ADJLIKE_&amp;#39;&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;RARE_SYMBOL&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Results&lt;/h3&gt;
+&lt;p&gt;The most frequent tag baseline &lt;code&gt;Most Frequent Tag&lt;/code&gt; where every word is tagged with its most frequent tag and the unknown or rare words are tagged as nouns by default already produces high tag accuracy of around 90%. The tag accuracy is defined as the percentage of words or tokens correctly tagged and implemented in the file &lt;code&gt;POS-S.py&lt;/code&gt; in my github repository. This is partly because many words are unambiguous and we get points for determiners like &lt;code&gt;the&lt;/code&gt; and &lt;code&gt;a&lt;/code&gt; and for punctuation marks. The average run time for a trigram HMM tagger is between 350 to 400 seconds. The weights &lt;span class="math"&gt;\(\lambda_1\)&lt;/span&gt;, &lt;span class="math"&gt;\(\lambda_2\)&lt;/span&gt;, and &lt;span class="math"&gt;\(\lambda_3\)&lt;/span&gt; from deleted interpolation are 0.125, 0.394, and 0.481, respectively.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Most Frequent Tag&lt;/code&gt;: &lt;code&gt;90%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Trigram HMM Viterbi (+ Deleted Interpolation + RARE)&lt;/code&gt;: &lt;code&gt;91.15%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Trigram HMM Viterbi (+ Deleted Interpolation + MORPHO)&lt;/code&gt;: &lt;code&gt;92.18%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Trigram HMM Viterbi (- Deleted Interpolation + RARE)&lt;/code&gt;: &lt;code&gt;93.32%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Trigram HMM Viterbi (- Deleted Interpolation + MORPHO)&lt;/code&gt;: &lt;code&gt;94.25%&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Upper Bound (Human Agreement)&lt;/code&gt;: &lt;code&gt;98%&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The trigram HMM tagger with no deleted interpolation and with MORPHO results in the highest overall accuracy of 94.25% but still well below the human agreement upper bound of 98%. Such 4 percentage point increase in accuracy from the most frequent tag baseline is quite significant in that it translates to &lt;span class="math"&gt;\(10000 \times 0.04 = 400\)&lt;/span&gt; additional sentences accurately tagged. Also note that using the weights from deleted interpolation to calculate trigram tag probabilities has an adverse effect in overall accuracy. This is most likely because many trigrams found in the training set are also found in the devset, rendering useless bigram and unigram tag probabilities.&lt;/p&gt;
+&lt;p&gt;In this post, we introduced the application of hidden Markov models to a well-known problem in natural language processing called part-of-speech tagging, explained the Viterbi algorithm that reduces the time complexity of the trigram HMM tagger, and evaluated different trigram HMM-based taggers with deleted interpolation and unknown word treatments on the subset of the Brown corpus. The result is quite promising with over 4 percentage point increase from the most frequent tag baseline but can still be improved comparing with the human agreement upper bound. The hidden Markov models are intuitive, yet powerful enough to uncover hidden states based on the observed sequences, and they form the backbone of more complex algorithms.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;You can find all of my Python codes and datasets in my Github repository &lt;a href="github.com/stathwang/HMM-POS-Tagger"&gt;here&lt;/a&gt;!&lt;/strong&gt;&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' &amp;&amp; location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="pos tagging"></category><category term="markov chain"></category><category term="viterbi algorithm"></category><category term="natural language processing"></category><category term="machine learning"></category><category term="python"></category></entry><entry><title>Generating Movie Reviews in Korean with Language Modeling</title><link href="https://stathwang.github.io/generating-movie-reviews-in-korean-with-language-modeling.html" rel="alternate"></link><published>2017-03-23T13:45:00-04:00</published><updated>2017-03-23T13:45:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2017-03-23:/generating-movie-reviews-in-korean-with-language-modeling.html</id><summary type="html">&lt;p&gt;&lt;img alt="MovieReviews" src="https://stathwang.github.io/images/MovieReviews.png"&gt;&lt;/p&gt;
 &lt;p&gt;A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;img alt="MovieReviews" src="https://stathwang.github.io/images/MovieReviews.png"&gt;&lt;/p&gt;
 &lt;p&gt;A statistical language modeling is a task of computing the probability of a sentence or sequence of words from a corpus. The standard is a trigram language model where the probability of a next word depends only on the previous two words. But the state-of-the-art as of writing is achieved by using neural networks such as &lt;code&gt;RNN&lt;/code&gt; and &lt;code&gt;LSTM&lt;/code&gt; and incorporating variants of probabilistic context-free grammars to produce grammatically sound sentences. I'll write about deep learning methods later when I have more free time, so stay tuned. In this post, I write a set of Python scripts to build unigram, bigram, trigram, and linearly interpolated language models using the &lt;code&gt;ratings.txt&lt;/code&gt; &lt;a href="https://github.com/e9t/nsmc"&gt;dataset&lt;/a&gt; that contains movie reviews in Korean scraped from &lt;a href="http://movie.naver.com/movie/point/af/list.nhn"&gt;Naver Movies&lt;/a&gt; (screenshot above) in order to randomly generated movie reviews.&lt;/p&gt;
 &lt;ul&gt;
