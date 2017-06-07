@@ -86,14 +86,14 @@
     <p>Posted on June 07 2017 in <a href="https://stathwang.github.io/category/machine-learning.html">Machine Learning</a></p>
   </header>
   <div>
-    <h1>1 The Hidden Markov Model</h1>
+    <h2>1 The Hidden Markov Model</h2>
 <p>The hidden Markov model or HMM for short is a probabilistic sequence model that assigns a label to each unit in a sequence of observations. The model computes a probability distribution over possible sequences of labels and chooses the best label sequence that maximizes the probability of generating the observed sequence. The HMM is widely used in natural language processing since language consists of sequences at many levels such as sentences, phrases, words, or even characters.</p>
-<p>In this post, I'm going to present the application of hidden Markov models to a classic problem in natural language processing called part-of-speech tagging, explain the key algorithm behind a trigram HMM tagger, and evaluate various trigram HMM-based taggers on the subset of a large real-world corpus.</p>
-<h1>2 Part of Speech Tagging</h1>
+<p>This post presents the application of hidden Markov models to a classic problem in natural language processing called part-of-speech tagging, explains the key algorithm behind a trigram HMM tagger, and evaluates various trigram HMM-based taggers on the subset of a large real-world corpus.</p>
+<h2>2 Part of Speech Tagging</h2>
 <p>Part-of-speech tagging or POS tagging is the process of assigning a part-of-speech marker to each word in an input text. Tags are not only applied to words, but also punctuations as well, so we often tokenize the input text as part of the preprocessing step, separating out non-words like commas and quotation marks from words as well as disambiguating end-of-sentence punctuations such as period and exclamation point from part-of-word punctuation in the case of abbreviations like <code>i.e.</code> and decimals.</p>
 <p>POS tagging is extremely useful in text-to-speech; for example, the word <code>read</code> can be read in two different ways depending on its part-of-speech in a sentence. A tagging algorithm receives as input a sequence of words and a set of all different tags that a word can take and outputs a sequence of tags. The algorithm works to resolve ambiguities of choosing the proper tag that best represents the syntax and the semantics of the sentence. When someone says <code>(I just remembered that I forgot to bring my phone)</code>, the word <code>that</code> grammatically works as a complementizer that connects two sentences into one, whereas in the following sentence, <code>(Does that make you feel sad)</code>, the same word <code>that</code> works as a determiner just like <code>the</code>, <code>a</code>, and <code>an</code>. Designing a highly accurate POS tagger is a must so as to avoid assigning a wrong tag to such potentially ambiguous word since then it becomes difficult to solve more sophisticated problems in natural language processing ranging from named-entity recognition and question-answering that build upon POS tagging.</p>
-<h1>3 The Brown Corpus</h1>
-<p>In the sections that follow, we build a trigram HMM POS tagger and evaluate it on a real-world text called the Brown corpus which is a million word sample from 500 texts in different genres published in 1961 in the United States. We train the trigram HMM POS tagger on the subset of the Brown corpus containing nearly 27500 tagged sentences to reduce computation time and cost and use the model to tag 10000 sentences in the development test set, or devset. The accuracy of the tagger is measured by comparing the predicted tags with the true tags. The algorithm of tagging each word token in the devset to the tag it occurred the most often in the training set (<code>Most Frequenct Tag</code>) is the baseline against which the performances of various trigram HMM taggers are measured.</p>
+<h2>3 The Brown Corpus</h2>
+<p>In the following sections, we are going to build a trigram HMM POS tagger and evaluate it on a real-world text called the Brown corpus which is a million word sample from 500 texts in different genres published in 1961 in the United States. We train the trigram HMM POS tagger on the subset of the Brown corpus containing nearly 27500 tagged sentences to reduce computation time and cost and use the model to tag 10000 sentences in the development test set, or devset. The accuracy of the tagger is measured by comparing the predicted tags with the true tags. The algorithm of tagging each word token in the devset to the tag it occurred the most often in the training set <code>(Most Frequenct Tag)</code> is the baseline against which the performances of various trigram HMM taggers are measured.</p>
 <p>It is useful to know as a reference how the part-of-speech tags are abbreviated, and the following table lists out few important part-of-speech tags and their corresponding descriptions.</p>
 <table>
 <thead>
@@ -147,15 +147,16 @@
 </tbody>
 </table>
 <p>Here is an example sentence from the Brown training corpus.</p>
-<p><code>At/ADP that/DET time/NOUN highway/NOUN engineers/NOUN traveled/VERB rough/ADJ and/CONJ dirty/ADJ roads/NOUN to/PRT accomplish/VERB their/DET duties/NOUN ./.</code></p>
+<p><code>At/ADP that/DET time/NOUN highway/NOUN engineers/NOUN traveled/VERB</code>
+<code>rough/ADJ and/CONJ dirty/ADJ roads/NOUN to/PRT accomplish/VERB their/DET duties/NOUN ./.</code></p>
 <p>Each sentence is a string of space separated <code>WORD/TAG</code> tokens, with a newline character in the end. Notice how the Brown training corpus uses a slightly different notation than the standard part-of-speech notation in the table above. Let's now discuss the method for building a trigram HMM POS tagger.</p>
-<h1>4 Trigram HMM Part-of-Speech Tagger</h1>
+<h2>4 Trigram HMM Part-of-Speech Tagger</h2>
 <p><strong>Decoding</strong> is the task of determining which sequence of variables is the underlying source of some sequence of observations. Mathematically, we want to find the most probable sequence of hidden states <span class="math">\(Q = q_1,q_2,q_3,...,q_N\)</span> given as input a HMM <span class="math">\(\lambda = (A,B)\)</span> and a sequence of observations <span class="math">\(O = o_1,o_2,o_3,...,o_N\)</span> where <span class="math">\(A\)</span> is a transition probability matrix, each element <span class="math">\(a_{ij}\)</span> represents the probability of moving from a hidden state <span class="math">\(q_i\)</span> to another <span class="math">\(q_j\)</span> such that <span class="math">\(\sum_{j=1}^{n} a_{ij} = 1\)</span> for <span class="math">\(\forall i\)</span> and <span class="math">\(B\)</span> a matrix of emission probabilities, each element representing the probability of an observation state <span class="math">\(o_i\)</span> being generated from a hidden state <span class="math">\(q_i\)</span>. In POS tagging, each hidden state corresponds to a single tag, and each observation state a word in a given sentence. For example, the task of the decoder is to find the best hidden tag sequence <code>(DT NNS VB)</code> that maximizes the probability of the observed sequence of words <code>(The dogs run)</code>. </p>
 <p>Define <span class="math">\(\hat{q}_{1}^{n} = \hat{q}_1,\hat{q}_2,\hat{q}_3,...,\hat{q}_n\)</span> to be the most probable tag sequence given the observed sequence of <span class="math">\(n\)</span> words <span class="math">\(o_{1}^{n} = o_1,o_2,o_3,...,o_n\)</span>. Then we have the decoding task:</p>
 <div class="math">\begin{equation}
 \hat{q}_{1}^{n}
-= \operatornamewithlimits{argmax}_{q_{1}^{n}}{P(q_{1}^{n} \mid o_{1}^{n})}
-= \operatornamewithlimits{argmax}_{q_{1}^{n}}{\dfrac{P(o_{1}^{n} \mid q_{1}^{n}) P(q_{1}^{n})}{P(o_{1}^{n})}}
+= {argmax}_{q_{1}^{n}}{P(q_{1}^{n} \mid o_{1}^{n})}
+= argmax_{q_{1}^{n}}{\dfrac{P(o_{1}^{n} \mid q_{1}^{n}) P(q_{1}^{n})}{P(o_{1}^{n})}}
 \end{equation}</div>
 <p>where the second equality is computed using Bayes' rule. Moreover, the denominator <span class="math">\(P(o_{1}^{n})\)</span> can be dropped in Eq. 1 since it does not depend on <span class="math">\(q_{1}^{n}\)</span>.</p>
 <div class="math">\begin{equation}
@@ -180,7 +181,7 @@ P(q_i \mid q_{i-1}, q_{i-2}) = \dfrac{C(q_{i-2}, q_{i-1}, q_i)}{C(q_{i-2}, q_{i-
 <div class="math">\begin{equation}
 P(o_i \mid q_i) = \dfrac{C(q_i, o_i)}{C(q_i)}
 \end{equation}</div>
-<h2>3.1 The Viterbi Algorithm</h2>
+<h3>3.1 The Viterbi Algorithm</h3>
 <p>Recall that the decoding task is to find</p>
 <div class="math">\begin{equation}
 \hat{q}_{1}^{n+1}
@@ -288,7 +289,7 @@ r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P
 
 
 <p>Note that the function takes in data to tag <code>(brown_dev_words)</code>, a set of all possible tags <code>(taglist)</code>, and a set of all known words <code>(known_words)</code>, trigram probabilities <code>(q_values)</code>, and emission probabilities <code>(e_values)</code>, and outputs a list where every element is a tagged sentence in the <code>WORD/TAG</code> format, separated by spaces with a newline character in the end, just like the input tagged data. Please refer to the full Python codes attached in a separate file for more details.</p>
-<h2>3.2 Deleted Interpolation</h2>
+<h3>3.2 Deleted Interpolation</h3>
 <p>Previously, a transition probability is calculated with Eq. 5. However, many times these counts will return a zero in a training corpus which erroneously predicts that a given tag sequence will never occur at all. A common, effective remedy to this zero division error is to estimate a trigram transition probability by aggregating weaker, yet more robust estimators such as a bigram and a unigram probability. For instance, assume we have never seen the tag sequence <code>DT NNS VB</code> in a training corpus, so the trigram transition probability <span class="math">\(P(VB \mid DT, NNS) = 0\)</span> but it may still be possible to compute the bigram transition probability <span class="math">\(P(VB | NNS)\)</span> as well as the unigram probability <span class="math">\(P(VB)\)</span>.</p>
 <p>More generally, the maximum likelihood estimates of the following transition probabilities can be computed using counts from a training corpus and subsequenty setting them to zero if the denominator happens to be zero:</p>
 <div class="math">\begin{equation}
@@ -341,11 +342,11 @@ r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P
 
 
 <p>Note that the inputs are the Python dictionaries of unigram, bigram, and trigram counts, respectively, where the keys are the tuples that represent the tag trigram, and the values are the counts of the tag trigram in the training corpus. The function returns the normalized values of <span class="math">\(\lambda\)</span>s.</p>
-<h2>3.3 Unknown Words</h2>
+<h3>3.3 Unknown Words</h3>
 <p>In all languages, new words and jargons such as acronyms and proper names are constantly being coined and added to a dictionary. Keep updating the dictionary of vocabularies is, however, too cumbersome and takes too much human effort. Thus, it is important to have a good model for dealing with unknown words to achieve a high accuracy with a trigram HMM POS tagger.</p>
-<h3>3.3.1 RARE</h3>
+<h4>3.3.1 RARE</h4>
 <p><span class="math">\(RARE\)</span> is a simple way to replace every word or token with the special symbol <code>_RARE_</code> whose frequency of appearance in the training set is less than or equal to 5. Without this process, words like person names and places that do not appear in the training set but are seen in the test set can have their maximum likelihood estimates of <span class="math">\(P(q_i \mid o_i)\)</span> undefined.</p>
-<h3>3.3.2 MORPHO</h3>
+<h4>3.3.2 MORPHO</h4>
 <p><span class="math">\(MORPHO\)</span> is a modification of <span class="math">\(RARE\)</span> that serves as a better alternative in that every word token whose frequency is less than or equal to 5 in the training set is replaced by further subcategorization based on a set of morphological cues. For example, we all know that a word with suffix like <code>-ion</code>, <code>-ment</code>, <code>-ence</code>, and <code>-ness</code>, to name a few, will be a noun, and an adjective has a prefix like <code>un-</code> and <code>in-</code> or a suffix like <code>-ious</code> and <code>-ble</code>. Take a look at the following Python function.</p>
 <div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
 
@@ -370,7 +371,7 @@ r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P
 </pre></div>
 
 
-<h1>4 Results and Discussions</h1>
+<h2>4 Results</h2>
 <p>The most frequent tag baseline <code>(Most Frequent Tag)</code> where every word is tagged with its most frequent tag and the unknown or rare words are tagged as nouns by default already produces high tag accuracy of around 90%. This is partly because many words are unambiguous and we get points for determiners like <code>the</code> and <code>a</code> and for punctuation marks. The average run time for a trigram HMM tagger is between 350 to 400 seconds. The weights <span class="math">\(\lambda_1\)</span>, <span class="math">\(\lambda_2\)</span>, and <span class="math">\(\lambda_3\)</span> from deleted interpolation are 0.125, 0.394, and 0.481, respectively.</p>
 <ul>
 <li><code>Most Frequent Tag</code>: <code>90%</code></li>
@@ -381,7 +382,6 @@ r(q_{-1}^{k}) = \prod_{i=1}^{n+1} P(q_i \mid q_{t-1}, q_{t-2}) \prod_{i=1}^{n} P
 <li><code>Upper Bound (Human Agreement)</code>: <code>98%</code></li>
 </ul>
 <p>The trigram HMM tagger with no deleted interpolation and with MORPHO results in the highest overall accuracy of 94.25% but still well below the human agreement upper bound of 98%. Such 4 percentage point increase in accuracy from the most frequent tag baseline is quite significant in that it translates to <span class="math">\(10000 \times 0.04 = 400\)</span> additional sentences accurately tagged. Also note that using the weights from deleted interpolation to calculate trigram tag probabilities has an adverse effect in overall accuracy. This is most likely because many trigrams found in the training set are also found in the devset, rendering useless bigram and unigram tag probabilities.</p>
-<h1>5 Conclusions</h1>
 <p>In this post, I introduced the application of hidden Markov models to a well-known problem in natural language processing called part-of-speech tagging, explained the Viterbi algorithm that reduces the time complexity of the trigram HMM tagger, and evaluated different trigram HMM-based taggers with deleted interpolation and unknown word treatments on the subset of the Brown corpus. The result is quite promising with over 4 percentage point increase from the most frequent tag baseline but can still be improved comparing with the human agreement upper bound. The hidden Markov models are intuitive, yet powerful enough to uncover hidden states based on the observed sequences, and they form the backbone of more complex algorithms.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
