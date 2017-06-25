@@ -121,7 +121,7 @@
 </pre></div>
 
 
-<p>Spatially join the points with the Seoul municipalities shapefiles and plot the points on top of municipality unit boundaries.</p>
+<p>Spatially join the points with the Seoul municipalities shapefiles and plot the points on top of municipality unit boundaries. Also plot the points and contours of a 2D kernel density estimate on the actual map of Seoul.</p>
 <div class="highlight"><pre><span></span><span class="n">shape</span> <span class="o">&lt;-</span> <span class="n">readOGR</span><span class="p">(</span><span class="s2">&quot;/Users/seonghwang/Downloads/seoul_municipalities.shp&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
@@ -143,7 +143,6 @@
 <span class="n">plot</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> <span class="n">pch</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">cex</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">)</span>
 <span class="n">polymap</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">poly</span><span class="p">,</span> <span class="n">add</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">)</span>
 
-<span class="c1"># Plot the points and contours of a 2D kernel density estimate on the actual map of Seoul</span>
 <span class="n">seoul_map</span> <span class="o">&lt;-</span> <span class="n">qmap</span><span class="p">(</span><span class="s1">&#39;seoul&#39;</span><span class="p">,</span> <span class="n">zoom</span> <span class="o">=</span> <span class="mi">11</span><span class="p">,</span> <span class="n">maptype</span> <span class="o">=</span> <span class="s1">&#39;roadmap&#39;</span><span class="p">)</span>
 <span class="n">q</span> <span class="o">&lt;-</span> <span class="n">seoul_map</span> <span class="o">+</span> 
   <span class="n">geom_point</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">wifi</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">lng</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">lat</span><span class="p">))</span> <span class="o">+</span> 
@@ -156,8 +155,27 @@
 
 
 <p><img alt="singleplot" src="https://stathwang.github.io/images/singleplot.png"></p>
-<p>Are the points clustered or regular? A clustered process means that events fall into clumped groupings, whereas in a regular process, there are regular spatial intervals between events i.e. if species are pushing against each other by inhibiting growth at too close a distance.</p>
-<p>Plot K, L, G, F and J functions.</p>
+<p>Are the points clustered, regular, or random? A clustered process means that events, or actual observations, fall into clumped groupings, whereas in a regular process, there are regular spatial intervals between events i.e. if species are pushing against each other by inhibiting growth at too close a distance. Events follow a <strong>completely spatially random</strong> pattern where events are equally likely to occur at any location within the defined region <span class="math">\(R\)</span>. The CSR serves as the baseline for comparison of clustered and regular point processes.</p>
+<p>Given a CSR, events follow a uniform distribution over the study region <span class="math">\(R\)</span>:</p>
+<div class="math">\begin{equation}
+f(x, y) = \dfrac{1}{|R|}
+\end{equation}</div>
+<p>for all <span class="math">\((x, y) \in R\)</span>, where <span class="math">\(|R|\)</span> is the area of <span class="math">\(R\)</span>. Events are also independent of each other. Note that since the area of <span class="math">\(R\)</span> may vary widely, it’s sometimes more helpful to think that the average number of points per unit area is some fixed, constant <span class="math">\(\lambda\)</span> (lambda): this number is called the intensity, also the mean. </p>
+<p>Poisson distributions are used to model the number of events per unit of space or time. The mean and the variance of a Poisson distribution are all equal to <span class="math">\(\lambda\)</span>. A <em>homogenous Poisson point process</em> is defined as follows:</p>
+<ul>
+<li>The random number of events <span class="math">\(X\)</span> in a finite region <span class="math">\(A\)</span> has a Poisson distribution with mean <span class="math">\(\lambda|A|* where $|A|\)</span> is the area of <span class="math">\(A\)</span> and <span class="math">\(\lambda\)</span> is the intensity.</li>
+</ul>
+<p><strong>Intensity</strong> is the number of expected events per unit area. For a homogenous process, this is constant over the area.</p>
+<ul>
+<li>Given that a total of <span class="math">\(X = N\)</span> events occur in <span class="math">\(A\)</span>, the locations of the events are uniformly distributed across <span class="math">\(A\)</span>.</li>
+</ul>
+<p>This means that for a CSR, while the observed number of points over a region <span class="math">\(R\)</span> will vary from one realization to the next, the average (expected) number of points is the fixed quantity $\lambda|R|*. We can therefore generate a CSR:</p>
+<ol>
+<li>Generate a Poisson number of points <span class="math">\(X = N\)</span> with mean <span class="math">\(\lambda|R|\)</span>.</li>
+<li>Randomly assign locations for the <span class="math">\(N\)</span> according to a uniform distribution.</li>
+</ol>
+<p>Several measures exist: nearest neighbor methods (G, F). However, most common and popular is K function.
+We can check this using the plot of K, L, G, F and J functions.</p>
 <div class="highlight"><pre><span></span><span class="c1"># K, L, G, F, J functions</span>
 <span class="n">wf</span><span class="o">.</span><span class="n">env</span> <span class="o">&lt;-</span> <span class="n">envelope</span><span class="p">(</span><span class="n">wfppp</span><span class="p">,</span> <span class="n">fun</span> <span class="o">=</span> <span class="n">Kest</span><span class="p">)</span>
 <span class="n">wf</span><span class="o">.</span><span class="n">K</span> <span class="o">&lt;-</span> <span class="n">Kest</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span>
@@ -212,6 +230,7 @@
 
 
 <p><img alt="wifitypes" src="https://stathwang.github.io/images/wifitypes.png"></p>
+<h3>Foursquare Data</h3>
 <p>First, get your own client ID and client secret from the <a href="https://developer.foursquare.com">Foursquare API</a> page by signing up. Then, for every free public WiFi location coordinate - that is, for every pair of latitude and longitude of our data <code>wifi</code> from above, retrieve up to 50 different locations (latitude and longitude) within the radius of 400m and their business names, business categories, total number of checkins, users, and tips. Refer to my R code below.</p>
 <div class="highlight"><pre><span></span><span class="n">client_id</span> <span class="o">&lt;-</span> <span class="s2">&quot;USE_YOUR_OWN_CLIENT_ID&quot;</span>
 <span class="n">client_secret</span> <span class="o">&lt;-</span> <span class="s2">&quot;USE_YOUR_OWN_CLIENT_SECRET&quot;</span>
@@ -257,9 +276,13 @@
 </pre></div>
 
 
+<h3>Point Process Models</h3>
 <p>Fit a point process model (PPM) without marks</p>
-<div class="highlight"><pre><span></span><span class="sb">``</span><span class="err">`</span><span class="n">python</span>
-<span class="n">d7_q</span> <span class="o">&lt;-</span> <span class="n">d7</span><span class="p">[</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nrow</span><span class="p">(</span><span class="n">d7</span><span class="p">),</span> <span class="mi">12389</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)]</span>
+<div class="highlight"><pre><span></span>
+</pre></div>
+
+
+<div class="highlight"><pre><span></span><span class="n">d7_q</span> <span class="o">&lt;-</span> <span class="n">d7</span><span class="p">[</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nrow</span><span class="p">(</span><span class="n">d7</span><span class="p">),</span> <span class="mi">12389</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)]</span>
 <span class="n">p1</span> <span class="o">&lt;-</span> <span class="n">ppm</span><span class="p">(</span><span class="n">quadscheme</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span> <span class="o">~</span> <span class="mi">1</span><span class="p">)</span>
 <span class="n">p2</span> <span class="o">&lt;-</span> <span class="n">ppm</span><span class="p">(</span><span class="n">quadscheme</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span> <span class="o">~</span> <span class="n">polynom</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">checkins</span> <span class="o">+</span> <span class="n">tips</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">d7_q</span><span class="p">)</span>
 <span class="n">p3</span> <span class="o">&lt;-</span> <span class="n">ppm</span><span class="p">(</span><span class="n">quadscheme</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span> <span class="o">~</span> <span class="n">polynom</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>

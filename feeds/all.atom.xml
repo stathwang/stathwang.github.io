@@ -38,7 +38,7 @@
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Spatially join the points with the Seoul municipalities shapefiles and plot the points on top of municipality unit boundaries.&lt;/p&gt;
+&lt;p&gt;Spatially join the points with the Seoul municipalities shapefiles and plot the points on top of municipality unit boundaries. Also plot the points and contours of a 2D kernel density estimate on the actual map of Seoul.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;shape&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;readOGR&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/Users/seonghwang/Downloads/seoul_municipalities.shp&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;shape&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
@@ -60,7 +60,6 @@
 &lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pts&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pts&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;pch&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;cex&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;1.2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;polymap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;poly&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;add&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;TRUE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
-&lt;span class="c1"&gt;# Plot the points and contours of a 2D kernel density estimate on the actual map of Seoul&lt;/span&gt;
 &lt;span class="n"&gt;seoul_map&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;qmap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;seoul&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;zoom&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;11&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;maptype&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;roadmap&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;q&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;seoul_map&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
   &lt;span class="n"&gt;geom_point&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;aes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lng&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lat&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
@@ -73,8 +72,27 @@
 
 
 &lt;p&gt;&lt;img alt="singleplot" src="https://stathwang.github.io/images/singleplot.png"&gt;&lt;/p&gt;
-&lt;p&gt;Are the points clustered or regular? A clustered process means that events fall into clumped groupings, whereas in a regular process, there are regular spatial intervals between events i.e. if species are pushing against each other by inhibiting growth at too close a distance.&lt;/p&gt;
-&lt;p&gt;Plot K, L, G, F and J functions.&lt;/p&gt;
+&lt;p&gt;Are the points clustered, regular, or random? A clustered process means that events, or actual observations, fall into clumped groupings, whereas in a regular process, there are regular spatial intervals between events i.e. if species are pushing against each other by inhibiting growth at too close a distance. Events follow a &lt;strong&gt;completely spatially random&lt;/strong&gt; pattern where events are equally likely to occur at any location within the defined region &lt;span class="math"&gt;\(R\)&lt;/span&gt;. The CSR serves as the baseline for comparison of clustered and regular point processes.&lt;/p&gt;
+&lt;p&gt;Given a CSR, events follow a uniform distribution over the study region &lt;span class="math"&gt;\(R\)&lt;/span&gt;:&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+f(x, y) = \dfrac{1}{|R|}
+\end{equation}&lt;/div&gt;
+&lt;p&gt;for all &lt;span class="math"&gt;\((x, y) \in R\)&lt;/span&gt;, where &lt;span class="math"&gt;\(|R|\)&lt;/span&gt; is the area of &lt;span class="math"&gt;\(R\)&lt;/span&gt;. Events are also independent of each other. Note that since the area of &lt;span class="math"&gt;\(R\)&lt;/span&gt; may vary widely, it’s sometimes more helpful to think that the average number of points per unit area is some fixed, constant &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; (lambda): this number is called the intensity, also the mean. &lt;/p&gt;
+&lt;p&gt;Poisson distributions are used to model the number of events per unit of space or time. The mean and the variance of a Poisson distribution are all equal to &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt;. A &lt;em&gt;homogenous Poisson point process&lt;/em&gt; is defined as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The random number of events &lt;span class="math"&gt;\(X\)&lt;/span&gt; in a finite region &lt;span class="math"&gt;\(A\)&lt;/span&gt; has a Poisson distribution with mean &lt;span class="math"&gt;\(\lambda|A|* where $|A|\)&lt;/span&gt; is the area of &lt;span class="math"&gt;\(A\)&lt;/span&gt; and &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is the intensity.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Intensity&lt;/strong&gt; is the number of expected events per unit area. For a homogenous process, this is constant over the area.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Given that a total of &lt;span class="math"&gt;\(X = N\)&lt;/span&gt; events occur in &lt;span class="math"&gt;\(A\)&lt;/span&gt;, the locations of the events are uniformly distributed across &lt;span class="math"&gt;\(A\)&lt;/span&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This means that for a CSR, while the observed number of points over a region &lt;span class="math"&gt;\(R\)&lt;/span&gt; will vary from one realization to the next, the average (expected) number of points is the fixed quantity $\lambda|R|*. We can therefore generate a CSR:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Generate a Poisson number of points &lt;span class="math"&gt;\(X = N\)&lt;/span&gt; with mean &lt;span class="math"&gt;\(\lambda|R|\)&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Randomly assign locations for the &lt;span class="math"&gt;\(N\)&lt;/span&gt; according to a uniform distribution.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Several measures exist: nearest neighbor methods (G, F). However, most common and popular is K function.
+We can check this using the plot of K, L, G, F and J functions.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# K, L, G, F, J functions&lt;/span&gt;
 &lt;span class="n"&gt;wf&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;env&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;envelope&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fun&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Kest&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;wf&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;Kest&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -129,6 +147,7 @@
 
 
 &lt;p&gt;&lt;img alt="wifitypes" src="https://stathwang.github.io/images/wifitypes.png"&gt;&lt;/p&gt;
+&lt;h3&gt;Foursquare Data&lt;/h3&gt;
 &lt;p&gt;First, get your own client ID and client secret from the &lt;a href="https://developer.foursquare.com"&gt;Foursquare API&lt;/a&gt; page by signing up. Then, for every free public WiFi location coordinate - that is, for every pair of latitude and longitude of our data &lt;code&gt;wifi&lt;/code&gt; from above, retrieve up to 50 different locations (latitude and longitude) within the radius of 400m and their business names, business categories, total number of checkins, users, and tips. Refer to my R code below.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;client_id&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;USE_YOUR_OWN_CLIENT_ID&amp;quot;&lt;/span&gt;
 &lt;span class="n"&gt;client_secret&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;USE_YOUR_OWN_CLIENT_SECRET&amp;quot;&lt;/span&gt;
@@ -174,9 +193,13 @@
 &lt;/pre&gt;&lt;/div&gt;
 
 
+&lt;h3&gt;Point Process Models&lt;/h3&gt;
 &lt;p&gt;Fit a point process model (PPM) without marks&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="sb"&gt;``&lt;/span&gt;&lt;span class="err"&gt;`&lt;/span&gt;&lt;span class="n"&gt;python&lt;/span&gt;
-&lt;span class="n"&gt;d7_q&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;d7&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;sample&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;d7&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;12389&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;replace&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;d7_q&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;d7&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;sample&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;nrow&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;d7&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;12389&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;replace&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;FALSE&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
 &lt;span class="n"&gt;p1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;ppm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quadscheme&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;p2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;ppm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quadscheme&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="n"&gt;polynom&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;checkins&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;tips&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;d7_q&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;p3&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;ppm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;quadscheme&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;~&lt;/span&gt; &lt;span class="n"&gt;polynom&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
