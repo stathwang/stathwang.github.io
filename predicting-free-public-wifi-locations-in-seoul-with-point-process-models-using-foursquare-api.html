@@ -121,8 +121,8 @@
 </pre></div>
 
 
-<p>Spatially join the points with the Seoul municipalities shapefiles and plot the points on top of municipality unit boundaries. Also plot the points and contours of a 2D kernel density estimate on the actual map of Seoul.</p>
-<div class="highlight"><pre><span></span><span class="n">shape</span> <span class="o">&lt;-</span> <span class="n">readOGR</span><span class="p">(</span><span class="s2">&quot;/Users/seonghwang/Downloads/seoul_municipalities.shp&quot;</span><span class="p">)</span>
+<p>Spatially join the points with the Seoul municipalities shapefile and plot the points on top of municipality unit boundaries. Also plot the points and contours of a 2D kernel density estimate on the actual map of Seoul.</p>
+<div class="highlight"><pre><span></span><span class="n">shape</span> <span class="o">&lt;-</span> <span class="n">readOGR</span><span class="p">(</span><span class="s2">&quot;seoul_municipalities.shp&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
 <span class="n">kt</span><span class="o">.</span><span class="n">list</span> <span class="o">&lt;-</span> <span class="nb">list</span><span class="p">()</span>
@@ -229,7 +229,7 @@ We can check this using the plot of K, L, G, F and J functions.</p>
 </pre></div>
 
 
-<p>The point process of free public WiFi locations in Seoul is actually a combination of points in several groups. Each point is marked - that is, we have a <strong>marked point process</strong>. There are two marks: WiFi network providers with 3 levels: KT, SKT, and LGU+ and WiFi location types with 12 levels mentioned near the beginning of this post. In a multiple point process, we can compare density estimates as well as multi-group versions of the K, L, G, F, and J functions. </p>
+<p>The point process of free public WiFi locations in Seoul is actually a combination of points in several groups. Each point is marked - that is, we have a <strong>marked point process</strong>. There are two marks: WiFi network providers with 3 levels (KT, SKT, LGU+) and WiFi location types with 12 levels. In a multiple point process, we can compare density estimates as well as plot multi-group versions of the K, L, G, F, and J functions. </p>
 <div class="highlight"><pre><span></span><span class="c1"># Marked point process</span>
 <span class="n">wfact</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">factor</span><span class="p">(</span><span class="n">wifi</span><span class="err">$</span><span class="n">comp</span><span class="p">)</span>
 <span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span> <span class="o">&lt;-</span> <span class="n">ppp</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> 
@@ -238,13 +238,20 @@ We can check this using the plot of K, L, G, F and J functions.</p>
                  <span class="n">marks</span> <span class="o">=</span> <span class="n">wfact</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">split</span><span class="p">(</span><span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span><span class="p">),</span> <span class="n">chars</span> <span class="o">=</span> <span class="mi">16</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">density</span><span class="p">(</span><span class="n">split</span><span class="p">(</span><span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span><span class="p">)),</span> <span class="n">chars</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="mi">16</span><span class="p">:</span><span class="mi">18</span><span class="p">),</span> <span class="n">ribbon</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)</span>
+</pre></div>
 
-<span class="c1"># Relative risk</span>
+
+<p>For many point processes, CSR is not the appropriate null hypothesis. Events will appear to be not CSR simply because the events follow a heterogenous Poisson point process that mirrors, say, population. For instance, disease or crime events will simply follow the population distribution or multiple tree species simply group by more favorable soil or climate conditions.</p>
+<p>In this case, we need to correct for the underlying intensity function. The basic idea is to compare the intensity function of "cases" to that of the chosen baseline of "control". This comparison is done by computing a kernel intensity estimate for each group over the same region <span class="math">\(R\)</span>. A ratio of estimates is then calculated and plotted. This method requires that the intensity functions be normalized to have total area under the curve equal to 1. That is, we use density functions instead of intensity functions in the ratio. The ratio of density estimates, or so called <strong>relative risk</strong>, is expressed as relative probabilities rather than relative intensities, but the interpretation is similar.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Relative risk</span>
 <span class="n">mainerr</span> <span class="o">=</span> <span class="n">relrisk</span><span class="p">(</span><span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">mainerr</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s2">&quot;Relative Risk by WiFi Network Providers&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">mainerr</span><span class="p">,</span> <span class="n">which</span><span class="o">.</span><span class="n">max</span><span class="p">),</span> <span class="n">main</span> <span class="o">=</span> <span class="s2">&quot;Most Common WiFi Network Providers&quot;</span><span class="p">)</span>
+</pre></div>
 
-<span class="c1"># Plot Gdot, Kdot, and Ldot from one to many</span>
+
+<p>Plot multi-group versions of the K, L, G, F, and J functions. Each function makes a one-to-many comparison.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Plot Gdot, Kdot, and Ldot from one to many</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">Gdot</span><span class="p">(</span><span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span><span class="p">,</span> <span class="s2">&quot;LGU+&quot;</span><span class="p">),</span> <span class="n">lwd</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s2">&quot;Gdot Ref. LGU+&quot;</span><span class="p">)</span>
 <span class="n">env</span> <span class="o">&lt;-</span> <span class="n">envelope</span><span class="p">(</span><span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span><span class="p">,</span> <span class="n">fun</span> <span class="o">=</span> <span class="n">Gdot</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="s2">&quot;LGU+&quot;</span><span class="p">,</span> <span class="n">nsim</span> <span class="o">=</span> <span class="mi">99</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">add</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">)</span>
