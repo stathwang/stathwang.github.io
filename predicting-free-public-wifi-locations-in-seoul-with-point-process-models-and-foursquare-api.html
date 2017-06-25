@@ -28,11 +28,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="author" content="Seong Hyun Hwang" />
-<meta name="description" content="The field of spatial statistics is quite fun to many practitioners although classical frequentist methods were developed many years ago. In this post, I'm going to show how to fit point process models on the dataset of free public WiFi locations in Seoul, Korea and predict Load the dataset of …" />
+<meta name="description" content="The field of spatial statistics is quite booming with the onset of fun to many practitioners although classical frequentist methods were developed many years ago. In this post, I'm going to show how to fit point process models on the dataset of free public WiFi locations in Seoul, Korea and …" />
 <meta name="keywords" content="point process models, spatial statistics, r">
 <meta property="og:site_name" content="Seong Hyun Hwang"/>
 <meta property="og:title" content="Predicting Free Public WiFi Locations in Seoul with Point Process Models and Foursquare API"/>
-<meta property="og:description" content="The field of spatial statistics is quite fun to many practitioners although classical frequentist methods were developed many years ago. In this post, I'm going to show how to fit point process models on the dataset of free public WiFi locations in Seoul, Korea and predict Load the dataset of …"/>
+<meta property="og:description" content="The field of spatial statistics is quite booming with the onset of fun to many practitioners although classical frequentist methods were developed many years ago. In this post, I'm going to show how to fit point process models on the dataset of free public WiFi locations in Seoul, Korea and …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://stathwang.github.io/predicting-free-public-wifi-locations-in-seoul-with-point-process-models-and-foursquare-api.html"/>
 <meta property="og:type" content="article"/>
@@ -83,7 +83,7 @@
     <p>Posted on June 24 2017 in <a href="https://stathwang.github.io/category/statistics.html">Statistics</a></p>
   </header>
   <div>
-    <p>The field of spatial statistics is quite fun to many practitioners although classical frequentist methods were developed many years ago. In this post, I'm going to show how to fit point process models on the dataset of free public WiFi locations in Seoul, Korea and predict </p>
+    <p>The field of spatial statistics is quite booming with the onset of  fun to many practitioners although classical frequentist methods were developed many years ago. In this post, I'm going to show how to fit point process models on the dataset of free public WiFi locations in Seoul, Korea and predict </p>
 <p>Load the dataset of free public WiFi locations in Seoul, Korea. The dataset consists of 2385 spatial points with 6 columns that are names of places, spatial coordinates (longitudes and latitudes), WiFi network providers, municipality units, and location types. There are 3 WiFi network providers: KT, SKT, and LGU+ and 12 location types: bus stops, community centers, cultural facilities, health facilities, main streets, parks, plazas, public institutions, tourist destinations, traditional markets, walking trails, and welfare facilities.</p>
 <div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">RCurl</span><span class="p">)</span>
 <span class="n">library</span><span class="p">(</span><span class="n">jsonlite</span><span class="p">)</span>
@@ -99,7 +99,7 @@
 </pre></div>
 
 
-<p>The distribution of WiFi network providers and that of location categories are plotted as follows. I borrowed the multiplot function from this page to plot two graphs in one window.</p>
+<p>The distribution of WiFi network providers and that of location categories are plotted as follows. I borrowed the <a href="http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/">multiplot</a> function to plot two graphs in a single window.</p>
 <p><img alt="wifiplots" src="https://stathwang.github.io/images/wifiplots.png"></p>
 <div class="highlight"><pre><span></span><span class="n">w1</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[,</span> <span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">cat</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">N</span><span class="p">)]</span>
 <span class="n">w2</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[,</span> <span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">comp</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">N</span><span class="p">)]</span>
@@ -117,9 +117,33 @@
 </pre></div>
 
 
+<p>We observe that KT WiFi locations are mainly concentrated near the north of the river, while SKTs are concentrated near the south of the river. LGU+ covers a wider range around the center of Seoul.</p>
 <p><img alt="w11" src="https://stathwang.github.io/images/WiFi-Locations-Part.png">
 <img alt="w12" src="https://stathwang.github.io/images/WiFi-Locations-Part2.png"></p>
 <p>First, get your own client ID and client secret from the <a href="https://developer.foursquare.com">Foursquare API</a> page by signing up. Then, for every free public WiFi location coordinate - that is, for every pair of latitude and longitude of our data <code>vdat</code> from above, retrieve up to 50 different locations (latitude and longitude) within the radius of 400m and their business names, business categories, total number of checkins, users, and tips. Refer to my R code below.</p>
+<div class="highlight"><pre><span></span><span class="n">shape</span> <span class="o">&lt;-</span> <span class="n">readOGR</span><span class="p">(</span><span class="s2">&quot;/Users/seonghwang/Downloads/seoul_municipalities.shp&quot;</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="n">kt</span><span class="o">.</span><span class="n">list</span> <span class="o">&lt;-</span> <span class="nb">list</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">shape</span><span class="nd">@polygons</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">kt</span> <span class="o">&lt;-</span> <span class="n">shape</span><span class="nd">@polygons</span><span class="p">[[</span><span class="n">i</span><span class="p">]]</span><span class="nd">@Polygons</span><span class="p">[[</span><span class="mi">1</span><span class="p">]]</span><span class="nd">@coords</span>
+  <span class="n">kt</span><span class="o">.</span><span class="n">list</span><span class="p">[[</span><span class="n">i</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">kt</span>
+<span class="p">}</span>
+
+<span class="n">kt</span><span class="o">.</span><span class="n">list</span> <span class="o">&lt;-</span> <span class="n">do</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">rbind</span><span class="p">,</span> <span class="n">kt</span><span class="o">.</span><span class="n">list</span><span class="p">)</span>
+
+<span class="n">wifi</span><span class="o">.</span><span class="n">pts</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">points</span><span class="p">(</span><span class="n">wifi</span><span class="err">$</span><span class="n">lng</span><span class="p">,</span> <span class="n">wifi</span><span class="err">$</span><span class="n">lat</span><span class="p">)</span>
+<span class="n">wifi</span><span class="o">.</span><span class="n">poly</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">points</span><span class="p">(</span><span class="n">kt</span><span class="o">.</span><span class="n">list</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">kt</span><span class="o">.</span><span class="n">list</span><span class="p">[,</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">wfppp</span> <span class="o">&lt;-</span> <span class="n">ppp</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span>
+             <span class="nb">xrange</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">poly</span><span class="p">[,</span><span class="mi">1</span><span class="p">]),</span>
+             <span class="n">yrange</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">poly</span><span class="p">[,</span><span class="mi">2</span><span class="p">]))</span>
+
+<span class="n">par</span><span class="p">(</span><span class="n">mfrow</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> <span class="n">pch</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">cex</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">)</span>
+<span class="n">polymap</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">poly</span><span class="p">,</span> <span class="n">add</span> <span class="o">=</span> <span class="n">T</span><span class="p">)</span>
+</pre></div>
+
+
 <div class="highlight"><pre><span></span><span class="n">client_id</span> <span class="o">&lt;-</span> <span class="s2">&quot;USE_YOUR_OWN_CLIENT_ID&quot;</span>
 <span class="n">client_secret</span> <span class="o">&lt;-</span> <span class="s2">&quot;USE_YOUR_OWN_CLIENT_SECRET&quot;</span>
 
@@ -165,54 +189,6 @@
 
 
 <p>Spatially join the output with the Seoul municipalities shapefile.</p>
-<div class="highlight"><pre><span></span><span class="n">shape</span> <span class="o">&lt;-</span> <span class="n">readOGR</span><span class="p">(</span><span class="s2">&quot;/Users/seonghwang/Downloads/seoul_municipalities.shp&quot;</span><span class="p">)</span>
-<span class="n">plot</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-
-<span class="n">wifi</span> <span class="o">&lt;-</span> <span class="n">fread</span><span class="p">(</span><span class="s2">&quot;seoul-public-wifi-data.csv&quot;</span><span class="p">)</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">lng</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">(</span><span class="n">wifi</span><span class="err">$</span><span class="n">lng</span><span class="p">)</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">lat</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">(</span><span class="n">wifi</span><span class="err">$</span><span class="n">lat</span><span class="p">)</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;공공기관&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Public Institutions&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;공원&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Parks&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;문화시설&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Cultural Facilities&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;버스승차대&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Bus Stops&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;보건시설&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Health Facilities&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;복지시설&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Welfare Facilities&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;전통시장&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Traditional Markets&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;주민센터&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Community Centers&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;주요거리&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Main Streets&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;산책로&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Walking Trails&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;광장&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Plazas&quot;</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">[</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">==</span> <span class="s2">&quot;관광&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="s2">&quot;Tourist Destinations&quot;</span>
-
-<span class="n">wifi</span><span class="err">$</span><span class="n">comp</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">factor</span><span class="p">(</span><span class="n">wifi</span><span class="err">$</span><span class="n">comp</span><span class="p">)</span>
-<span class="n">wifi</span><span class="err">$</span><span class="n">cat</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">factor</span><span class="p">(</span><span class="n">wifi</span><span class="err">$</span><span class="n">cat</span><span class="p">)</span>
-<span class="n">wifi</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[</span><span class="n">comp</span> <span class="o">%</span><span class="ow">in</span><span class="o">%</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;SKT&quot;</span><span class="p">,</span> <span class="s2">&quot;KT&quot;</span><span class="p">,</span> <span class="s2">&quot;LGU+&quot;</span><span class="p">)]</span>
-<span class="n">wifi</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[</span><span class="o">-</span><span class="mi">1065</span><span class="p">,]</span>
-<span class="n">wifi</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[</span><span class="o">-</span><span class="mi">489</span><span class="p">,]</span>
-<span class="n">wifi</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[</span><span class="o">-</span><span class="mi">452</span><span class="p">,]</span>
-<span class="n">wifi</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[</span><span class="o">-</span><span class="n">c</span><span class="p">(</span><span class="mi">518</span><span class="p">:</span><span class="mi">531</span><span class="p">),]</span>
-<span class="n">wifi</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[</span><span class="o">-</span><span class="n">c</span><span class="p">(</span><span class="mi">517</span><span class="p">:</span><span class="mi">519</span><span class="p">),]</span>
-
-<span class="n">kt</span><span class="o">.</span><span class="n">list</span> <span class="o">&lt;-</span> <span class="nb">list</span><span class="p">()</span>
-<span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">shape</span><span class="nd">@polygons</span><span class="p">))</span> <span class="p">{</span>
-  <span class="n">kt</span> <span class="o">&lt;-</span> <span class="n">shape</span><span class="nd">@polygons</span><span class="p">[[</span><span class="n">i</span><span class="p">]]</span><span class="nd">@Polygons</span><span class="p">[[</span><span class="mi">1</span><span class="p">]]</span><span class="nd">@coords</span>
-  <span class="n">kt</span><span class="o">.</span><span class="n">list</span><span class="p">[[</span><span class="n">i</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="n">kt</span>
-<span class="p">}</span>
-
-<span class="n">kt</span><span class="o">.</span><span class="n">list</span> <span class="o">&lt;-</span> <span class="n">do</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">rbind</span><span class="p">,</span> <span class="n">kt</span><span class="o">.</span><span class="n">list</span><span class="p">)</span>
-
-<span class="n">wifi</span><span class="o">.</span><span class="n">pts</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">points</span><span class="p">(</span><span class="n">wifi</span><span class="err">$</span><span class="n">lng</span><span class="p">,</span> <span class="n">wifi</span><span class="err">$</span><span class="n">lat</span><span class="p">)</span>
-<span class="n">wifi</span><span class="o">.</span><span class="n">poly</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">points</span><span class="p">(</span><span class="n">kt</span><span class="o">.</span><span class="n">list</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">kt</span><span class="o">.</span><span class="n">list</span><span class="p">[,</span><span class="mi">2</span><span class="p">])</span>
-<span class="n">wfppp</span> <span class="o">&lt;-</span> <span class="n">ppp</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span>
-             <span class="nb">xrange</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">poly</span><span class="p">[,</span><span class="mi">1</span><span class="p">]),</span>
-             <span class="n">yrange</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">poly</span><span class="p">[,</span><span class="mi">2</span><span class="p">]))</span>
-
-<span class="n">par</span><span class="p">(</span><span class="n">mfrow</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
-<span class="n">plot</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> <span class="n">pch</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">cex</span> <span class="o">=</span> <span class="mf">1.2</span><span class="p">)</span>
-<span class="n">polymap</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">poly</span><span class="p">,</span> <span class="n">add</span> <span class="o">=</span> <span class="n">T</span><span class="p">)</span>
-</pre></div>
-
-
 <p>Plot K, L, G, F and J functions.</p>
 <div class="highlight"><pre><span></span><span class="c1"># K, L, G, F, J functions</span>
 <span class="n">wf</span><span class="o">.</span><span class="n">env</span> <span class="o">&lt;-</span> <span class="n">envelope</span><span class="p">(</span><span class="n">wfppp</span><span class="p">,</span> <span class="n">fun</span> <span class="o">=</span> <span class="n">Kest</span><span class="p">)</span>
@@ -533,7 +509,7 @@
   },
   "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
   "url": "https://stathwang.github.io/predicting-free-public-wifi-locations-in-seoul-with-point-process-models-and-foursquare-api.html",
-  "description": "The field of spatial statistics is quite fun to many practitioners although classical frequentist methods were developed many years ago. In this post, I'm going to show how to fit point process models on the dataset of free public WiFi locations in Seoul, Korea and predict Load the dataset of …"
+  "description": "The field of spatial statistics is quite booming with the onset of fun to many practitioners although classical frequentist methods were developed many years ago. In this post, I'm going to show how to fit point process models on the dataset of free public WiFi locations in Seoul, Korea and …"
 }
 </script></body>
 </html>
