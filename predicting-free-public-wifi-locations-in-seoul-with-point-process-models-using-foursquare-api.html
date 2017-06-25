@@ -103,7 +103,7 @@
 </pre></div>
 
 
-<p>The distribution of WiFi network providers and that of location categories are plotted as follows. I borrowed the <a href="http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/">multiplot</a> function to plot two graphs in a single window.</p>
+<p>The distribution of WiFi network providers and that of location categories are plotted as follows. I borrowed the <a href="http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/">multiplot</a> function to plot two graphs in a single window. About 55% of free public WiFis are located in the main streets and parks. WiFi network providers SKT and LGU+ serve nearly 75% of the locations.</p>
 <p><img alt="wifiplots" src="https://stathwang.github.io/images/wifiplots.png"></p>
 <div class="highlight"><pre><span></span><span class="n">w1</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[,</span> <span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">cat</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">N</span><span class="p">)]</span>
 <span class="n">w2</span> <span class="o">&lt;-</span> <span class="n">wifi</span><span class="p">[,</span> <span class="o">.</span><span class="n">N</span><span class="p">,</span> <span class="n">comp</span><span class="p">][</span><span class="n">order</span><span class="p">(</span><span class="o">-</span><span class="n">N</span><span class="p">)]</span>
