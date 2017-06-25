@@ -78,19 +78,25 @@
 f(x, y) = \dfrac{1}{|R|}
 \end{equation}&lt;/div&gt;
 &lt;p&gt;for all &lt;span class="math"&gt;\((x, y) \in R\)&lt;/span&gt;, where &lt;span class="math"&gt;\(|R|\)&lt;/span&gt; is the area of &lt;span class="math"&gt;\(R\)&lt;/span&gt;. Events are also independent of each other. Note that since the area of &lt;span class="math"&gt;\(R\)&lt;/span&gt; may vary widely, it’s sometimes more helpful to think that the average number of points per unit area is some fixed, constant &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; (lambda): this number is called the intensity, also the mean. &lt;/p&gt;
-&lt;p&gt;Poisson distributions are used to model the number of events per unit of space or time. The mean and the variance of a Poisson distribution are all equal to &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt;. A &lt;em&gt;homogenous Poisson point process&lt;/em&gt; is defined as follows:&lt;/p&gt;
+&lt;p&gt;Poisson distributions are used to model the number of events per unit of space or time. The mean and the variance of a Poisson distribution are all equal to &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt;. A &lt;strong&gt;homogenous Poisson point process&lt;/strong&gt; is defined as follows:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;The random number of events &lt;span class="math"&gt;\(X\)&lt;/span&gt; in a finite region &lt;span class="math"&gt;\(A\)&lt;/span&gt; has a Poisson distribution with mean &lt;span class="math"&gt;\(\lambda|A|* where $|A|\)&lt;/span&gt; is the area of &lt;span class="math"&gt;\(A\)&lt;/span&gt; and &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is the intensity.&lt;/li&gt;
+&lt;li&gt;The random number of events &lt;span class="math"&gt;\(X\)&lt;/span&gt; in a finite region &lt;span class="math"&gt;\(A\)&lt;/span&gt; has a Poisson distribution with mean &lt;span class="math"&gt;\(\lambda|A|\)&lt;/span&gt; where &lt;span class="math"&gt;\(|A|\)&lt;/span&gt; is the area of &lt;span class="math"&gt;\(A\)&lt;/span&gt; and &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is the intensity.&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;strong&gt;Intensity&lt;/strong&gt; is the number of expected events per unit area. For a homogenous process, this is constant over the area.&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Given that a total of &lt;span class="math"&gt;\(X = N\)&lt;/span&gt; events occur in &lt;span class="math"&gt;\(A\)&lt;/span&gt;, the locations of the events are uniformly distributed across &lt;span class="math"&gt;\(A\)&lt;/span&gt;.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;This means that for a CSR, while the observed number of points over a region &lt;span class="math"&gt;\(R\)&lt;/span&gt; will vary from one realization to the next, the average (expected) number of points is the fixed quantity $\lambda|R|*. We can therefore generate a CSR:&lt;/p&gt;
+&lt;p&gt;This means that for a CSR, while the observed number of points over a region &lt;span class="math"&gt;\(R\)&lt;/span&gt; will vary from one realization to the next, the average (expected) number of points is the fixed quantity &lt;span class="math"&gt;\(\lambda|R|\)&lt;/span&gt;. We can therefore generate a CSR:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Generate a Poisson number of points &lt;span class="math"&gt;\(X = N\)&lt;/span&gt; with mean &lt;span class="math"&gt;\(\lambda|R|\)&lt;/span&gt;.&lt;/li&gt;
 &lt;li&gt;Randomly assign locations for the &lt;span class="math"&gt;\(N\)&lt;/span&gt; according to a uniform distribution.&lt;/li&gt;
 &lt;/ol&gt;
+&lt;p&gt;Let's use Clark-Evans test to check whether the points follow a completely spatially random pattern.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then let's plot a Ripley's K function&lt;/p&gt;
 &lt;p&gt;Several measures exist: nearest neighbor methods (G, F). However, most common and popular is K function.
 We can check this using the plot of K, L, G, F and J functions.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# K, L, G, F, J functions&lt;/span&gt;
@@ -117,6 +123,30 @@ We can check this using the plot of K, L, G, F and J functions.&lt;/p&gt;
 &lt;p&gt;Here we observe that KT WiFi locations are mainly concentrated near the north of the river, while SKTs are concentrated near the south of the river. LGU+ covers a wider range around the center of Seoul.&lt;/p&gt;
 &lt;p&gt;&lt;img alt="w11" src="https://stathwang.github.io/images/WiFi-Locations-Part.png"&gt;
 &lt;img alt="w12" src="https://stathwang.github.io/images/WiFi-Locations-Part2.png"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;q1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;seoul_map&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
+  &lt;span class="n"&gt;geom_points&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+              &lt;span class="n"&gt;aes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lng&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lat&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="n"&gt;q2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;seoul_map&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  &lt;span class="n"&gt;geom_polygon&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; 
+               &lt;span class="n"&gt;aes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lng&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lat&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fill&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="o"&gt;..&lt;/span&gt;&lt;span class="n"&gt;level&lt;/span&gt;&lt;span class="o"&gt;..&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+               &lt;span class="n"&gt;stat&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;density2d&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+               &lt;span class="n"&gt;alpha&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;0.3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
+  &lt;span class="n"&gt;facet_wrap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="n"&gt;comp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;q1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;q2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Plotting the points by location types, we observe that KT WiFis are exclusively near bus stops, while SKT and LGU+ dominate near main streets and parks. Note that pink dots refer to KT locations, greens LGU+s, and blue dots SKTs.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="wifitypes" src="https://stathwang.github.io/images/wifitypes.png"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;q3&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;seoul_map&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
+  &lt;span class="n"&gt;geom_point&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;aes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lng&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lat&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colour&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;comp&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; 
+  &lt;span class="n"&gt;facet_wrap&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;~&lt;/span&gt;&lt;span class="n"&gt;cat&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;q3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The point process of free public WiFi locations in Seoul is actually a combination of points in several groups. Each point is marked - that is, we have a &lt;strong&gt;marked point process&lt;/strong&gt;. There are two marks: WiFi network providers with 3 levels: KT, SKT, and LGU+ and WiFi location types with 12 levels mentioned near the beginning of this post. In a multiple point process, we can compare density estimates as well as multi-group versions of the K, L, G, F, and J functions. &lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Marked point process&lt;/span&gt;
 &lt;span class="n"&gt;wfact&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;factor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="n"&gt;comp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;wfdot&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ppp&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;ppp&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pts&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;wifi&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pts&lt;/span&gt;&lt;span class="p"&gt;[,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; 
@@ -146,8 +176,9 @@ We can check this using the plot of K, L, G, F and J functions.&lt;/p&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;&lt;img alt="wifitypes" src="https://stathwang.github.io/images/wifitypes.png"&gt;&lt;/p&gt;
 &lt;h3&gt;Foursquare Data&lt;/h3&gt;
+&lt;p&gt;My hypothesis is there may be a correlation between the popularity of an area and the location of free public WiFi in Seoul. The more popular the area, there's a high chance we'll see a free public WiFi since otherwise what's the point of setting up one?&lt;/p&gt;
+&lt;p&gt;How should we define the metric for popularity? Where do we get the data? Well, Foursquare is a location-based social network that has gathered a wealth of location and foot traffic data from its users. &lt;/p&gt;
 &lt;p&gt;First, get your own client ID and client secret from the &lt;a href="https://developer.foursquare.com"&gt;Foursquare API&lt;/a&gt; page by signing up. Then, for every free public WiFi location coordinate - that is, for every pair of latitude and longitude of our data &lt;code&gt;wifi&lt;/code&gt; from above, retrieve up to 50 different locations (latitude and longitude) within the radius of 400m and their business names, business categories, total number of checkins, users, and tips. Refer to my R code below.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;client_id&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;USE_YOUR_OWN_CLIENT_ID&amp;quot;&lt;/span&gt;
 &lt;span class="n"&gt;client_secret&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;USE_YOUR_OWN_CLIENT_SECRET&amp;quot;&lt;/span&gt;
