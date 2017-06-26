@@ -97,7 +97,7 @@
 <li>Data sparsity and new city problem. User activites are very limited in distant locations.</li>
 </ol>
 <h3>Main Ideas</h3>
-<p>To produce a personalized spatial item recommendation, we combine 
+<p>To produce personalized spatial item recommendations, we combine 
     * the querying user's interest
     * the local preference of the querying city</p>
 <p>The generative model learns:
@@ -111,13 +111,13 @@
     * <code>LCA-LDA.R</code>: combination of <code>CA-LDA.R</code> and <code>LA-LDA.R</code> that takes into account both locations and content words of an event.</p>
 <h3>Methods</h3>
 <p>Use <strong>collapsed Gibbs sampling</strong> by only keeping track of coin flips and topic assignments for every record of a user's checkin history. For the hyperparameter settings, see the paper.</p>
-<p>Split the data into training and test set (3:1) for every user checkin history. Fit the models above on the training set. For each user's checkin history in the test set, compute the <strong>score</strong> (see the paper) for the event as well as all other events in the city not visited by the user.</p>
+<p>Split the data into training and test set (3:1) for every user checkin history. Fit the models above on the training set. For each user's checkin history in the test set, compute the score (see the paper) for the event as well as all other events in the city not visited by the user.</p>
 <p>Rank the events by sorting the scores in decreasing order. For every threshold <span class="math">\(k\)</span> (see the paper), if an event in the test set is in top <span class="math">\(k\)</span>, then call that a <strong>hit</strong>. Average the scores for all test records.</p>
 <h3>Results and Conclusions</h3>
 <ol>
 <li>LDA performs the worst, and LCA-LDA outperforms all other models. Local preference and content words are indeed effective.</li>
 <li>For the number of latent topics &gt; 25, recommendation performance increase is rather small. This prompts to set the number of topics to 25 to balance out model complexity and computational efficiency.</li>
-<li>Users mainly participate in social events based on their interests, but from time to time they attend popular local events regardless of their interests. Local preference plays an important role.</li>
+<li>Users mainly participate in social events based on their interests, but from time to time they attend popular local events regardless of their interests. Local preference still plays an important role.</li>
 <li>Each latent topic captures event co-occurrence under same event category across different locations. LCA-LDA model helps reduce sparsity in user-item ratings matrix.</li>
 <li>User interest, local preference, and content words are blended in a flexible, robust way to produce a very interpretable probabilistic model.</li>
 <li>Further research needed: Can local preference be split into that of avid travelers and non-travelers, possibly a weighted sum of those two group preferences? Does correlation exist between locations and content words i.e. correlated topic models?</li>
