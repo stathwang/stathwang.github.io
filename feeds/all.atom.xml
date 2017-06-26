@@ -18,14 +18,14 @@
     * the querying user's interest
     * the local preference of the querying city&lt;/p&gt;
 &lt;p&gt;The generative model learns:
-    * latent &lt;strong&gt;topic&lt;/strong&gt; distribution over spatial items and that over content words
-    * intrinsic &lt;strong&gt;user interest&lt;/strong&gt; distribution over topics
-    * &lt;strong&gt;local preference&lt;/strong&gt; in a given region over topics&lt;/p&gt;
+    - latent &lt;strong&gt;topic&lt;/strong&gt; distribution over spatial items and that over content words
+    - intrinsic &lt;strong&gt;user interest&lt;/strong&gt; distribution over topics
+    - &lt;strong&gt;local preference&lt;/strong&gt; in a given region over topics&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;src&lt;/code&gt; folder contains 4 models:
-    * &lt;code&gt;LDA.R&lt;/code&gt;: each user is a document and events visited by the user are the words in the document. Ignores both location and content words. The most basic model similar to collaborative filtering.
-    * &lt;code&gt;CA-LDA.R&lt;/code&gt;: &lt;em&gt;content&lt;/em&gt; component of LCA-LDA model. Only considers content words of an event, not locations.
-    * &lt;code&gt;LA-LDA.R&lt;/code&gt;: &lt;em&gt;location&lt;/em&gt; component of LDA-LDA model. Only considers locations, not content words.
-    * &lt;code&gt;LCA-LDA.R&lt;/code&gt;: combination of &lt;code&gt;CA-LDA.R&lt;/code&gt; and &lt;code&gt;LA-LDA.R&lt;/code&gt; that takes into account both locations and content words of an event.&lt;/p&gt;
+    - &lt;code&gt;LDA.R&lt;/code&gt;: each user is a document and events visited by the user are the words in the document. Ignores both location and content words. The most basic model similar to collaborative filtering.
+    - &lt;code&gt;CA-LDA.R&lt;/code&gt;: &lt;em&gt;content&lt;/em&gt; component of LCA-LDA model. Only considers content words of an event, not locations.
+    - &lt;code&gt;LA-LDA.R&lt;/code&gt;: &lt;em&gt;location&lt;/em&gt; component of LDA-LDA model. Only considers locations, not content words.
+    - &lt;code&gt;LCA-LDA.R&lt;/code&gt;: combination of &lt;code&gt;CA-LDA.R&lt;/code&gt; and &lt;code&gt;LA-LDA.R&lt;/code&gt; that takes into account both locations and content words of an event.&lt;/p&gt;
 &lt;h3&gt;Methods&lt;/h3&gt;
 &lt;p&gt;Use &lt;strong&gt;collapsed Gibbs sampling&lt;/strong&gt; by only keeping track of coin flips and topic assignments for every record of a user's checkin history. For the hyperparameter settings, see the paper.&lt;/p&gt;
 &lt;p&gt;Split the data into training and test set (3:1) for every user checkin history. Fit the models above on the training set. For each user's checkin history in the test set, compute the score (see the paper) for the event as well as all other events in the city not visited by the user.&lt;/p&gt;
