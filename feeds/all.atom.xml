@@ -91,18 +91,29 @@ f(x, y) = \dfrac{1}{|R|}
 &lt;li&gt;Generate a Poisson number of points &lt;span class="math"&gt;\(X = N\)&lt;/span&gt; with mean &lt;span class="math"&gt;\(\lambda|R|\)&lt;/span&gt;.&lt;/li&gt;
 &lt;li&gt;Randomly assign locations for the &lt;span class="math"&gt;\(N\)&lt;/span&gt; according to a uniform distribution.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Under the homogeneous Poisson model, the intensity function &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is constant. However, for many processes, a constant risk hypothesis is too restrictive - the intensity varies over a region according to population, gradients, etc. Hence we define a &lt;em&gt;heterogenous Poisson point process&lt;/em&gt; with intensity function &lt;span class="math"&gt;\(\lambda(s)\)&lt;/span&gt; where &lt;span class="math"&gt;\(s\)&lt;/span&gt; is any point in our study region &lt;span class="math"&gt;\(R\)&lt;/span&gt;, using the criteria:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;The number of events in any region &lt;span class="math"&gt;\(A \in R\)&lt;/span&gt; has a Poisson distribution with mean &lt;span class="math"&gt;\(\int_A \lambda(s)~ds\)&lt;/span&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Let's use Clark-Evans test to check whether the points follow a completely spatially random pattern.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;
+&lt;p&gt;Under the homogeneous Poisson model, the intensity function &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is constant. However, for many processes, a constant risk hypothesis is too restrictive - the intensity varies over a region according to population, gradients, etc. Hence we define a &lt;strong&gt;heterogenous Poisson point process&lt;/strong&gt; with intensity function &lt;span class="math"&gt;\(\lambda(s)\)&lt;/span&gt; where &lt;span class="math"&gt;\(s\)&lt;/span&gt; is any point in our study region &lt;span class="math"&gt;\(R\)&lt;/span&gt;, using the criteria:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;The number of events in any region &lt;span class="math"&gt;\(A \subset R\)&lt;/span&gt; has a Poisson distribution with mean &lt;span class="math"&gt;\(\int_A \lambda(s)~ds\)&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Given that a total of &lt;span class="math"&gt;\(X = N\)&lt;/span&gt; events occur in &lt;span class="math"&gt;\(A\)&lt;/span&gt;, the locations of the events are a random sample of &lt;span class="math"&gt;\(N\)&lt;/span&gt; events sampled proportional to &lt;span class="math"&gt;\(\lambda(s)\)&lt;/span&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Let's use the Clark-Evans test to show whether the points follow a completely spatially random pattern or are clustered.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;clarkevans&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;clarkevans&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alternative&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;clustered&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
+&lt;p&gt;Since the p-value is less than 0.05, we reject the null hypothesis that the WiFi locations are completely spatially randomly distributed within Seoul. In fact, the earlier contour plot indicates that points are clustered near the center of Seoul where we expect to see a lot of foot traffic.&lt;/p&gt;
 &lt;p&gt;Then let's plot a Ripley's K function&lt;/p&gt;
 &lt;p&gt;Several measures exist: nearest neighbor methods (G, F). However, most common and popular is K function.
 We can check this using the plot of K, L, G, F and J functions.&lt;/p&gt;
+&lt;p&gt;The Ripley's &lt;strong&gt;K&lt;/strong&gt; function &lt;span class="math"&gt;\(K(r)\)&lt;/span&gt; measures the expected number of events within distance &lt;span class="math"&gt;\(r\)&lt;/span&gt; of a random event divided by &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt;. The &lt;strong&gt;G&lt;/strong&gt; function &lt;span class="math"&gt;\(G(r)\)&lt;/span&gt; is the cumulative probability distribution of nearest neighbor distances between events. On the other hand, the &lt;strong&gt;F&lt;/strong&gt; function &lt;span class="math"&gt;\(F(r)\)&lt;/span&gt; is the cumulative probability distribution of nearest neighbor distances from a random point to an event. Remember that an event is an actual observation in region &lt;span class="math"&gt;\(R\)&lt;/span&gt;, but a point is any other location of interest in the region. The &lt;strong&gt;J&lt;/strong&gt; function &lt;span class="math"&gt;\(J(r)\)&lt;/span&gt; is just &lt;span class="math"&gt;\(\dfrac{1 - G(r)}{1 - F(r)}\)&lt;/span&gt;.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;F function&lt;/li&gt;
+&lt;/ol&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# K, L, G, F, J functions&lt;/span&gt;
 &lt;span class="n"&gt;wf&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;env&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;envelope&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;fun&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Kest&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;wf&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;K&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;Kest&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;

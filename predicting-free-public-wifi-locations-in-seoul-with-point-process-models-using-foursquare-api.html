@@ -174,18 +174,29 @@ f(x, y) = \dfrac{1}{|R|}
 <li>Generate a Poisson number of points <span class="math">\(X = N\)</span> with mean <span class="math">\(\lambda|R|\)</span>.</li>
 <li>Randomly assign locations for the <span class="math">\(N\)</span> according to a uniform distribution.</li>
 </ol>
-<p>Under the homogeneous Poisson model, the intensity function <span class="math">\(\lambda\)</span> is constant. However, for many processes, a constant risk hypothesis is too restrictive - the intensity varies over a region according to population, gradients, etc. Hence we define a <em>heterogenous Poisson point process</em> with intensity function <span class="math">\(\lambda(s)\)</span> where <span class="math">\(s\)</span> is any point in our study region <span class="math">\(R\)</span>, using the criteria:</p>
-<ul>
-<li>The number of events in any region <span class="math">\(A \in R\)</span> has a Poisson distribution with mean <span class="math">\(\int_A \lambda(s)~ds\)</span>.</li>
-</ul>
-<p>Let's use Clark-Evans test to check whether the points follow a completely spatially random pattern.</p>
-<div class="highlight"><pre><span></span>
+<p>Under the homogeneous Poisson model, the intensity function <span class="math">\(\lambda\)</span> is constant. However, for many processes, a constant risk hypothesis is too restrictive - the intensity varies over a region according to population, gradients, etc. Hence we define a <strong>heterogenous Poisson point process</strong> with intensity function <span class="math">\(\lambda(s)\)</span> where <span class="math">\(s\)</span> is any point in our study region <span class="math">\(R\)</span>, using the criteria:</p>
+<ol>
+<li>
+<p>The number of events in any region <span class="math">\(A \subset R\)</span> has a Poisson distribution with mean <span class="math">\(\int_A \lambda(s)~ds\)</span>.</p>
+</li>
+<li>
+<p>Given that a total of <span class="math">\(X = N\)</span> events occur in <span class="math">\(A\)</span>, the locations of the events are a random sample of <span class="math">\(N\)</span> events sampled proportional to <span class="math">\(\lambda(s)\)</span>.</p>
+</li>
+</ol>
+<p>Let's use the Clark-Evans test to show whether the points follow a completely spatially random pattern or are clustered.</p>
+<div class="highlight"><pre><span></span><span class="n">clarkevans</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span>
+<span class="n">clarkevans</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">wfppp</span><span class="p">,</span> <span class="n">alternative</span> <span class="o">=</span> <span class="s2">&quot;clustered&quot;</span><span class="p">)</span>
 </pre></div>
 
 
+<p>Since the p-value is less than 0.05, we reject the null hypothesis that the WiFi locations are completely spatially randomly distributed within Seoul. In fact, the earlier contour plot indicates that points are clustered near the center of Seoul where we expect to see a lot of foot traffic.</p>
 <p>Then let's plot a Ripley's K function</p>
 <p>Several measures exist: nearest neighbor methods (G, F). However, most common and popular is K function.
 We can check this using the plot of K, L, G, F and J functions.</p>
+<p>The Ripley's <strong>K</strong> function <span class="math">\(K(r)\)</span> measures the expected number of events within distance <span class="math">\(r\)</span> of a random event divided by <span class="math">\(\lambda\)</span>. The <strong>G</strong> function <span class="math">\(G(r)\)</span> is the cumulative probability distribution of nearest neighbor distances between events. On the other hand, the <strong>F</strong> function <span class="math">\(F(r)\)</span> is the cumulative probability distribution of nearest neighbor distances from a random point to an event. Remember that an event is an actual observation in region <span class="math">\(R\)</span>, but a point is any other location of interest in the region. The <strong>J</strong> function <span class="math">\(J(r)\)</span> is just <span class="math">\(\dfrac{1 - G(r)}{1 - F(r)}\)</span>.</p>
+<ol>
+<li>F function</li>
+</ol>
 <div class="highlight"><pre><span></span><span class="c1"># K, L, G, F, J functions</span>
 <span class="n">wf</span><span class="o">.</span><span class="n">env</span> <span class="o">&lt;-</span> <span class="n">envelope</span><span class="p">(</span><span class="n">wfppp</span><span class="p">,</span> <span class="n">fun</span> <span class="o">=</span> <span class="n">Kest</span><span class="p">)</span>
 <span class="n">wf</span><span class="o">.</span><span class="n">K</span> <span class="o">&lt;-</span> <span class="n">Kest</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span>
