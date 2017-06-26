@@ -1,31 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Seong Hyun Hwang</title><link href="https://stathwang.github.io/" rel="alternate"></link><link href="https://stathwang.github.io/feeds/all.atom.xml" rel="self"></link><id>https://stathwang.github.io/</id><updated>2017-06-26T18:03:00-04:00</updated><entry><title>Foursquare Location-Content-Aware Recommender System</title><link href="https://stathwang.github.io/foursquare-location-content-aware-recommender-system.html" rel="alternate"></link><published>2017-06-26T18:03:00-04:00</published><updated>2017-06-26T18:03:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2017-06-26:/foursquare-location-content-aware-recommender-system.html</id><summary type="html">&lt;blockquote&gt;
-&lt;p&gt;I'm highly interested in leveraging Foursquare's unique location technology and foot traffic panel to produce sound recommendations of spatial items. Recently I've read a paper &lt;a href="http://net.pku.edu.cn/~cuibin/Papers/2014%20TOIS%20-%20lcars.pdf"&gt;LCARS: A Spatial Item Recommender System&lt;/a&gt; that I implemented from scratch in R.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;&lt;strong&gt;You can find all of my R codes and datasets in my …&lt;/strong&gt;&lt;/p&gt;</summary><content type="html">&lt;blockquote&gt;
-&lt;p&gt;I'm highly interested in leveraging Foursquare's unique location technology and foot traffic panel to produce sound recommendations of spatial items. Recently I've read a paper &lt;a href="http://net.pku.edu.cn/~cuibin/Papers/2014%20TOIS%20-%20lcars.pdf"&gt;LCARS: A Spatial Item Recommender System&lt;/a&gt; that I implemented from scratch in R.&lt;/p&gt;
-&lt;/blockquote&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Seong Hyun Hwang</title><link href="https://stathwang.github.io/" rel="alternate"></link><link href="https://stathwang.github.io/feeds/all.atom.xml" rel="self"></link><id>https://stathwang.github.io/</id><updated>2017-06-26T18:03:00-04:00</updated><entry><title>Foursquare Location-Content-Aware Recommender System</title><link href="https://stathwang.github.io/foursquare-location-content-aware-recommender-system.html" rel="alternate"></link><published>2017-06-26T18:03:00-04:00</published><updated>2017-06-26T18:03:00-04:00</updated><author><name>Seong Hyun Hwang</name></author><id>tag:stathwang.github.io,2017-06-26:/foursquare-location-content-aware-recommender-system.html</id><summary type="html">&lt;p&gt;I'm highly interested in leveraging Foursquare's unique location technology and foot traffic panel to produce sound recommendations of spatial items. Recently I've read a paper &lt;a href="http://net.pku.edu.cn/~cuibin/Papers/2014%20TOIS%20-%20lcars.pdf"&gt;LCARS: A Spatial Item Recommender System&lt;/a&gt; that I implemented from scratch in R.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;You can find all of my R codes and datasets in my …&lt;/strong&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;I'm highly interested in leveraging Foursquare's unique location technology and foot traffic panel to produce sound recommendations of spatial items. Recently I've read a paper &lt;a href="http://net.pku.edu.cn/~cuibin/Papers/2014%20TOIS%20-%20lcars.pdf"&gt;LCARS: A Spatial Item Recommender System&lt;/a&gt; that I implemented from scratch in R.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;You can find all of my R codes and datasets in my Github repository &lt;a href="https://github.com/stathwang/Foursquare-Rec-Sys"&gt;here&lt;/a&gt;!&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;Feel free to email me or comment below if you have any questions.&lt;/p&gt;
-&lt;h3&gt;Problems&lt;/h3&gt;
+&lt;h4&gt;Problems&lt;/h4&gt;
 &lt;ol&gt;
 &lt;li&gt;Cold-start users. How should we recommend spatial items to a new user traveling to a new city?&lt;/li&gt;
 &lt;li&gt;User checkin histories are locally clustered, so the traditional collaborative filtering methods would produce poor recommendations.&lt;/li&gt;
 &lt;li&gt;Data sparsity and new city problem. User activites are very limited in distant locations.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h3&gt;Main Ideas&lt;/h3&gt;
+&lt;h4&gt;Main Ideas&lt;/h4&gt;
 &lt;p&gt;To produce personalized spatial item recommendations, we combine the querying user's interest and the local preference of the querying city.&lt;/p&gt;
 &lt;p&gt;The generative model learns latent &lt;strong&gt;topic&lt;/strong&gt; distribution over spatial items and that over content words, intrinsic &lt;strong&gt;user interest&lt;/strong&gt; distribution over topics, and &lt;strong&gt;local preference&lt;/strong&gt; in a given region over topics.&lt;/p&gt;
-&lt;p&gt;The &lt;code&gt;src&lt;/code&gt; folder contains 4 models:
-+ &lt;code&gt;LDA.R&lt;/code&gt;: each user is a document and events visited by the user are the words in the document. Ignores both location and content words. The most basic model similar to collaborative filtering.
-+ &lt;code&gt;CA-LDA.R&lt;/code&gt;: &lt;em&gt;content&lt;/em&gt; component of LCA-LDA model. Only considers content words of an event, not locations.
-+ &lt;code&gt;LA-LDA.R&lt;/code&gt;: &lt;em&gt;location&lt;/em&gt; component of LDA-LDA model. Only considers locations, not content words.
-+ &lt;code&gt;LCA-LDA.R&lt;/code&gt;: combination of &lt;code&gt;CA-LDA.R&lt;/code&gt; and &lt;code&gt;LA-LDA.R&lt;/code&gt; that takes into account both locations and content words of an event.&lt;/p&gt;
-&lt;h3&gt;Methods&lt;/h3&gt;
+&lt;p&gt;The &lt;code&gt;src&lt;/code&gt; folder contains &lt;code&gt;LDA.R&lt;/code&gt; where each user is a document and events visited by the user are the words in the document. Ignores both location and content words. The most basic model similar to collaborative filtering. &lt;code&gt;CA-LDA.R&lt;/code&gt; is the &lt;em&gt;content&lt;/em&gt; component of LCA-LDA model. It only considers content words of an event, not locations. &lt;code&gt;LA-LDA.R&lt;/code&gt; is the &lt;em&gt;location&lt;/em&gt; component of LDA-LDA model. It only considers locations, not content words. The final model &lt;code&gt;LCA-LDA.R&lt;/code&gt; is a combination of &lt;code&gt;CA-LDA.R&lt;/code&gt; and &lt;code&gt;LA-LDA.R&lt;/code&gt; that takes into account both locations and content words of an event.&lt;/p&gt;
+&lt;h4&gt;Methods&lt;/h4&gt;
 &lt;p&gt;Use &lt;strong&gt;collapsed Gibbs sampling&lt;/strong&gt; by only keeping track of coin flips and topic assignments for every record of a user's checkin history. For the hyperparameter settings, see the paper.&lt;/p&gt;
 &lt;p&gt;Split the data into training and test set (3:1) for every user checkin history. Fit the models above on the training set. For each user's checkin history in the test set, compute the score (see the paper) for the event as well as all other events in the city not visited by the user.&lt;/p&gt;
 &lt;p&gt;Rank the events by sorting the scores in decreasing order. For every threshold &lt;span class="math"&gt;\(k\)&lt;/span&gt; (see the paper), if an event in the test set is in top &lt;span class="math"&gt;\(k\)&lt;/span&gt;, then call that a &lt;strong&gt;hit&lt;/strong&gt;. Average the scores for all test records.&lt;/p&gt;
-&lt;h3&gt;Results and Conclusions&lt;/h3&gt;
+&lt;h4&gt;Results and Conclusions&lt;/h4&gt;
 &lt;ol&gt;
 &lt;li&gt;LDA performs the worst, and LCA-LDA outperforms all other models. Local preference and content words are indeed effective.&lt;/li&gt;
 &lt;li&gt;For the number of latent topics &amp;gt; 25, recommendation performance increase is rather small. This prompts to set the number of topics to 25 to balance out model complexity and computational efficiency.&lt;/li&gt;
