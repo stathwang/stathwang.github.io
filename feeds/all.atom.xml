@@ -93,12 +93,8 @@ f(x, y) = \dfrac{1}{|R|}
 &lt;/ol&gt;
 &lt;p&gt;Under the homogeneous Poisson model, the intensity function &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is constant. However, for many processes, a constant risk hypothesis is too restrictive - the intensity varies over a region according to population, gradients, etc. Hence we define a &lt;strong&gt;heterogenous Poisson point process&lt;/strong&gt; with intensity function &lt;span class="math"&gt;\(\lambda(s)\)&lt;/span&gt; where &lt;span class="math"&gt;\(s\)&lt;/span&gt; is any point in our study region &lt;span class="math"&gt;\(R\)&lt;/span&gt;, using the criteria:&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;The number of events in any region &lt;span class="math"&gt;\(A \subset R\)&lt;/span&gt; has a Poisson distribution with mean &lt;span class="math"&gt;\(\int_A \lambda(s)~ds\)&lt;/span&gt;.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Given that a total of &lt;span class="math"&gt;\(X = N\)&lt;/span&gt; events occur in &lt;span class="math"&gt;\(A\)&lt;/span&gt;, the locations of the events are a random sample of &lt;span class="math"&gt;\(N\)&lt;/span&gt; events sampled proportional to &lt;span class="math"&gt;\(\lambda(s)\)&lt;/span&gt;.&lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;The number of events in any region &lt;span class="math"&gt;\(A \subset R\)&lt;/span&gt; has a Poisson distribution with mean &lt;span class="math"&gt;\(\int_A \lambda(s)~ds\)&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Given that a total of &lt;span class="math"&gt;\(X = N\)&lt;/span&gt; events occur in &lt;span class="math"&gt;\(A\)&lt;/span&gt;, the locations of the events are a random sample of &lt;span class="math"&gt;\(N\)&lt;/span&gt; events sampled proportional to &lt;span class="math"&gt;\(\lambda(s)\)&lt;/span&gt;.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Let's use the &lt;strong&gt;Clark-Evans test&lt;/strong&gt; to show whether the points follow a completely spatially random pattern.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;clarkevans&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -421,12 +417,8 @@ f(x, y) = \dfrac{1}{|R|}
 &lt;p&gt;The diagnostic plot of the null model with no predictors looks quite awful compared to that of the final model. The sky blue colored &lt;code&gt;valley&lt;/code&gt; we see on the lower right corner of the diagnostic plot of the final model refers to the Han river that goes through the center of Seoul which doesn't have any buildings or free public WiFis. To overcome this dip in the residuals, we can include geographical features such as elevations in the final model.&lt;/p&gt;
 &lt;h3&gt;Conclusions&lt;/h3&gt;
 &lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;Free public WiFi locations in Seoul are clustered. How they are clustered is different across WiFi network providers and location types.&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;Foursquare checkin data are quite useful. The best model is &lt;code&gt;ppm(quadscheme(wf.ppp) ~ polynom(x,y,2) + checkins, data = fsq)&lt;/code&gt; with no marks.&lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;Free public WiFi locations in Seoul are clustered. How they are clustered is different across WiFi network providers and location types.&lt;/li&gt;
+&lt;li&gt;Foursquare checkin data are quite useful. The best model is &lt;code&gt;ppm(quadscheme(wf.ppp) ~ polynom(x,y,2) + checkins, data = fsq)&lt;/code&gt; with no marks.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
