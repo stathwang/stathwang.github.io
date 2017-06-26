@@ -183,20 +183,15 @@ f(x, y) = \dfrac{1}{|R|}
 <p>Given that a total of <span class="math">\(X = N\)</span> events occur in <span class="math">\(A\)</span>, the locations of the events are a random sample of <span class="math">\(N\)</span> events sampled proportional to <span class="math">\(\lambda(s)\)</span>.</p>
 </li>
 </ol>
-<p>Let's use the Clark-Evans test to show whether the points follow a completely spatially random pattern or are clustered.</p>
+<p>Let's use the <em>Clark-Evans test</em> to show whether the points follow a completely spatially random pattern.</p>
 <div class="highlight"><pre><span></span><span class="n">clarkevans</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span>
 <span class="n">clarkevans</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">wfppp</span><span class="p">,</span> <span class="n">alternative</span> <span class="o">=</span> <span class="s2">&quot;clustered&quot;</span><span class="p">)</span>
 </pre></div>
 
 
-<p>Since the p-value is less than 0.05, we reject the null hypothesis that the WiFi locations are completely spatially randomly distributed within Seoul. In fact, the earlier contour plot indicates that points are clustered near the center of Seoul where we expect to see a lot of foot traffic.</p>
-<p>The points look clustered. Is this perhaps due to the mean, or <span class="math">\(\lambda\)</span>, changing overlet's plot a Ripley's K function</p>
-<p>Several measures exist: nearest neighbor methods (G, F). However, most common and popular is K function.
-We can check this using the plot of K, L, G, F and J functions.</p>
-<p>The Ripley's <strong>K</strong> function <span class="math">\(K(r)\)</span> measures the expected number of events within distance <span class="math">\(r\)</span> of a random event divided by <span class="math">\(\lambda\)</span>. The <strong>L</strong> function <span class="math">\(L(r)\)</span> is just <span class="math">\(\sqrt{\dfrac{K(r)}{\pi}} - r\)</span>The <strong>G</strong> function <span class="math">\(G(r)\)</span> is the cumulative probability distribution of nearest neighbor distances between events. On the other hand, the <strong>F</strong> function <span class="math">\(F(r)\)</span> is the cumulative probability distribution of nearest neighbor distances from a random point to an event. Remember that an event is an actual observation in region <span class="math">\(R\)</span>, but a point is any other location of interest in the region. The <strong>J</strong> function <span class="math">\(J(r)\)</span> is just <span class="math">\(\dfrac{1 - G(r)}{1 - F(r)}\)</span>.</p>
-<ol>
-<li>F function</li>
-</ol>
+<p>Since the p-value is less than 0.05, we reject the null hypothesis that the WiFi locations are completely spatially randomly distributed within Seoul. In fact, the earlier contour plot indicates that points are rather clustered near the center of Seoul where we expect to see a lot of foot traffic.</p>
+<p>Is this clustering of points perhaps due to changing mean <span class="math">\(\lambda\)</span> or spatial correlation? Several measures exist to check this: nearest neighbor methods such as the G and F functions. However, most common and popular is the Ripley's K function.</p>
+<p>The <strong>K</strong> function <span class="math">\(K(r)\)</span> measures the expected number of events within distance <span class="math">\(r\)</span> of a random event divided by <span class="math">\(\lambda\)</span>. The <strong>L</strong> function <span class="math">\(L(r)\)</span> is just <span class="math">\(\sqrt{\dfrac{K(r)}{\pi}} - r\)</span>The <strong>G</strong> function <span class="math">\(G(r)\)</span> is the cumulative probability distribution of nearest neighbor distances between events. On the other hand, the <strong>F</strong> function <span class="math">\(F(r)\)</span> is the cumulative probability distribution of nearest neighbor distances from a random point to an event. Remember that an event is an actual observation in region <span class="math">\(R\)</span>, but a point is any other location of interest in the region. The <strong>J</strong> function <span class="math">\(J(r)\)</span> is just <span class="math">\(\dfrac{1 - G(r)}{1 - F(r)}\)</span>.</p>
 <div class="highlight"><pre><span></span><span class="c1"># K, L, G, F, J functions</span>
 <span class="n">wf</span><span class="o">.</span><span class="n">env</span> <span class="o">&lt;-</span> <span class="n">envelope</span><span class="p">(</span><span class="n">wfppp</span><span class="p">,</span> <span class="n">fun</span> <span class="o">=</span> <span class="n">Kest</span><span class="p">)</span>
 <span class="n">wf</span><span class="o">.</span><span class="n">K</span> <span class="o">&lt;-</span> <span class="n">Kest</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span>
@@ -217,6 +212,7 @@ We can check this using the plot of K, L, G, F and J functions.</p>
 </pre></div>
 
 
+<p>In the K and the L plots, the colored lines are well above the black and the dotted ones, so the points are clustered. Plots of other functions G, F, and J also indicate the process is clustered.</p>
 <p>Since each spatial point is marked by two factors: WiFi network providers and WiFi location types, we have a <strong>marked point process</strong>. Each point has an associated attribute which could be categorical (species, disease status), or continuous (diameter). We can examine relationships between a particular group and all other groups i.e. multi-group comparison.</p>
 <p>Here we observe that KT WiFi locations are mainly concentrated near the north of the river, while SKTs are concentrated near the south of the river. LGU+ covers a wider range around the center of Seoul.</p>
 <p><img alt="w11" src="https://stathwang.github.io/images/WiFi-Locations-Part.png">
