@@ -100,7 +100,7 @@ f(x, y) = \dfrac{1}{|R|}
 &lt;p&gt;Given that a total of &lt;span class="math"&gt;\(X = N\)&lt;/span&gt; events occur in &lt;span class="math"&gt;\(A\)&lt;/span&gt;, the locations of the events are a random sample of &lt;span class="math"&gt;\(N\)&lt;/span&gt; events sampled proportional to &lt;span class="math"&gt;\(\lambda(s)\)&lt;/span&gt;.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;First, let's use the &lt;strong&gt;Clark-Evans test&lt;/strong&gt; to show whether the points follow a completely spatially random pattern.&lt;/p&gt;
+&lt;p&gt;Let's use the &lt;strong&gt;Clark-Evans test&lt;/strong&gt; to show whether the points follow a completely spatially random pattern.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;clarkevans&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;clarkevans&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;test&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;wfppp&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alternative&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;clustered&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
