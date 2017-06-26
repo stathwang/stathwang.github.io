@@ -473,7 +473,7 @@ f(x, y) = \dfrac{1}{|R|}
 
 <h3>Point Process Models</h3>
 <p>Fit <strong>point process models</strong> (PPM) with a mark. <code>dq</code> is the final output after all necessary iterations of the code above. The mark here is the factor variable WiFi network providers with 3 levels. Though we can set the mark to be the factor variable location types, the number of levels is 12 and the model runs pretty slow with that many levels. Note that <code>ppm</code> function doesn't allow data to have more than one mark, so if we want to use both factors in this case, then we would need to multiply them and set the new mark to be a single factor variable with <span class="math">\(12 \times 3 = 36\)</span> levels.</p>
-<p>After model fitting, we use the stepwise variable selection to arrive at our final model <code>ppm(quadscheme(wfdot.ppp) ~ poly(x,y,2) + checkins, data = dq)</code> with no marks included. The model has the lowest AIC (-45418.85).</p>
+<p>After model fitting, use the stepwise variable selection to arrive at the final model <code>ppm(quadscheme(wfdot.ppp) ~ poly(x,y,2) + checkins, data = dq)</code> with no marks included. The model has the lowest AIC (-45418.85).</p>
 <div class="highlight"><pre><span></span><span class="c1"># Add a mark to a ppp object</span>
 <span class="n">wfact</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">factor</span><span class="p">(</span><span class="n">wifi</span><span class="err">$</span><span class="n">comp</span><span class="p">)</span>
 <span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span> <span class="o">&lt;-</span> <span class="n">ppp</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> 
@@ -483,8 +483,8 @@ f(x, y) = \dfrac{1}{|R|}
 <span class="n">P</span> <span class="o">&lt;-</span> <span class="n">quadscheme</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span>
 <span class="n">Q</span> <span class="o">&lt;-</span> <span class="n">quadscheme</span><span class="p">(</span><span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span><span class="p">)</span>
 <span class="n">pp</span><span class="o">.</span><span class="n">null</span> <span class="o">&lt;-</span> <span class="n">ppm</span><span class="p">(</span><span class="n">P</span> <span class="o">~</span> <span class="mi">1</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">dq</span><span class="p">)</span>
-<span class="n">pp</span><span class="o">.</span><span class="n">full1</span> <span class="o">&lt;-</span> <span class="n">ppm</span><span class="p">(</span><span class="n">P</span> <span class="o">~</span> <span class="n">polynom</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">checkins</span> <span class="o">+</span> <span class="n">users</span> <span class="o">+</span> <span class="n">tips</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">dq</span><span class="p">)</span>
-<span class="n">pp</span><span class="o">.</span><span class="n">full2</span> <span class="o">&lt;-</span> <span class="n">ppm</span><span class="p">(</span><span class="n">Q</span> <span class="o">~</span> <span class="n">polynom</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">marks</span> <span class="o">+</span> <span class="n">checkins</span> <span class="o">+</span> <span class="n">users</span> <span class="o">+</span> <span class="n">tips</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">dq</span><span class="p">)</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">full1</span> <span class="o">&lt;-</span> <span class="n">ppm</span><span class="p">(</span><span class="n">P</span> <span class="o">~</span> <span class="n">polynom</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">checkins</span> <span class="o">+</span> <span class="n">users</span> <span class="o">+</span> <span class="n">tips</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">dq</span><span class="p">)</span>  <span class="c1"># with mark</span>
+<span class="n">pp</span><span class="o">.</span><span class="n">full2</span> <span class="o">&lt;-</span> <span class="n">ppm</span><span class="p">(</span><span class="n">Q</span> <span class="o">~</span> <span class="n">polynom</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">marks</span> <span class="o">+</span> <span class="n">checkins</span> <span class="o">+</span> <span class="n">users</span> <span class="o">+</span> <span class="n">tips</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">dq</span><span class="p">)</span>  <span class="c1"># without any mark</span>
 
 <span class="c1"># Analysis of deviance</span>
 <span class="n">anova</span><span class="p">(</span><span class="n">pp</span><span class="o">.</span><span class="n">null</span><span class="p">,</span> <span class="n">pp</span><span class="o">.</span><span class="n">full1</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="s2">&quot;LRT&quot;</span><span class="p">)</span>
@@ -500,18 +500,15 @@ f(x, y) = \dfrac{1}{|R|}
 </pre></div>
 
 
-<p><img alt="wifidiagnostics" src="{attach}images/wifidiagnostics.png"></p>
-<p>The diagnostic plot of the null model with no predictors looks awful, while that of the final model looks good. The sky blue "valley" we see on the lower right corner may refer to the Han river that goes through the center of Seoul which doesn't have any buildings or free public WiFis.</p>
+<p><img alt="wfdiagnostics" src="https://stathwang.github.io/images/wfdiagnostics.png"></p>
+<p>The diagnostic plot of the null model with no predictors looks quite awful compared to that of the final model. The sky blue colored <code>valley</code> we see on the lower right corner of the diagnostic plot of the final model refers to the Han river that goes through the center of Seoul which doesn't have any buildings or free public WiFis. To overcome this dip in the residuals, we can include geographical features such as elevations in the final model.</p>
 <h3>Conclusions</h3>
 <ol>
 <li>
-<p>Free public WiFi locations are clustered. How they are clustered is different across WiFi network providers and location types.</p>
+<p>Free public WiFi locations in Seoul are clustered. How they are clustered is different across WiFi network providers and location types.</p>
 </li>
 <li>
-<p>Foursquare checkins data are quite useful.</p>
-</li>
-<li>
-<p>The best model is <code>ppm(quadscheme(wf.ppp) ~ polynom(x,y,2) + checkins, data = dq)</code> with no marks.</p>
+<p>Foursquare checkin data are quite useful. The best model is <code>ppm(quadscheme(wf.ppp) ~ polynom(x,y,2) + checkins, data = dq)</code> with no marks.</p>
 </li>
 </ol>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
