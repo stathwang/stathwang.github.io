@@ -179,7 +179,7 @@ f(x, y) = \dfrac{1}{|R|}
 <li>The number of events in any region <span class="math">\(A \subset R\)</span> has a Poisson distribution with mean <span class="math">\(\int_A \lambda(s)~ds\)</span>.</li>
 <li>Given that a total of <span class="math">\(X = N\)</span> events occur in <span class="math">\(A\)</span>, the locations of the events are a random sample of <span class="math">\(N\)</span> events sampled proportional to <span class="math">\(\lambda(s)\)</span>.</li>
 </ol>
-<p>Let's use the <strong>Clark-Evans test</strong> to show whether the points follow a completely spatially random pattern.</p>
+<p>Let's use the <strong>Clark-Evans test</strong> to examine whether the points follow a completely spatially random pattern.</p>
 <div class="highlight"><pre><span></span><span class="n">clarkevans</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">wfppp</span><span class="p">)</span>
 <span class="n">clarkevans</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">wfppp</span><span class="p">,</span> <span class="n">alternative</span> <span class="o">=</span> <span class="s2">&quot;clustered&quot;</span><span class="p">)</span>
 </pre></div>
@@ -469,7 +469,7 @@ f(x, y) = \dfrac{1}{|R|}
 
 <h3>Point Process Models</h3>
 <p>Fit <strong>point process models</strong> (PPM) with a mark. <code>fsq</code> is the final output after all necessary iterations of the code above. The mark here is the factor variable WiFi network providers with 3 levels. Though we can set the mark to be the factor variable location types, the number of levels is 12 and the model runs pretty slow with that many levels. Note that <code>ppm</code> function doesn't allow data to have more than one mark, so if we want to use both factors in this case, then we would need to multiply them and set the new mark to be a single factor variable with <span class="math">\(12 \times 3 = 36\)</span> levels.</p>
-<p>After model fitting, use the stepwise variable selection to arrive at the final model <code>ppm(quadscheme(wfdot.ppp) ~ poly(x,y,2) + checkins, data = dq)</code> with no marks included. The model has the lowest AIC (-45418.85).</p>
+<p>After model fitting, use the stepwise variable selection to arrive at the final model <code>ppm(quadscheme(wfdot.ppp) ~ poly(x,y,2) + checkins, data = fsq)</code> with no marks included. The model has the lowest AIC (-45418.85).</p>
 <div class="highlight"><pre><span></span><span class="c1"># Add a mark to a ppp object</span>
 <span class="n">wfact</span> <span class="o">&lt;-</span> <span class="k">as</span><span class="o">.</span><span class="n">factor</span><span class="p">(</span><span class="n">wifi</span><span class="err">$</span><span class="n">comp</span><span class="p">)</span>
 <span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span> <span class="o">&lt;-</span> <span class="n">ppp</span><span class="p">(</span><span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">wifi</span><span class="o">.</span><span class="n">pts</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> 
