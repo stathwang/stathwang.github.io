@@ -121,7 +121,7 @@
 </pre></div>
 
 
-<p>Spatially join the points with the Seoul municipalities shapefile <code>seoul_municipalities.shp</code> and plot the points on top of the municipality boundaries. Also plot the points and contours of a 2D kernel density estimate on the actual geographical map of Seoul.</p>
+<p>Spatially join the points with the Seoul municipalities shapefile <code>seoul_municipalities.shp</code> and plot the points on top of the municipality boundaries (not shown). Plot the points and contours of a 2D kernel density estimate on the actual geographical map of Seoul.</p>
 <div class="highlight"><pre><span></span><span class="n">shape</span> <span class="o">&lt;-</span> <span class="n">readOGR</span><span class="p">(</span><span class="s2">&quot;seoul_municipalities.shp&quot;</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
@@ -352,7 +352,8 @@ f(x, y) = \dfrac{1}{|R|}
 </pre></div>
 
 
-<p>From the <span class="math">\(K\)</span> and the <span class="math">\(L\)</span> plots, all the colored lines are well above the black and the dotted ones, which represents the CSR baseline, so the points are indeed clustered. Different color corresponds to different border correction methods. Plots of other functions <span class="math">\(G\)</span>, <span class="math">\(F\)</span>, and <span class="math">\(J\)</span> also indicate a clustered process.</p>
+<p><img alt="wifikl" src="https://stathwang.github.io/images/wifikl.png"></p>
+<p>From the <span class="math">\(K\)</span> and the <span class="math">\(L\)</span> plots, all the colored lines are well above the black and the dotted ones, which represents the CSR baseline, so the points are indeed clustered. Different color corresponds to different border correction methods. Plots of other functions <span class="math">\(G\)</span>, <span class="math">\(F\)</span>, and <span class="math">\(J\)</span> (not shown) also indicate a clustered process.</p>
 <h3>Marked Point Process</h3>
 <p>Since each spatial point is marked by two factors: WiFi network providers and WiFi location types, we have a <strong>marked point process</strong>. Each point has an associated attribute which could be categorical (species, disease status), or continuous (diameter). We can examine relationships between a particular group and all other groups i.e. multi-group comparison.</p>
 <p>Here we observe that KT WiFi locations are mainly concentrated near the north of the river, while SKTs are concentrated near the south of the river. LGU+ covers a wider range around the center of Seoul.</p>
@@ -372,7 +373,7 @@ f(x, y) = \dfrac{1}{|R|}
 </pre></div>
 
 
-<p>Plotting the points by location types, we observe that KT WiFis are exclusively near bus stops, while SKT and LGU+ dominate near main streets and parks. Note that pink dots refer to KT locations, greens LGU+s, and blue dots SKTs.</p>
+<p>Plotting the points by location types, we observe that KT WiFis are exclusively near bus stops, while SKT and LGU+ dominate near main streets and parks. Note that the red dots refer to KT locations, greens LGU+s, and blue dots SKTs.</p>
 <p><img alt="wifitypes" src="https://stathwang.github.io/images/wifitypes.png"></p>
 <div class="highlight"><pre><span></span><span class="n">q3</span> <span class="o">&lt;-</span> <span class="n">seoul_map</span> <span class="o">+</span> 
   <span class="n">geom_point</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">wifi</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">lng</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">lat</span><span class="p">,</span> <span class="n">colour</span> <span class="o">=</span> <span class="n">comp</span><span class="p">))</span> <span class="o">+</span> 
@@ -394,7 +395,7 @@ f(x, y) = \dfrac{1}{|R|}
 
 
 <p>For many point processes, CSR is not the appropriate null hypothesis. Events will appear to be not CSR simply because the events follow a heterogenous Poisson point process that mirrors, say, population. For instance, disease or crime events will simply follow the population distribution or multiple tree species simply group by more favorable soil or climate conditions.</p>
-<p>In this case, we need to correct for the underlying intensity function. The basic idea is to compare the intensity function of <code>cases</code> to that of the chosen baseline of <code>control</code>. This comparison is done by computing a kernel intensity estimate for each group over the same region <span class="math">\(R\)</span>. A ratio of estimates is then calculated and plotted. This method requires that the intensity functions be normalized to have total area under the curve equal to 1. That is, we use density functions instead of intensity functions in the ratio. The ratio of density estimates, or so called <strong>relative risk</strong>, is expressed as relative probabilities rather than relative intensities, but the interpretation is similar.</p>
+<p>In this case, we need to correct for the underlying intensity function. The basic idea is to compare the intensity function of <code>cases</code> to that of a chosen baseline of <code>control</code>. This comparison is done by computing a kernel intensity estimate for each group over the same region <span class="math">\(R\)</span>. A ratio of estimates is then calculated and plotted. This method requires that the intensity functions be normalized to have total area under the curve equal to 1. That is, we use density functions instead of intensity functions in the ratio. The ratio of density estimates, or so called <strong>relative risk</strong>, is expressed as relative probabilities rather than relative intensities, but the interpretation is similar.</p>
 <div class="highlight"><pre><span></span><span class="c1"># Relative risk</span>
 <span class="n">mainerr</span> <span class="o">&lt;-</span> <span class="n">relrisk</span><span class="p">(</span><span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">mainerr</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s2">&quot;Relative Risk by WiFi Network Providers&quot;</span><span class="p">)</span>
@@ -406,6 +407,7 @@ f(x, y) = \dfrac{1}{|R|}
 <p>For KT, the density is higher near the upper outskirts of Seoul, whereas the density for LGU+ is concentrated near the center and SKT near the lower right.</p>
 <p>Plot multi-group versions of the <span class="math">\(K\)</span>, <span class="math">\(L\)</span>, and <span class="math">\(G\)</span> functions. Each function makes a one-to-many comparison. As an example, the R code below sets the baseline control to be LGU+. The points are clustered as well even when compared to a different baseline than CSR.</p>
 <div class="highlight"><pre><span></span><span class="c1"># Plot Gdot, Kdot, and Ldot from one to many</span>
+<span class="n">par</span><span class="p">(</span><span class="n">mfrow</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">Gdot</span><span class="p">(</span><span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span><span class="p">,</span> <span class="s2">&quot;LGU+&quot;</span><span class="p">),</span> <span class="n">lwd</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s2">&quot;Gdot Ref. LGU+&quot;</span><span class="p">)</span>
 <span class="n">env</span> <span class="o">&lt;-</span> <span class="n">envelope</span><span class="p">(</span><span class="n">wfdot</span><span class="o">.</span><span class="n">ppp</span><span class="p">,</span> <span class="n">fun</span> <span class="o">=</span> <span class="n">Gdot</span><span class="p">,</span> <span class="n">i</span> <span class="o">=</span> <span class="s2">&quot;LGU+&quot;</span><span class="p">,</span> <span class="n">nsim</span> <span class="o">=</span> <span class="mi">99</span><span class="p">)</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">add</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">)</span>
@@ -420,6 +422,7 @@ f(x, y) = \dfrac{1}{|R|}
 </pre></div>
 
 
+<p><img alt="wifidots" src="https://stathwang.github.io/images/wifidots.png"></p>
 <h3>Foursquare Data</h3>
 <p>My hypothesis is there may be a correlation between the popularity of the area near the location of a free public WiFi in Seoul and the location itself. The more popular the area, the higher the chance of seeing a free public WiFi. Otherwise, what's the point of setting up one if no one will use it?</p>
 <p>How should we define the metric of popularity? Where do we get the data? Foursquare is a location-based social network that has gathered a wealth of location and foot traffic data from its users. I'm going to retrieve the data on places within a predefined region of each WiFi location and roughly estimate the popularity as the total number of checkins, users, and tips. The more often Foursquare users check into a place, the more likely there may be a free public WiFi nearby.</p>
