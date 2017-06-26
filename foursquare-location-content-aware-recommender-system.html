@@ -88,7 +88,6 @@
     <p>I'm highly interested in leveraging Foursquare's unique location technology and foot traffic panel to produce sound recommendations of spatial items. Recently I've read a paper <a href="http://net.pku.edu.cn/~cuibin/Papers/2014%20TOIS%20-%20lcars.pdf">LCARS: A Spatial Item Recommender System</a> that I implemented from scratch in R.</p>
 <p><strong>You can find all of my R codes and datasets in my Github repository <a href="https://github.com/stathwang/Foursquare-Rec-Sys">here</a>!</strong></p>
 <p>Feel free to email me or comment below if you have any questions.</p>
-<p>--</p>
 <h3>Problems</h3>
 <ol>
 <li>Cold-start users. How should we recommend spatial items to a new user traveling to a new city?</li>
@@ -100,19 +99,19 @@
 - the querying user's interest
 - the local preference of the querying city</p>
 <p>The generative model learns:
-   - latent <strong>topic</strong> distribution over spatial items and that over content words
-   - intrinsic <strong>user interest</strong> distribution over topics
-   - <strong>local preference</strong> in a given region over topics</p>
+    - latent <strong>topic</strong> distribution over spatial items and that over content words
+    - intrinsic <strong>user interest</strong> distribution over topics
+    - <strong>local preference</strong> in a given region over topics</p>
 <p>The <code>src</code> folder contains 4 models:
-  - <code>LDA.R</code>: each user is a document and events visited by the user are the words in the document. Ignores both location and content words. The most basic model similar to collaborative filtering.
-  - <code>CA-LDA.R</code>: <em>content</em> component of LCA-LDA model. Only considers content words of an event, not locations.
-  - <code>LA-LDA.R</code>: <em>location</em> component of LDA-LDA model. Only considers locations, not content words.
-  - <code>LCA-LDA.R</code>: combination of <code>CA-LDA.R</code> and <code>LA-LDA.R</code> that takes into account both locations and content words of an event.</p>
+    - <code>LDA.R</code>: each user is a document and events visited by the user are the words in the document. Ignores both location and content words. The most basic model similar to collaborative filtering.
+    - <code>CA-LDA.R</code>: <em>content</em> component of LCA-LDA model. Only considers content words of an event, not locations.
+    - <code>LA-LDA.R</code>: <em>location</em> component of LDA-LDA model. Only considers locations, not content words.
+    - <code>LCA-LDA.R</code>: combination of <code>CA-LDA.R</code> and <code>LA-LDA.R</code> that takes into account both locations and content words of an event.</p>
 <h3>Methods</h3>
-<p>Use collapsed Gibbs sampling by only keeping track of coin flips and topic assignments for every record of a user's checkin history. For the hyperparameter settings, see the paper.</p>
-<p>Split the data into training and test set (3:1) for every user checkin history. Fit the models above on the training set. For each user's checkin history in the test set, compute the score for the event as well as all other events in the city not visited by the user.</p>
-<p>Rank the events by sorting the scores in decreasing order. For every threshold k (see the paper), if an event in the test set is in top-k, then call that a hit. Average the scores for all test records.</p>
-<h3>Results</h3>
+<p>Use <strong>collapsed Gibbs sampling</strong> by only keeping track of coin flips and topic assignments for every record of a user's checkin history. For the hyperparameter settings, see the paper.</p>
+<p>Split the data into training and test set (3:1) for every user checkin history. Fit the models above on the training set. For each user's checkin history in the test set, compute the <strong>score</strong> (see the paper) for the event as well as all other events in the city not visited by the user.</p>
+<p>Rank the events by sorting the scores in decreasing order. For every threshold <span class="math">\(k\)</span> (see the paper), if an event in the test set is in top <span class="math">\(k\)</span>, then call that a <strong>hit</strong>. Average the scores for all test records.</p>
+<h3>Results and Conclusions</h3>
 <ol>
 <li>LDA performs the worst, and LCA-LDA outperforms all other models. Local preference and content words are indeed effective.</li>
 <li>For the number of latent topics &gt; 25, recommendation performance increase is rather small. This prompts to set the number of topics to 25 to balance out model complexity and computational efficiency.</li>
@@ -121,6 +120,63 @@
 <li>User interest, local preference, and content words are blended in a flexible, robust way to produce a very interpretable probabilistic model.</li>
 <li>Further research needed: Can local preference be split into that of avid travelers and non-travelers, possibly a weighted sum of those two group preferences? Does correlation exist between locations and content words i.e. correlated topic models?</li>
 </ol>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
   </div>
   <div class="tag-cloud">
     <p>
