@@ -100,10 +100,10 @@
 <p>To produce personalized spatial item recommendations, we combine the querying user's interest and the local preference of the querying city.</p>
 <p>The generative model learns latent <strong>topic</strong> distribution over spatial items and that over content words, intrinsic <strong>user interest</strong> distribution over topics, and <strong>local preference</strong> in a given region over topics.</p>
 <p>The <code>src</code> folder contains 4 models:
-<em> <code>LDA.R</code>: each user is a document and events visited by the user are the words in the document. Ignores both location and content words. The most basic model similar to collaborative filtering.
-</em> <code>CA-LDA.R</code>: <em>content</em> component of LCA-LDA model. Only considers content words of an event, not locations.
-<em> <code>LA-LDA.R</code>: </em>location<em> component of LDA-LDA model. Only considers locations, not content words.
-</em> <code>LCA-LDA.R</code>: combination of <code>CA-LDA.R</code> and <code>LA-LDA.R</code> that takes into account both locations and content words of an event.</p>
++ <code>LDA.R</code>: each user is a document and events visited by the user are the words in the document. Ignores both location and content words. The most basic model similar to collaborative filtering.
++ <code>CA-LDA.R</code>: <em>content</em> component of LCA-LDA model. Only considers content words of an event, not locations.
++ <code>LA-LDA.R</code>: <em>location</em> component of LDA-LDA model. Only considers locations, not content words.
++ <code>LCA-LDA.R</code>: combination of <code>CA-LDA.R</code> and <code>LA-LDA.R</code> that takes into account both locations and content words of an event.</p>
 <h3>Methods</h3>
 <p>Use <strong>collapsed Gibbs sampling</strong> by only keeping track of coin flips and topic assignments for every record of a user's checkin history. For the hyperparameter settings, see the paper.</p>
 <p>Split the data into training and test set (3:1) for every user checkin history. Fit the models above on the training set. For each user's checkin history in the test set, compute the score (see the paper) for the event as well as all other events in the city not visited by the user.</p>
