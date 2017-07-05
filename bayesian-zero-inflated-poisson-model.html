@@ -28,15 +28,15 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="author" content="Seong Hyun Hwang" />
-<meta name="description" content="Wikipedia defines: The zero-inflated Poisson model concerns a random event containing excess zero-count data in unit time. For instance, the number of insurance claims within a population for a certain type of risk would be zero-inflated by those people who have not taken out insurance against the risk and thus …" />
+<meta name="description" content="Wikipedia defines The zero-inflated Poisson model concerns a random event containing excess zero-count data in unit time. For instance, the number of insurance claims within a population for a certain type of risk would be zero-inflated by those people who have not taken out insurance against the risk and thus …" />
 <meta name="keywords" content="zero inflated poisson, mcmc, bayesian statistics, statistics, r">
 <meta property="og:site_name" content="Seong Hyun Hwang"/>
 <meta property="og:title" content="Bayesian Zero-Inflated Poisson Model"/>
-<meta property="og:description" content="Wikipedia defines: The zero-inflated Poisson model concerns a random event containing excess zero-count data in unit time. For instance, the number of insurance claims within a population for a certain type of risk would be zero-inflated by those people who have not taken out insurance against the risk and thus …"/>
+<meta property="og:description" content="Wikipedia defines The zero-inflated Poisson model concerns a random event containing excess zero-count data in unit time. For instance, the number of insurance claims within a population for a certain type of risk would be zero-inflated by those people who have not taken out insurance against the risk and thus …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://stathwang.github.io/bayesian-zero-inflated-poisson-model.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2017-07-05 19:30:00-04:00"/>
+<meta property="article:published_time" content="2017-07-05 19:57:00-04:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="https://stathwang.github.io/author/seong-hyun-hwang.html">
 <meta property="article:section" content="Bayesian Statistics"/>
@@ -85,20 +85,21 @@
     <p>Posted on July 05 2017 in <a href="https://stathwang.github.io/category/bayesian-statistics.html">Bayesian Statistics</a></p>
   </header>
   <div>
-    <p>Wikipedia defines:</p>
+    <p>Wikipedia defines</p>
 <blockquote>
 <p>The zero-inflated Poisson model concerns a random event containing excess zero-count data in unit time. For instance, the number of insurance claims within a population for a certain type of risk would be zero-inflated by those people who have not taken out insurance against the risk and thus are unable to claim.</p>
 </blockquote>
-<p>Specifically, the model can be broken down into two components that correspond to two different zero generating processes. The first is a binary distribution that generates structural zeroes, and the second process is governed by a Poisson distribution that generates counts, some of which may be zero. </p>
+<p>Specifically, the model can be broken down into two components that correspond to two different zero generating processes. The first is under a binary distribution that generates structural zeroes, and the second process is subject to a Poisson distribution that generates counts, some of which may be zero. </p>
 <p>The two model components are aggregated as follows:</p>
-<p>Suppose $Y_1,..., Y_n | \theta, \lambda \tilde $</p>
+<p>Suppose $Y_1,..., Y_n | \theta, \lambda \stackrel{iid}{\tilde} $</p>
 <p>Let's derive the full conditional distributions for <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> assuming that we observe at least one <span class="math">\(Y_i = 0\)</span> and at least one <span class="math">\(Y_j &gt; 0\)</span>.</p>
 <div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">&lt;-</span> <span class="n">scan</span><span class="p">(</span><span class="s2">&quot;ZIP.txt&quot;</span><span class="p">)</span>
 <span class="n">hist</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s2">&quot;Histogram of 1000 observations&quot;</span><span class="p">,</span> <span class="n">xlab</span> <span class="o">=</span> <span class="s2">&quot;Observations&quot;</span><span class="p">)</span>
 </pre></div>
 
 
-<p>The dataset contains 1000 observations from the model specified. Generate samples from the posterior distribution of interest using the Markov chain Monte Carlo (MCMC) simulation. I'm going to use three chains with overdispersed initial values with respect to the true marginal posterior distributions for <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> in each chain.</p>
+<p><img alt="poisplot" src="{attach}images/poisplot.png"></p>
+<p>The synthetic dataset contains 1000 observations from the model specified. Generate samples from the posterior distribution of interest using the Markov chain Monte Carlo (MCMC) simulation. I'm going to use three chains with overdispersed initial values with respect to the true marginal posterior distributions for <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> in each chain.</p>
 <div class="highlight"><pre><span></span><span class="nb">set</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">28473</span><span class="p">)</span>
 
 <span class="c1"># function to convert theta to psi</span>
@@ -455,7 +456,7 @@
   "@type": "BlogPosting",
   "name": "Bayesian Zero-Inflated Poisson Model",
   "headline": "Bayesian Zero-Inflated Poisson Model",
-  "datePublished": "2017-07-05 19:30:00-04:00",
+  "datePublished": "2017-07-05 19:57:00-04:00",
   "dateModified": "",
   "author": {
     "@type": "Person",
@@ -464,7 +465,7 @@
   },
   "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
   "url": "https://stathwang.github.io/bayesian-zero-inflated-poisson-model.html",
-  "description": "Wikipedia defines: The zero-inflated Poisson model concerns a random event containing excess zero-count data in unit time. For instance, the number of insurance claims within a population for a certain type of risk would be zero-inflated by those people who have not taken out insurance against the risk and thus …"
+  "description": "Wikipedia defines The zero-inflated Poisson model concerns a random event containing excess zero-count data in unit time. For instance, the number of insurance claims within a population for a certain type of risk would be zero-inflated by those people who have not taken out insurance against the risk and thus …"
 }
 </script></body>
 </html>
