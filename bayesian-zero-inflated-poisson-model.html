@@ -91,7 +91,7 @@
 </blockquote>
 <p>Specifically, the model can be broken down into two components that correspond to two different zero generating processes. The first is under a binary distribution that generates structural zeroes, and the second process is subject to a Poisson distribution that generates counts, some of which may be zero. </p>
 <p>The two model components are aggregated as follows:</p>
-<p>Suppose <span class="math">\(Y_1, ..., Y_n | \theta, \lambda \sim P(Y = y | \theta, \lambda)\)</span> where</p>
+<p>Suppose <span class="math">\(Y_1, ..., Y_n | \theta, \lambda \sim P(Y = y | \theta, \lambda)\)</span> (iid) where</p>
 <div class="math">\begin{equation}
 P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda} \lambda^y}{y!}
 \end{equation}</div>
@@ -209,7 +209,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 
 
 <p><img alt="traceplot" src="https://stathwang.github.io/images/traceplot.png"></p>
-<p>Below are the traceplots after removing the first 2000 burn-in samples.</p>
+<p>Below are the traceplots after removing the first 2000 burn-in samples:</p>
 <div class="highlight"><pre><span></span><span class="c1"># burn-in amount: 2000 chosen by looking at the trace plots</span>
 <span class="n">burnin</span> <span class="o">&lt;-</span> <span class="mi">2000</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">theta</span><span class="p">[(</span><span class="n">burnin</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">mcmc_samples</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span> <span class="n">ylab</span> <span class="o">=</span> <span class="s2">&quot;MCMC samples for theta&quot;</span><span class="p">)</span>
