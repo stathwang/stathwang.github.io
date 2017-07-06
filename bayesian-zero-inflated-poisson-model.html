@@ -96,7 +96,7 @@
 P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda} \lambda^y}{y!}
 \end{equation}</div>
 <p>where <span class="math">\(y = 0, 1, 2, ...\)</span>, <span class="math">\(\theta \in [0,1]\)</span>, and <span class="math">\(\lambda &gt; 0\)</span>. Typically, <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> are assumed to be unknown constants, meaning their values are fixed; however, Bayesians assign a prior distribution to an unknown variable which makes possible making inference on it using Bayes rule.</p>
-<p>Suppose the priors are specified as <span class="math">\(\theta \sim Beta(a,b)\)</span> and <span class="math">\(\theta \sim Gamma(c,d)\)</span> where <span class="math">\(a, b, c, d\)</span> are fixed hyperparameters.</p>
+<p>Suppose the priors are specified as <span class="math">\(\theta \sim Beta(a,b)\)</span> and <span class="math">\(\lambda \sim Gamma(c,d)\)</span> where <span class="math">\(a, b, c, d\)</span> are fixed hyperparameters.</p>
 <p>Let's derive the full conditional distributions for <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> assuming that we observe at least one <span class="math">\(Y_i = 0\)</span> and at least one <span class="math">\(Y_j &gt; 0\)</span>.</p>
 <div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">&lt;-</span> <span class="n">scan</span><span class="p">(</span><span class="s2">&quot;ZIP.txt&quot;</span><span class="p">)</span>
 <span class="n">hist</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s2">&quot;Histogram of 1000 observations&quot;</span><span class="p">,</span> <span class="n">xlab</span> <span class="o">=</span> <span class="s2">&quot;Observations&quot;</span><span class="p">)</span>
@@ -189,7 +189,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 </pre></div>
 
 
-<p>Is there evidence to suggest that the chains have converged and that there are enough posterior samples to make proper inference?</p>
+<p>There is evidence to suggest that the chains have converged since the traceplots look converged after roughly about 2000 iterations. Let's set the burn-in amount to 2000.</p>
 <div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">coda</span><span class="p">)</span>
 
 <span class="c1"># trace plots</span>
@@ -209,7 +209,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 
 
 <p><img alt="traceplot" src="https://stathwang.github.io/images/traceplot.png"></p>
-<p>Set the burn-in amount to 2000 by looking at the trace plots. The autocorrelation plots (not shown) look good since the lags decay quickly. The effective sample sizes seem permissible. Gelman and Rubin diagnostics are all less than 1.1 which is a good sign. Below are the traceplots after removing the first 2000 samples.</p>
+<p>Below are the traceplots after removing the first 2000 burn-in samples.</p>
 <div class="highlight"><pre><span></span><span class="c1"># burn-in amount: 2000 chosen by looking at the trace plots</span>
 <span class="n">burnin</span> <span class="o">&lt;-</span> <span class="mi">2000</span>
 <span class="n">plot</span><span class="p">(</span><span class="n">theta</span><span class="p">[(</span><span class="n">burnin</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span><span class="n">mcmc_samples</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span> <span class="n">ylab</span> <span class="o">=</span> <span class="s2">&quot;MCMC samples for theta&quot;</span><span class="p">)</span>
@@ -224,6 +224,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 
 
 <p><img alt="traceplot2" src="https://stathwang.github.io/images/traceplot2.png"></p>
+<p>The autocorrelation plots (not shown) look good since the lags decay quickly. The effective sample sizes seem permissible so there are enough posterior samples to make proper inference. Gelman and Rubin diagnostics are all less than 1.1 which is a good sign.</p>
 <div class="highlight"><pre><span></span><span class="c1"># autocorrelation plots look good</span>
 <span class="c1"># lags decay quickly</span>
 <span class="n">par</span><span class="p">(</span><span class="n">mfrow</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
@@ -267,7 +268,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
                  <span class="k">as</span><span class="o">.</span><span class="n">mcmc</span><span class="p">(</span><span class="n">theta</span><span class="p">[</span><span class="n">keep_set1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span>
                  <span class="k">as</span><span class="o">.</span><span class="n">mcmc</span><span class="p">(</span><span class="n">theta</span><span class="p">[</span><span class="n">keep_set2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
 <span class="n">mh</span><span class="o">.</span><span class="n">list1t</span> <span class="o">&lt;-</span> <span class="n">mcmc</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="n">mh</span><span class="o">.</span><span class="n">list1</span><span class="p">)</span>
-<span class="n">gelman</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">mh</span><span class="o">.</span><span class="n">list1t</span><span class="p">)</span><span class="err">$</span><span class="n">psrf</span>
+<span class="k">print</span><span class="p">(</span><span class="n">gelman</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">mh</span><span class="o">.</span><span class="n">list1t</span><span class="p">)</span><span class="err">$</span><span class="n">psrf</span><span class="p">)</span>
 
 <span class="n">mh</span><span class="o">.</span><span class="n">list2</span> <span class="o">&lt;-</span> <span class="nb">list</span><span class="p">(</span><span class="k">as</span><span class="o">.</span><span class="n">mcmc</span><span class="p">(</span><span class="k">lambda</span><span class="p">[</span><span class="n">keep_set1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> 
                  <span class="k">as</span><span class="o">.</span><span class="n">mcmc</span><span class="p">(</span><span class="k">lambda</span><span class="p">[</span><span class="n">keep_set2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
@@ -276,7 +277,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
                  <span class="k">as</span><span class="o">.</span><span class="n">mcmc</span><span class="p">(</span><span class="k">lambda</span><span class="p">[</span><span class="n">keep_set1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> 
                  <span class="k">as</span><span class="o">.</span><span class="n">mcmc</span><span class="p">(</span><span class="k">lambda</span><span class="p">[</span><span class="n">keep_set2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]))</span>
 <span class="n">mh</span><span class="o">.</span><span class="n">list2l</span> <span class="o">&lt;-</span> <span class="n">mcmc</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="n">mh</span><span class="o">.</span><span class="n">list2</span><span class="p">)</span>
-<span class="n">gelman</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">mh</span><span class="o">.</span><span class="n">list2l</span><span class="p">)</span><span class="err">$</span><span class="n">psrf</span>
+<span class="k">print</span><span class="p">(</span><span class="n">gelman</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">mh</span><span class="o">.</span><span class="n">list2l</span><span class="p">)</span><span class="err">$</span><span class="n">psrf</span><span class="p">)</span>
 </pre></div>
 
 
