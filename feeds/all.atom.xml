@@ -19,7 +19,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 
 
 &lt;p&gt;&lt;img alt="poisplot" src="https://stathwang.github.io/images/poisplot.png"&gt;&lt;/p&gt;
-&lt;p&gt;The synthetic dataset contains 1000 observations from the model specified. Generate samples from the posterior distribution of interest using the Markov chain Monte Carlo (MCMC) simulation. I'm going to use three chains with overdispersed initial values with respect to the true marginal posterior distributions for &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; and &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; in each chain.&lt;/p&gt;
+&lt;p&gt;The synthetic dataset contains 1000 observations from the model specified. Generate samples from the posterior distribution of interest with Markov chain Monte Carlo (MCMC) simulation. I'm going to use three chains with overdispersed initial values (with respect to the true marginal posterior distributions) for &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; and &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; in each chain.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;set&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;seed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;28473&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="c1"&gt;# function to convert theta to psi&lt;/span&gt;
@@ -123,9 +123,9 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Set the burn-in amount to 2000 by looking at the trace plots. Autocorrelation plots look good since the lags decay quickly. Effective sample sizes seem permissible. Gelman and Rubin diagnostics are all less than 1.1 which is a good sign.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# burn-in amount: 2000&lt;/span&gt;
-&lt;span class="c1"&gt;# chosen by looking at the trace plots&lt;/span&gt;
+&lt;p&gt;&lt;img alt="traceplot" src="https://stathwang.github.io/images/traceplot.png"&gt;&lt;/p&gt;
+&lt;p&gt;Set the burn-in amount to 2000 by looking at the trace plots. The autocorrelation plots (not shown) look good since the lags decay quickly. The effective sample sizes seem permissible. Gelman and Rubin diagnostics are all less than 1.1 which is a good sign. Below are the traceplots after removing the first 2000 samples.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# burn-in amount: 2000 chosen by looking at the trace plots&lt;/span&gt;
 &lt;span class="n"&gt;burnin&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="mi"&gt;2000&lt;/span&gt;
 &lt;span class="n"&gt;plot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;theta&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;burnin&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="n"&gt;mcmc_samples&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;l&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;ylab&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;MCMC samples for theta&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;chains&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -135,8 +135,11 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;chains&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
   &lt;span class="n"&gt;lines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;burnin&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="n"&gt;mcmc_samples&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="n"&gt;col&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;j&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
-&lt;span class="c1"&gt;# autocorrelation plots look good&lt;/span&gt;
+
+&lt;p&gt;&lt;img alt="traceplot2" src="https://stathwang.github.io/images/traceplot2.png"&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# autocorrelation plots look good&lt;/span&gt;
 &lt;span class="c1"&gt;# lags decay quickly&lt;/span&gt;
 &lt;span class="n"&gt;par&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;mfrow&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;j&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;chains&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
@@ -167,7 +170,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 &lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gtable&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Gelman and Rubin diagnostics&lt;/span&gt;
-&lt;span class="c1"&gt;# all is less than 1.1 which is a good sign&lt;/span&gt;
+&lt;span class="c1"&gt;# all less than 1.1 which is a good sign&lt;/span&gt;
 &lt;span class="n"&gt;total_count&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;mcmc_samples&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;burnin&lt;/span&gt;
 &lt;span class="n"&gt;keep_set1&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="n"&gt;burnin&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;burnin&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;total_count&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;keep_set2&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;seq&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;burnin&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;total_count&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;mcmc_samples&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -192,7 +195,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;The posterior mean is . The posterior standard deviation is . The 95% quantile-based, equal tail credible interval estimate for &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; is , and that for &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is .&lt;/p&gt;
+&lt;p&gt;The posterior mean of &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; is 0.0424 and that of &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is 5.034. The posterior standard deviation of &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; is 0.007024 and that of &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is 0.07197. The 95% quantile-based, equal tail credible interval estimate for &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; is (0.0298, 0.0573) and that for &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; is (4.894, 5.172).&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# final inference for theta and lambda&lt;/span&gt;
 &lt;span class="n"&gt;full_theta&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="n"&gt;theta&lt;/span&gt;&lt;span class="p"&gt;[(&lt;/span&gt;&lt;span class="n"&gt;burnin&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="n"&gt;mcmc_samples&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
 &lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full_theta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
@@ -204,10 +207,11 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda
 &lt;span class="n"&gt;hist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full_lambda&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="n"&gt;quantile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full_lambda&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;0.025&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;0.975&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;span class="n"&gt;mean&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full_lambda&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;sd&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full_theta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;sd&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;full_lambda&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
+&lt;p&gt;&lt;img alt="postval" src="https://stathwang.github.io/images/postval.png"&gt;&lt;/p&gt;
 &lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
