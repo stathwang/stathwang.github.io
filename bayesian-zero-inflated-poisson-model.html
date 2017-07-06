@@ -93,16 +93,16 @@
 <p>The two model components are aggregated as follows:</p>
 <p>Suppose <span class="math">\(Y_1, ..., Y_n | \theta, \lambda \sim P(Y = y | \theta, \lambda)\)</span> where</p>
 <div class="math">\begin{equation}
-P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{exp^{-\lambda} \lambda^y}{y!}
+P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{\exp^{-\lambda} \lambda^y}{y!}
 \end{equation}</div>
-<p>where <span class="math">\(y = 0, 1, 2, ...\)</span>, <span class="math">\(\theta \in [0,1]\)</span>, and <span class="math">\(\lambda &gt; 0\)</span>. Typically, <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> are assumed to be unknown constants, meaning their values are fixed; however, Bayesians assign a distribution to an unknown variable. This makes possible making inference on the unknowns via Bayes rule.</p>
+<p>where <span class="math">\(y = 0, 1, 2, ...\)</span>, <span class="math">\(\theta \in [0,1]\)</span>, and <span class="math">\(\lambda &gt; 0\)</span>. Typically, <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> are assumed to be unknown constants, meaning their values are fixed; however, Bayesians assign a distribution to an unknown variable which makes possible making inference on it using Bayes rule.</p>
 <p>Let's derive the full conditional distributions for <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> assuming that we observe at least one <span class="math">\(Y_i = 0\)</span> and at least one <span class="math">\(Y_j &gt; 0\)</span>.</p>
 <div class="highlight"><pre><span></span><span class="n">obs</span> <span class="o">&lt;-</span> <span class="n">scan</span><span class="p">(</span><span class="s2">&quot;ZIP.txt&quot;</span><span class="p">)</span>
 <span class="n">hist</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s2">&quot;Histogram of 1000 observations&quot;</span><span class="p">,</span> <span class="n">xlab</span> <span class="o">=</span> <span class="s2">&quot;Observations&quot;</span><span class="p">)</span>
 </pre></div>
 
 
-<p><img alt="poisplot" src="{attach}images/poisplot.png"></p>
+<p><img alt="poisplot" src="https://stathwang.github.io/images/poisplot.png"></p>
 <p>The synthetic dataset contains 1000 observations from the model specified. Generate samples from the posterior distribution of interest using the Markov chain Monte Carlo (MCMC) simulation. I'm going to use three chains with overdispersed initial values with respect to the true marginal posterior distributions for <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> in each chain.</p>
 <div class="highlight"><pre><span></span><span class="nb">set</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">28473</span><span class="p">)</span>
 
