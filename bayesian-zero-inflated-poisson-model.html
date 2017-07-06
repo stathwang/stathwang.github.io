@@ -103,7 +103,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{e^{-\lambda} \
 
 
 <p><img alt="poisplot" src="https://stathwang.github.io/images/poisplot.png"></p>
-<p>The synthetic dataset contains 1000 observations from the model specified. Generate samples from the posterior distribution of interest <span class="math">\(f(\theta, \lambda | Y_1, ..., Y_n)\)</span> with Markov chain Monte Carlo (MCMC) simulation. I'm going to use three chains with overdispersed initial values (with respect to the true marginal posterior distributions) for <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> in each chain.</p>
+<p>The synthetic dataset contains 1000 observations from the model specified. Generate samples from the posterior distribution of interest <span class="math">\(f(\theta, \lambda | y_1, ..., y_n)\)</span> with Markov chain Monte Carlo (MCMC) simulation. I'm going to use three chains with overdispersed initial values (with respect to the true marginal posterior distributions) for <span class="math">\(\theta\)</span> and <span class="math">\(\lambda\)</span> in each chain.</p>
 <div class="highlight"><pre><span></span><span class="nb">set</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">28473</span><span class="p">)</span>
 
 <span class="c1"># function to convert theta to psi</span>

@@ -19,7 +19,7 @@ P(Y = y | \theta, \lambda) = \theta I(y = 0) + (1 - \theta)\dfrac{e^{-\lambda} \
 
 
 &lt;p&gt;&lt;img alt="poisplot" src="https://stathwang.github.io/images/poisplot.png"&gt;&lt;/p&gt;
-&lt;p&gt;The synthetic dataset contains 1000 observations from the model specified. Generate samples from the posterior distribution of interest &lt;span class="math"&gt;\(f(\theta, \lambda | Y_1, ..., Y_n)\)&lt;/span&gt; with Markov chain Monte Carlo (MCMC) simulation. I'm going to use three chains with overdispersed initial values (with respect to the true marginal posterior distributions) for &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; and &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; in each chain.&lt;/p&gt;
+&lt;p&gt;The synthetic dataset contains 1000 observations from the model specified. Generate samples from the posterior distribution of interest &lt;span class="math"&gt;\(f(\theta, \lambda | y_1, ..., y_n)\)&lt;/span&gt; with Markov chain Monte Carlo (MCMC) simulation. I'm going to use three chains with overdispersed initial values (with respect to the true marginal posterior distributions) for &lt;span class="math"&gt;\(\theta\)&lt;/span&gt; and &lt;span class="math"&gt;\(\lambda\)&lt;/span&gt; in each chain.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;set&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;seed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;28473&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 
 &lt;span class="c1"&gt;# function to convert theta to psi&lt;/span&gt;
