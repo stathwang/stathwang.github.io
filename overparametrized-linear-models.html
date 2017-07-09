@@ -101,19 +101,54 @@ B_z = \{b \in \mathbb{R}^p: Xb = z\} = \{b_z + w : w \in W^\perp\}
 <p>Statisticians use two general strategies to avoid this embarrassment.</p>
 <ol>
 <li>
-<p>Restrict attention to linear functions <span class="math">\(L^T \beta\)</span> (with <span class="math">\(L \in \mathbb{R}^p) of the unknown $\beta\)</span> that are uniquely determined by <span class="math">\(\mu\)</span>. That is, only interpret the linear combinations for which there exiwsts some vector <span class="math">\(l\)</span> in <span class="math">\(\mathbb{R}^n\)</span> such that <span class="math">\(L^T \beta = l^T \mu\)</span> whenever <span class="math">\(\mu = X\beta\)</span>. Such linear combinations are said to be <strong>estimable</strong>.</p>
+<p>Restrict attention to linear functions <span class="math">\(L^T \beta\)</span> (with <span class="math">\(L \in \mathbb{R}^p\)</span>) of the unknown <span class="math">\(\beta\)</span> that are uniquely determined by <span class="math">\(\mu\)</span>. That is, only interpret the linear combinations for which there exiwsts some vector <span class="math">\(l\)</span> in <span class="math">\(\mathbb{R}^n\)</span> such that <span class="math">\(L^T \beta = l^T \mu\)</span> whenever <span class="math">\(\mu = X\beta\)</span>. Such linear combinations are said to be <strong>estimable</strong>.</p>
 </li>
 <li>
 <p>Impose a set of <span class="math">\(p - m\)</span> linearly independent lienar constraints on <span class="math">\(b\)</span>, say <span class="math">\(D_1^T b = 0\)</span> for fixed <span class="math">\(p \times (p - m)\)</span> matrix <span class="math">\(D_1\)</span>, so that to every <span class="math">\(z \in \chi\)</span> there exists a unique <span class="math">\(b\)</span> in <span class="math">\(\mathbb{R}^p\)</span> for which both <span class="math">\(z = Xb\)</span> and <span class="math">\(D_1^T b = 0\)</span>.</p>
 </li>
 </ol>
 <h4>Estimable Functions</h4>
+<p>If <span class="math">\(L \in W\)</span> then it can be written as a linear combination of the columns of <span class="math">\(X^T\)</span>, that is, <span class="math">\(L = X^T l\)</span> for some <span class="math">\(l\)</span> in <span class="math">\(\mathbb{R}^n\)</span>. If <span class="math">\(Xb = z\)</span> then</p>
+<div class="math">\begin{equation}
+L^T b = l^T Xb = l^T z
+\end{equation}</div>
+<p>In particular, if <span class="math">\(X\beta = \mu \in \chi\)</span> then <span class="math">\(L^T \beta = l^T \mu\)</span>. That is, <span class="math">\(L^T \beta\)</span> is an estimable function.</p>
+<p>Conversely, suppose that <span class="math">\(L = L_1 + L_2\)</span> with <span class="math">\(L_1 \in W\)</span> and <span class="math">\(L_2 \in W^\perp\)</span> and <span class="math">\(b = b_z + w \in B_z\)</span> as in (2). Then</p>
+<div class="math">\begin{equation}
+L^T b = L_1^T b_z + L_2^T w
+\end{equation}</div>
+<p>If <span class="math">\(L_2 \neq 0\)</span> then we can generate many different <span class="math">\(L^T b\)</span> values by varying <span class="math">\(w\)</span>. For example, try <span class="math">\(w = 0\)</span> then <span class="math">\(w = L_2\)</span>.</p>
+<p>In short, the estimable functions <span class="math">\(L^T \beta\)</span> of the unknown parameters are precisely those for which <span class="math">\(L \in W\)</span>, that is, <span class="math">\(L = X^T l\)</span> for some <span class="math">\(l\)</span> in \mathbb{R}^n<span class="math">\(. In that case, $L^T \hat{b} = l^T X \hat{b} = l^T \hat{y}\)</span> for every solution <span class="math">\(\hat{b}\)</span> of the equation <span class="math">\(X \hat{b} = \hat{y}\)</span>. Under the linear model where <span class="math">\(y = \mu + \epsilon\)</span> with <span class="math">\(\mathbb{E}y = \mu \in \chi\)</span> and <span class="math">\(var(\epsilon) = \sigma^2 I_n\)</span> we have</p>
+<div class="math">\begin{equation}
+\mathbb{E}L^T \hat{b} = L^T \beta
+\end{equation}</div>
+<p>and</p>
+<div class="math">\begin{equation}
+var(L^T \hat{b}) = \sigma^2 \|l\|^2
+\end{equation}</div>
+<p>Note that there is a role for estimability if we start with an <span class="math">\(X\)</span> of full rank but lose some of the data. When the corresponding rows are removed from <span class="math">\(X\)</span> we might be left with a reduced model matrix that is not of full rank.</p>
 <h4>Linear Constraints</h4>
 <p>Suppose we constrain the parametrization by adding <span class="math">\(p - m\)</span> more rows to the <span class="math">\(X\)</span> matrix, in such a way that the augmented matrix</p>
 <div class="math">\begin{equation}
+\widetilde{X} = 
+\begin{bmatrix}
+  \alpha_{1} \\
+  \alpha_{2} \\
+  \vdots \\
+  \alpha_{m} \\
+\end{bmatrix}
 \end{equation}</div>
-<p>has rank <span class="math">\(p\)</span>. The columns of <span class="math">\(\widetilde{X}^T\)</span> span <span class="math">\(\mathbb{R}^p\)</span>. The columns of the <span class="math">\(p \times p\)</span> matrix <span class="math">\(M^T = [W_1, D_1]\)</span> span the same space. Thus <span class="math">\(M\)</span> has rank <span class="math">\(p\)</span>; it is non-singular. For each <span class="math">\(z\)</span> in <span class="math">\(\chi\)</span> there is now a unique <span class="math">\(b\)</span> in <span class="math">\(\mathbb{R}^p\)</span> for which <span class="math">\(Xb = z\)</span> and <span class="math">\(D_1^T b = 0\)</span>:</p>
+<p>has rank <span class="math">\(p\)</span>. The columns of <span class="math">\(\widetilde{X^T}\)</span> span <span class="math">\(\mathbb{R}^p\)</span>. The columns of the <span class="math">\(p \times p\)</span> matrix <span class="math">\(M^T = [W_1, D_1]\)</span> span the same space. Thus <span class="math">\(M\)</span> has rank <span class="math">\(p\)</span>; it is non-singular. For each <span class="math">\(z\)</span> in <span class="math">\(\chi\)</span> there is now a unique <span class="math">\(b\)</span> in <span class="math">\(\mathbb{R}^p\)</span> for which <span class="math">\(Xb = z\)</span> and <span class="math">\(D_1^T b = 0\)</span>:</p>
 <div class="math">\begin{equation}
+\widetilde{X}b = 
+\end{equation}</div>
+<p>if and only if</p>
+<div class="math">\begin{equation}
+\binom{W_1^T}{D_1^T} b = \binom{z_1}{0}
+\end{equation}</div>
+<p>if and only if </p>
+<div class="math">\begin{equation}
+b = M^{-1} \binom{z_1}{0}
 \end{equation}</div>
 <p>Here is another way to derive the solution. It corresponds to the way R actually handles the overparametrization problem for factors. The linearly independent columns of <span class="math">\(D_1\)</span> span a <span class="math">\((p - m)\)</span>-dimensional subspace <span class="math">\(D\)</span> of <span class="math">\(\mathbb{R}^p\)</span>. Find a <span class="math">\(p \times m\)</span> matrix <span class="math">\(D_2\)</span> whose columns span <span class="math">\(D^\perp\)</span>, the <span class="math">\(m\)</span>-dimensional subspace of all vectors in <span class="math">\(\mathbb{R}^p\)</span> that are orthogonal to <span class="math">\(D\)</span>. The requirement <span class="math">\(D_1^T b = 0\)</span> means that <span class="math">\(b\)</span> should be orthogonal to <span class="math">\(D\)</span>. That is, b = D_2 a<span class="math">\( for some $a\)</span> in <span class="math">\(\mathbb{R}^m\)</span>. The second requirement then becomes XD_2 a = z<span class="math">\(. We now have a new parametrization for the model with the $n \times m\)</span> model matrix <span class="math">\(XD_2\)</span> and parameters <span class="math">\(a \in \mathbb{R}^m\)</span>. The equation <span class="math">\(XD_2 a = z\)</span> has a unique solution for each <span class="math">\(z\)</span> in <span class="math">\(\chi\)</span>.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
