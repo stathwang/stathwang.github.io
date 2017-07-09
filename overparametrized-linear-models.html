@@ -28,11 +28,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="author" content="Seong Hyun Hwang" />
-<meta name="description" content="I've seen many data scientists overlooking the importance of linear regressions. In this post, I Ranks, Subspaces, and Bases Suppose \(X = (x_1, x_2, \dots, x_p)\) is an \(n \times p\) matrix of rank \(m\), with \(m < p\). That is, the space \(\chi\) spanned by all the columns of \(X\) can …" />
+<meta name="description" content="Surprisingly, quite a few data scientists overlook the importance of linear regression and the problem of overparametrization. In this post, I'm going to describe mathematically what it means for a model to be overparametrized and the general strategies used by a statistician to resolve non-uniqueness. Ranks, Subspaces, and Bases Suppose …" />
 <meta name="keywords" content="overparametrization, linear models, statistics, r">
 <meta property="og:site_name" content="Seong Hyun Hwang"/>
 <meta property="og:title" content="Overparametrized Linear Models"/>
-<meta property="og:description" content="I've seen many data scientists overlooking the importance of linear regressions. In this post, I Ranks, Subspaces, and Bases Suppose \(X = (x_1, x_2, \dots, x_p)\) is an \(n \times p\) matrix of rank \(m\), with \(m < p\). That is, the space \(\chi\) spanned by all the columns of \(X\) can …"/>
+<meta property="og:description" content="Surprisingly, quite a few data scientists overlook the importance of linear regression and the problem of overparametrization. In this post, I'm going to describe mathematically what it means for a model to be overparametrized and the general strategies used by a statistician to resolve non-uniqueness. Ranks, Subspaces, and Bases Suppose …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://stathwang.github.io/overparametrized-linear-models.html"/>
 <meta property="og:type" content="article"/>
@@ -84,7 +84,7 @@
     <p>Posted on July 09 2017 in <a href="https://stathwang.github.io/category/statistics.html">Statistics</a></p>
   </header>
   <div>
-    <p>I've seen many data scientists overlooking the importance of linear regressions. In this post, I </p>
+    <p>Surprisingly, quite a few data scientists overlook the importance of linear regression and the problem of overparametrization. In this post, I'm going to describe mathematically what it means for a model to be overparametrized and the general strategies used by a statistician to resolve non-uniqueness.</p>
 <h4>Ranks, Subspaces, and Bases</h4>
 <p>Suppose <span class="math">\(X = (x_1, x_2, \dots, x_p)\)</span> is an <span class="math">\(n \times p\)</span> matrix of rank <span class="math">\(m\)</span>, with <span class="math">\(m &lt; p\)</span>. That is, the space <span class="math">\(\chi\)</span> spanned by all the columns of <span class="math">\(X\)</span> can also be spanned by some subset of <span class="math">\(m\)</span> linearly independent columns. The space <span class="math">\(\chi\)</span> is overparametrized; we don't need all <span class="math">\(p\)</span> parameters to specify vectors in <span class="math">\(\chi\)</span> because there is a set of <span class="math">\(m\)</span> linearly independent columns that spans <span class="math">\(\chi\)</span>. For each <span class="math">\(z\)</span> in <span class="math">\(\chi\)</span> there are many different <span class="math">\(b\)</span> in <span class="math">\(\mathbb{R}^p\)</span> for which <span class="math">\(z = Xb\)</span>. The non-uniqueness of <span class="math">\(b\)</span> leads to several difficulties when the columns of <span class="math">\(X\)</span> are used as the predictors in a least squares problem.</p>
 <p>The <span class="math">\(p \times n\)</span> matrix <span class="math">\(X^T = (w_1, w_2, \dots, w_n)\)</span> also has rank <span class="math">\(m\)</span>. The subspace <span class="math">\(W\)</span> of <span class="math">\(\mathbb{R}^p\)</span> spanned by all the columns of <span class="math">\(X^T\)</span> can also be spanned by some subset of <span class="math">\(m\)</span> linearly independent columns, which (without loss of generality) we may suppose correspond to the first <span class="math">\(m\)</span> rows of <span class="math">\(X\)</span>. Put another way,</p>
@@ -145,7 +145,7 @@ var(L^T \hat{b}) = \sigma^2 \|l\|^2
 \end{bmatrix}
 \end{equation}</div>
 <p>where <span class="math">\(X\)</span> is a <span class="math">\(n \times p\)</span> matrix, <span class="math">\(D_1^T\)</span> is a <span class="math">\((p - m) \times p\)</span> matrix, <span class="math">\(W_1^T\)</span> a <span class="math">\(m \times p\)</span> matrix, and <span class="math">\(W_2^T\)</span> a <span class="math">\((n - m) \times p\)</span> matrix</p>
-<p>has rank <span class="math">\(p\)</span>. The columns of <span class="math">\({\widetilde{X}}^T\)</span> span <span class="math">\(\mathbb{R}^p\)</span>. The columns of the <span class="math">\(p \times p\)</span> matrix <span class="math">\(M^T = [W_1, D_1]\)</span> span the same space. Thus <span class="math">\(M\)</span> has rank <span class="math">\(p\)</span>; it is non-singular. For each <span class="math">\(z\)</span> in <span class="math">\(\chi\)</span> there is now a unique <span class="math">\(b\)</span> in <span class="math">\(\mathbb{R}^p\)</span> for which <span class="math">\(Xb = z\)</span> and <span class="math">\(D_1^T b = 0\)</span>:</p>
+<p>has rank <span class="math">\(p\)</span>. The columns of <span class="math">\({\widetilde{X}}^T\)</span> span <span class="math">\(\mathbb{R}^p\)</span>. The columns of the <span class="math">\(p \times p\)</span> matrix <span class="math">\(M^T = [W_1 D_1]\)</span> span the same space. Thus <span class="math">\(M\)</span> has rank <span class="math">\(p\)</span>; it is non-singular. For each <span class="math">\(z\)</span> in <span class="math">\(\chi\)</span> there is now a unique <span class="math">\(b\)</span> in <span class="math">\(\mathbb{R}^p\)</span> for which <span class="math">\(Xb = z\)</span> and <span class="math">\(D_1^T b = 0\)</span>:</p>
 <div class="math">\begin{equation}
 \widetilde{X}b
 = 
@@ -340,7 +340,7 @@ b = M^{-1} \binom{z_1}{0}
   },
   "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
   "url": "https://stathwang.github.io/overparametrized-linear-models.html",
-  "description": "I've seen many data scientists overlooking the importance of linear regressions. In this post, I Ranks, Subspaces, and Bases Suppose \(X = (x_1, x_2, \dots, x_p)\) is an \(n \times p\) matrix of rank \(m\), with \(m < p\). That is, the space \(\chi\) spanned by all the columns of \(X\) can …"
+  "description": "Surprisingly, quite a few data scientists overlook the importance of linear regression and the problem of overparametrization. In this post, I'm going to describe mathematically what it means for a model to be overparametrized and the general strategies used by a statistician to resolve non-uniqueness. Ranks, Subspaces, and Bases Suppose …"
 }
 </script></body>
 </html>
