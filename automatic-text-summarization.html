@@ -28,11 +28,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <meta name="author" content="Seong Hyun Hwang" />
-<meta name="description" content="a short background Automatic text summarization is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such …" />
+<meta name="description" content="Background Automatic text summarization is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such problem of …" />
 <meta name="keywords" content="text summarization, natural language processing, machine learning, r">
 <meta property="og:site_name" content="Seong Hyun Hwang"/>
 <meta property="og:title" content="Automatic Text Summarization"/>
-<meta property="og:description" content="a short background Automatic text summarization is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such …"/>
+<meta property="og:description" content="Background Automatic text summarization is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such problem of …"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://stathwang.github.io/automatic-text-summarization.html"/>
 <meta property="og:type" content="article"/>
@@ -84,16 +84,16 @@
     <p>Posted on September 10 2015 in <a href="https://stathwang.github.io/category/natural-language-processing.html">Natural Language Processing</a></p>
   </header>
   <div>
-    <p><strong>a short background</strong></p>
+    <h5>Background</h5>
 <p><a href="https://en.wikipedia.org/wiki/Automatic_summarization">Automatic text summarization</a> is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such problem of information overload becomes more salient with the exponential growth in the quantity of data, such as the online and offline articles, books, and newspapers, so has our interest in automatic text summarization to <em>reduce time and inefficiency of digesting them</em>. Automatic summarization reduces a text document using <a href="https://en.wikipedia.org/wiki/Natural_language_processing">natural language processing</a> to create a coherent, robust summary without loss of important ideas of the original document. I've decided to build a naive but powerful text summarization tool in R that feeds in and summarizes <a href="https://www.facebook.com/techcrunch">TechCrunch</a> and <a href="https://www.facebook.com/nytimes">The New York Times</a> articles from their respective Facebook pages.</p>
 <p>There are two major approaches to text summarization: one that is <em>extraction-based</em> and the other <em>abstraction-based</em>. I'll be focusing on the extractive method which works by selecting a subset of words, phrases or sentences that already exist in the original text to make the summary. On the other hand, the abstractive method try to form the summary by building words, phrases or sentences from scratch. The latter is much more complicated than the former, so much of the research has focused on the former.</p>
-<p><strong>the algorithm</strong></p>
+<h5>Algorithm</h5>
 <p>In extractive methods, culling key words, sentences, or paragraphs is very important. The naive algorithm I've written in R extracts the key sentence from each paragraph in the document. So if there are five paragraphs in an article, then the algorithm will return five key sentences as a summary. Why am I doing this? Well, I assume that each paragraph is <em>well-written</em>, meaning it contains one main idea and purpose. This is a pretty solid assumption in that the writers of news and blog articles want to make sure they convey their ideas succinctly and coherently. If their writings are sloppy and unclear, then the readers would get confused as to what they are trying to say. So for each paragraph, the algorithm computes a similarity score between any two sentences. The similarity score is roughly calculated as two times the number of words that overlap divided by the total number of words in two sentences:</p>
 <div class="math">\begin{equation*} 
 \dfrac{2 \times |Sentence_1 \cap Sentence_2|}{|Sentence_1| + |Sentence_2|}
 \end{equation*}</div>
 <p>where <span class="math">\(Sentence_1\)</span> represents a set of words in the first sentence and <span class="math">\(Sentence_2\)</span> a set of words in the second. The intuition is that we would split each sentence into words or tokens, count how many common words there are, and then normalize the result with the average length of the two sentences. This similarity function is called <a href="https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient">Dice coefficient</a>, but feel free to use other similarity metrics such as <em>Jaccard</em> and <em>Cosine similarity</em> or even <em>Euclidean distance</em>. Once we have a list of similarity scores for every sentence in a paragraph, we choose the sentence that have the highest sum of its similarity scores to be the key sentence of the paragraph.</p>
-<p><strong>the pseudocode</strong></p>
+<h5>Pseudocode</h5>
 <ol>
 <li>Split a text document into pre-existing paragraphs.</li>
 <li>Remove stopwords and non-alphanumeric characters in every sentence. Stem all words.</li>
@@ -108,7 +108,7 @@
 </li>
 </ol>
 <p>Of course this is not the foolproof method of summarizing text as there can be a lot of ways my naive text summarization algorithm can be adjusted and improved. For instance, the title contains words that are usually keywords from the text, so you can give more weight to those sentences that contain one or more of title keywords in the similarity function. You can also experiment with different similarity metrics as I've mentioned above or only return key sentences that have similarity scores above a certain heuristic cutoff. Also instead of picking one best sentence from each paragraph, try picking 2-3 important paragraphs.</p>
-<p><strong>the data and results</strong></p>
+<h5>Data and Results</h5>
 <p>Let's use this naive algorithm to summarize this <a href="http://techcrunch.com/2015/10/19/common-building-opening/">article</a> from the TechCrunch Facebook post. The article is summarized using sentences whose similarity scores exceed 1.</p>
 <blockquote>
 <p>Common, a co-living startup from General Assembly co-founder Brad Hargreaves, is unveiling its first building today in Brooklyn's Crown Heights. The Common opening comes at a time when venture-backed companies like WeWork are piling into co-living as a way to use urban residential space more cost-efficiently and to attract Millennials, who are delaying marriage and families later and later. Over the summer, Common partnered with a local New York City real estate developer to buy Crown Heights building earlier this year. "The whole idea here is to use common areas and activate typically under-utilized space," Hargreaves told me in a video tour via Skype. They're bringing in Common residents to the next one. About 250 people have applied for the 19 available Common spots so far in the neighborhood. They later fell out of favor as the American middle-class left for the suburbs in the mid-20th century, turning residential hotels into the housing choice of last resort for the poor left behind in the urban core. Unless low-rise, suburban areas ringing the urban core step up and add housing and unless cities start scrutinizing the higher-end of the market where external capital is sitting in vacant units as pure investment rather than shelter, there will be an extraordinary amount of pressure to make urban residential space more efficient. For now, Hargreaves is focused on New York City with two buildings slated for opening in Brooklyn.He has raised about $7.35 million from Maveron and other investors this year.</p>
@@ -290,7 +290,7 @@
   },
   "image": "http://www.gravatar.com/avatar/ea0e94239070aef9781e64fb53facf13?s=120&d=http%3A%2F%2Fwww.example.com%2Fdefault.jpg",
   "url": "https://stathwang.github.io/automatic-text-summarization.html",
-  "description": "a short background Automatic text summarization is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such …"
+  "description": "Background Automatic text summarization is an area of machine learning that has made significant progress over the past years. We read hundreds and thousands of articles either on our desktop, tablet, or mobile devices, and we simply don't have the time to peruse all of them. As such problem of …"
 }
 </script></body>
 </html>
